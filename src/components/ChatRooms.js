@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+// src/components/ChatRooms.js
+
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_CHAT_ROOMS_OF_USER } from "../graphql/queries";
 import ChatRoom from "./ChatRoom";
+import { useWebSocket } from "../context/WebSocketContext";
 
 const ChatRooms = ({ userId }) => {
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
@@ -9,6 +12,21 @@ const ChatRooms = ({ userId }) => {
   });
 
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
+  const [messages, setMessages] = useState({});
+  const { subscribeToChatRoom, connected } = useWebSocket();
+
+  useEffect(() => {
+    if (!data || !connected) return;
+
+    data.getChatRoomsOfUser.forEach((room) => {
+      subscribeToChatRoom(room.id, (receivedMessage) => {
+        setMessages((prevMessages) => ({
+          ...prevMessages,
+          [room.id]: [...(prevMessages[room.id] || []), receivedMessage],
+        }));
+      });
+    });
+  }, [data, connected, subscribeToChatRoom]);
 
   const handleChatRoomClick = (chatRoomId) => {
     setSelectedChatRoomId(chatRoomId);
@@ -34,7 +52,11 @@ const ChatRooms = ({ userId }) => {
       ))}
 
       {selectedChatRoomId && (
-        <ChatRoom key={selectedChatRoomId} chatRoomId={selectedChatRoomId} />
+        <ChatRoom
+          key={selectedChatRoomId}
+          chatRoomId={selectedChatRoomId}
+          messages={messages[selectedChatRoomId] || []}
+        />
       )}
     </div>
   );
