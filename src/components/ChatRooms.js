@@ -1,5 +1,3 @@
-// src/components/ChatRooms.js
-
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_CHAT_ROOMS_OF_USER } from "../graphql/queries";
@@ -18,8 +16,11 @@ const ChatRooms = ({ userId }) => {
   useEffect(() => {
     if (!data || !connected) return;
 
+    // Subscribe to each chat room and update messages state
     data.getChatRoomsOfUser.forEach((room) => {
       subscribeToChatRoom(room.id, (receivedMessage) => {
+        console.log("Received message:", receivedMessage); // Debug log
+
         setMessages((prevMessages) => ({
           ...prevMessages,
           [room.id]: [...(prevMessages[room.id] || []), receivedMessage],
@@ -55,7 +56,7 @@ const ChatRooms = ({ userId }) => {
         <ChatRoom
           key={selectedChatRoomId}
           chatRoomId={selectedChatRoomId}
-          messages={messages[selectedChatRoomId] || []}
+          initialMessages={messages[selectedChatRoomId] || []}
         />
       )}
     </div>
