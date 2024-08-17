@@ -11,20 +11,32 @@ const ChatRooms = ({ userId }) => {
 
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
   const [messages, setMessages] = useState({});
+  const [chatRooms, setChatRooms] = useState([]);
   const { subscribeToChatRoom, connected } = useWebSocket();
+
+  useEffect(() => {
+    if (data) {
+      setChatRooms(data.getChatRoomsOfUser);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (!data || !connected) return;
 
-    // Subscribe to each chat room and update messages state
     data.getChatRoomsOfUser.forEach((room) => {
       subscribeToChatRoom(room.id, (receivedMessage) => {
-        console.log("Received message:", receivedMessage); // Debug log
-
         setMessages((prevMessages) => ({
           ...prevMessages,
           [room.id]: [...(prevMessages[room.id] || []), receivedMessage],
         }));
+
+        setChatRooms((prevChatRooms) =>
+          prevChatRooms.map((chatRoom) =>
+            chatRoom.id === room.id
+              ? { ...chatRoom, latestMessage: receivedMessage }
+              : chatRoom
+          )
+        );
       });
     });
   }, [data, connected, subscribeToChatRoom]);
@@ -38,7 +50,7 @@ const ChatRooms = ({ userId }) => {
 
   return (
     <div className="chat-rooms">
-      {data.getChatRoomsOfUser.map((room) => (
+      {chatRooms.map((room) => (
         <div
           key={room.id}
           className="chat-room-tile"
