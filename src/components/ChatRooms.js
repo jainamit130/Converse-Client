@@ -1,14 +1,19 @@
+// src/components/ChatRooms.js
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_CHAT_ROOMS_OF_USER } from "../graphql/queries";
 import ChatRoom from "./ChatRoom";
 import { useWebSocket } from "../context/WebSocketContext";
+import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
-const ChatRooms = ({ userId }) => {
+const ChatRooms = () => {
+  const { userId } = useUser();
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
     variables: { userId },
   });
 
+  const navigate = useNavigate();
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
   const [messages, setMessages] = useState({});
   const [chatRooms, setChatRooms] = useState([]);
@@ -41,6 +46,10 @@ const ChatRooms = ({ userId }) => {
     });
   }, [data, connected, subscribeToChatRoom]);
 
+  const handleCreateGroup = () => {
+    navigate("/add-users");
+  };
+
   const handleChatRoomClick = (chatRoomId) => {
     setSelectedChatRoomId(chatRoomId);
   };
@@ -50,6 +59,10 @@ const ChatRooms = ({ userId }) => {
 
   return (
     <div className="chat-rooms">
+      <div>
+        <h1>Chat Rooms</h1>
+        <button onClick={handleCreateGroup}>+ Create Group</button>
+      </div>
       {chatRooms.map((room) => (
         <div
           key={room.id}

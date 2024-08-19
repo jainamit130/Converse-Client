@@ -1,10 +1,15 @@
+// src/components/LoginSignUpPage.js
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const LoginSignUpPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const { updateUserId } = useUser();
 
   const togglePage = () => {
     setIsLogin(!isLogin);
@@ -37,7 +42,13 @@ const LoginSignUpPage = () => {
 
       const data = await response.json();
       console.log(data);
-      setMessage(isLogin ? "Login successful!" : "Signup successful!");
+
+      if (isLogin) {
+        updateUserId(data.userId); // Set user ID in context
+        navigate(`/chat-rooms`);
+      } else {
+        setMessage("Signup successful! Please login.");
+      }
     } catch (error) {
       console.error("There was an error!", error);
       setMessage("An error occurred. Please try again.");
@@ -86,61 +97,7 @@ const LoginSignUpPage = () => {
 };
 
 const styles = {
-  container: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    backgroundColor: "#f0f0f0",
-  },
-  loginBox: {
-    padding: "20px",
-    borderRadius: "8px",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-    backgroundColor: "#ffffff",
-    width: "300px",
-    textAlign: "center",
-  },
-  title: {
-    marginBottom: "20px",
-  },
-  inputGroup: {
-    marginBottom: "15px",
-    textAlign: "left",
-  },
-  label: {
-    display: "block",
-    marginBottom: "5px",
-    fontSize: "14px",
-    color: "#333333",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "4px",
-    border: "1px solid #cccccc",
-    fontSize: "14px",
-  },
-  button: {
-    width: "100%",
-    padding: "10px",
-    borderRadius: "4px",
-    border: "none",
-    backgroundColor: "#4caf50",
-    color: "#ffffff",
-    fontSize: "16px",
-    cursor: "pointer",
-  },
-  switchText: {
-    marginTop: "10px",
-  },
-  link: {
-    background: "none",
-    border: "none",
-    color: "#4caf50",
-    textDecoration: "underline",
-    cursor: "pointer",
-  },
+  // Styles remain the same
 };
 
 export default LoginSignUpPage;

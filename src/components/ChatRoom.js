@@ -1,9 +1,12 @@
+// src/components/ChatRoom.js
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_MESSAGES_OF_CHAT_ROOM } from "../graphql/queries";
 import { useWebSocket } from "../context/WebSocketContext";
+import { useUser } from "../context/UserContext"; // Import the UserContext
 
 const ChatRoom = ({ chatRoomId, initialMessages = [] }) => {
+  const { userId } = useUser(); // Get the userId from context
   const { subscribeToChatRoom, sendMessage, connected } = useWebSocket();
   const [messages, setMessages] = useState(initialMessages);
 
@@ -35,10 +38,15 @@ const ChatRoom = ({ chatRoomId, initialMessages = [] }) => {
   }, [chatRoomId, subscribeToChatRoom, connected]);
 
   const handleSendMessage = (messageContent) => {
+    if (!userId) {
+      console.error("User ID is not available");
+      return;
+    }
+
     const newMessage = {
       id: `${Math.random()}`,
       content: messageContent,
-      senderId: "668bbb44d834f25303f35c39",
+      senderId: userId, // Use the userId from context
       chatRoomId,
       timestamp: new Date().toISOString(),
     };

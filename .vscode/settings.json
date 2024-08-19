@@ -2,6 +2,20 @@
     "files.associations": {
         "vector": "cpp",
         "utility": "cpp",
-        "ostream": "cpp"
-    }
+        "ostream": "cpp",
+        "iostream": "cpp",
+        "xstring": "cpp",
+        "unordered_map": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp",
+        "xutility": "cpp",
+        "deque": "cpp",
+        "format": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "algorithm": "cpp",
+        "iterator": "cpp",
+        "xmemory": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
 }
