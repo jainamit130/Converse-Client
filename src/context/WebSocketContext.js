@@ -31,6 +31,12 @@ export const WebSocketProvider = ({ children }) => {
     };
   }, []);
 
+  const subscribeToUser = (userId, callback) => {
+    stompClient.subscribe(`/topic/user/${userId}`, (message) => {
+      callback(JSON.parse(message.body));
+    });
+  };
+
   const subscribeToChatRoom = (chatRoomId, callback) => {
     if (!stompClient || !connected) {
       console.warn("WebSocket not connected yet");
@@ -74,7 +80,7 @@ export const WebSocketProvider = ({ children }) => {
 
   return (
     <WebSocketContext.Provider
-      value={{ subscribeToChatRoom, sendMessage, connected }}
+      value={{ subscribeToChatRoom, subscribeToUser, sendMessage, connected }}
     >
       {children}
     </WebSocketContext.Provider>

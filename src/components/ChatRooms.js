@@ -1,4 +1,3 @@
-// src/components/ChatRooms.js
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_CHAT_ROOMS_OF_USER } from "../graphql/queries";
@@ -17,7 +16,7 @@ const ChatRooms = () => {
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
   const [messages, setMessages] = useState({});
   const [chatRooms, setChatRooms] = useState([]);
-  const { subscribeToChatRoom, connected } = useWebSocket();
+  const { subscribeToChatRoom, subscribeToUser, connected } = useWebSocket();
 
   useEffect(() => {
     if (data) {
@@ -28,6 +27,7 @@ const ChatRooms = () => {
   useEffect(() => {
     if (!data || !connected) return;
 
+    // Subscribe to all chat rooms for receiving messages
     data.getChatRoomsOfUser.forEach((room) => {
       subscribeToChatRoom(room.id, (receivedMessage) => {
         setMessages((prevMessages) => ({
@@ -44,7 +44,12 @@ const ChatRooms = () => {
         );
       });
     });
-  }, [data, connected, subscribeToChatRoom]);
+
+    // Subscribe to the user-specific topic for receiving new chat rooms
+    subscribeToUser(userId, (newChatRoom) => {
+      setChatRooms((prevChatRooms) => [...prevChatRooms, newChatRoom]);
+    });
+  }, [data, connected, subscribeToChatRoom, subscribeToUser, userId]);
 
   const handleCreateGroup = () => {
     navigate("/add-users");

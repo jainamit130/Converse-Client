@@ -45,22 +45,11 @@ const AddUser = () => {
     axios
       .post("http://localhost:8080/chat/groups/create", {
         groupName: groupName,
+        members: selectedUserIds,
       })
-      .then((response) => {
-        const chatRoomId = response.data.id; // Assume the response contains the new chat room ID
-
-        // Then add selected users to the group
-        axios
-          .post(`http://localhost:8080/chat/groups/add/${chatRoomId}`, {
-            memberIds: selectedUserIds,
-          })
-          .then(() => {
-            alert("Group created and users added successfully");
-            navigate("/chat-rooms"); // Redirect to chat rooms page
-          })
-          .catch((error) =>
-            console.error("Error adding users to group:", error)
-          );
+      .then(() => {
+        alert("Group created and users added successfully");
+        navigate("/chat-rooms"); // Redirect to chat rooms page
       })
       .catch((error) => console.error("Error creating group:", error));
   };
