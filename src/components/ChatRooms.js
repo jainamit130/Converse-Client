@@ -45,14 +45,13 @@ const ChatRooms = () => {
       });
     });
 
-    // Subscribe to the user-specific topic for receiving new chat rooms
     subscribeToUser(userId, (newChatRoom) => {
       setChatRooms((prevChatRooms) => [...prevChatRooms, newChatRoom]);
     });
   }, [data, connected, subscribeToChatRoom, subscribeToUser, userId]);
 
   const handleCreateGroup = () => {
-    navigate("/add-users");
+    navigate(`/add-users?userId=${userId}`);
   };
 
   const handleChatRoomClick = (chatRoomId) => {

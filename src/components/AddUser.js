@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const AddUser = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const creatorId = queryParams.get("userId");
+
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [selectedUserIds, setSelectedUserIds] = useState([creatorId]);
   const [groupName, setGroupName] = useState("");
   const navigate = useNavigate();
 
@@ -48,7 +52,6 @@ const AddUser = () => {
         members: selectedUserIds,
       })
       .then(() => {
-        alert("Group created and users added successfully");
         navigate("/chat-rooms"); // Redirect to chat rooms page
       })
       .catch((error) => console.error("Error creating group:", error));
@@ -75,17 +78,20 @@ const AddUser = () => {
         <button onClick={handleSearch}>Search</button>
       </div>
       <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            <input
-              type="checkbox"
-              checked={selectedUserIds.includes(user.id)}
-              onChange={() => handleSelectUser(user)}
-            />
-            {user.username}
-          </li>
-        ))}
+        {users
+          .filter((user) => user.id !== creatorId)
+          .map((user) => (
+            <li key={user.id}>
+              <input
+                type="checkbox"
+                checked={selectedUserIds.includes(user.id)}
+                onChange={() => handleSelectUser(user)}
+              />
+              {user.username}
+            </li>
+          ))}
       </ul>
+
       <h2>Selected Users:</h2>
       <ul>
         {selectedUsers.map((user) => (

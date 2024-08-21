@@ -46,7 +46,7 @@ const ChatRoom = ({ chatRoomId, initialMessages = [] }) => {
     const newMessage = {
       id: `${Math.random()}`,
       content: messageContent,
-      senderId: userId, // Use the userId from context
+      senderId: userId,
       chatRoomId,
       timestamp: new Date().toISOString(),
     };
