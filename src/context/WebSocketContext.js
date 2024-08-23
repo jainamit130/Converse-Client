@@ -22,6 +22,22 @@ export const WebSocketProvider = ({ children }) => {
     client.connect({}, () => {
       setStompClient(client);
       setConnected(true);
+
+      // Re-subscribe to all stored subscriptions when reconnecting
+      Object.keys(subscriptions.current).forEach((chatRoomId) => {
+        const subscriptionData = subscriptions.current[chatRoomId];
+        if (!subscriptionData.unsubscribe) {
+          const subscription = client.subscribe(
+            `/topic/chat/${chatRoomId}`,
+            (message) => {
+              subscriptionData.callbacks.forEach((callback) =>
+                callback(JSON.parse(message.body))
+              );
+            }
+          );
+          subscriptionData.unsubscribe = () => subscription.unsubscribe();
+        }
+      });
     });
 
     return () => {
@@ -32,9 +48,11 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   const subscribeToUser = (userId, callback) => {
-    stompClient.subscribe(`/topic/user/${userId}`, (message) => {
-      callback(JSON.parse(message.body));
-    });
+    if (stompClient && connected) {
+      stompClient.subscribe(`/topic/user/${userId}`, (message) => {
+        callback(JSON.parse(message.body));
+      });
+    }
   };
 
   const subscribeToChatRoom = (chatRoomId, callback) => {
@@ -45,27 +63,32 @@ export const WebSocketProvider = ({ children }) => {
 
     if (!subscriptions.current[chatRoomId]) {
       subscriptions.current[chatRoomId] = {
-        count: 0,
+        callbacks: [],
         unsubscribe: null,
       };
     }
 
     const subscriptionData = subscriptions.current[chatRoomId];
-    subscriptionData.count += 1;
+    subscriptionData.callbacks.push(callback);
 
     if (!subscriptionData.unsubscribe) {
       const subscription = stompClient.subscribe(
         `/topic/chat/${chatRoomId}`,
         (message) => {
-          callback(JSON.parse(message.body));
+          subscriptionData.callbacks.forEach((cb) =>
+            cb(JSON.parse(message.body))
+          );
         }
       );
       subscriptionData.unsubscribe = () => subscription.unsubscribe();
     }
 
     return () => {
-      subscriptionData.count -= 1;
-      if (subscriptionData.count === 0) {
+      // Remove callback on unsubscription
+      subscriptionData.callbacks = subscriptionData.callbacks.filter(
+        (cb) => cb !== callback
+      );
+      if (subscriptionData.callbacks.length === 0) {
         subscriptionData.unsubscribe();
         subscriptionData.unsubscribe = null;
       }
