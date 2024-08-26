@@ -13,11 +13,15 @@ const AddUser = () => {
   const [selectedUserIds, setSelectedUserIds] = useState([creatorId]);
   const [groupName, setGroupName] = useState("");
   const navigate = useNavigate();
+  const token = localStorage.getItem("authenticationToken");
 
   useEffect(() => {
-    // Fetch users on component mount
     axios
-      .get("http://localhost:8080/converse/users/getUsers")
+      .get("http://localhost:8080/converse/users/getUsers", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Set Bearer token in Authorization header
+        },
+      })
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
@@ -47,12 +51,20 @@ const AddUser = () => {
   const handleSubmit = () => {
     // First create the group
     axios
-      .post("http://localhost:8080/chat/groups/create", {
-        groupName: groupName,
-        members: selectedUserIds,
-      })
+      .post(
+        "http://localhost:8080/chat/groups/create",
+        {
+          groupName: groupName,
+          members: selectedUserIds,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then(() => {
-        navigate("/chat-rooms"); // Redirect to chat rooms page
+        navigate("/chat-rooms");
       })
       .catch((error) => console.error("Error creating group:", error));
   };

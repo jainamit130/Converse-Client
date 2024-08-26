@@ -1,52 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_CHAT_ROOMS_OF_USER } from "../graphql/queries";
-import ChatRoom from "./ChatRoom";
 import { useWebSocket } from "../context/WebSocketContext";
+import ChatRoom from "./ChatRoom";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
+import { useChatRoom } from "../context/ChatRoomContext";
 
 const ChatRooms = () => {
   const { userId } = useUser();
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
     variables: { userId },
   });
-
+  const { chatRooms, messages, addMessageToRoom, mergeChatRooms } =
+    useChatRoom();
   const navigate = useNavigate();
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
-  const [messages, setMessages] = useState({});
-  const [chatRooms, setChatRooms] = useState([]);
   const { subscribeToChatRoom, subscribeToUser, connected } = useWebSocket();
 
+  // Syncing the data fetched from the query with the global state
   useEffect(() => {
     if (data) {
-      setChatRooms(data.getChatRoomsOfUser);
+      mergeChatRooms(data.getChatRoomsOfUser); // Merge with global state
     }
   }, [data]);
 
+  // Subscribing to WebSocket events and handling new messages or rooms
   useEffect(() => {
     if (!data || !connected) return;
 
-    // Subscribe to all chat rooms for receiving messages
-    data.getChatRoomsOfUser.forEach((room) => {
-      subscribeToChatRoom(room.id, (receivedMessage) => {
-        setMessages((prevMessages) => ({
-          ...prevMessages,
-          [room.id]: [...(prevMessages[room.id] || []), receivedMessage],
-        }));
-
-        setChatRooms((prevChatRooms) =>
-          prevChatRooms.map((chatRoom) =>
-            chatRoom.id === room.id
-              ? { ...chatRoom, latestMessage: receivedMessage }
-              : chatRoom
-          )
-        );
-      });
+    // Subscribe to new chat rooms for the user
+    subscribeToUser(userId, (newChatRoom) => {
+      mergeChatRooms([newChatRoom]); // Use the merging function to add new rooms
     });
 
-    subscribeToUser(userId, (newChatRoom) => {
-      setChatRooms((prevChatRooms) => [...prevChatRooms, newChatRoom]);
+    // Subscribe to each chat room
+    chatRooms.forEach((room) => {
+      subscribeToChatRoom(room.id, (receivedMessage) => {
+        addMessageToRoom(room.id, receivedMessage);
+      });
     });
   }, [data, connected, subscribeToChatRoom, subscribeToUser, userId]);
 

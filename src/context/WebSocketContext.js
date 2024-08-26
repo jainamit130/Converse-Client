@@ -16,28 +16,13 @@ export const WebSocketProvider = ({ children }) => {
   const subscriptions = useRef({});
 
   useEffect(() => {
-    const socket = new SockJS("http://localhost:8080/ws");
+    const token = localStorage.getItem("authenticationToken");
+    const socket = new SockJS(`http://localhost:8080/ws?token=${token}`);
     const client = Stomp.over(socket);
 
     client.connect({}, () => {
       setStompClient(client);
       setConnected(true);
-
-      // Re-subscribe to all stored subscriptions when reconnecting
-      Object.keys(subscriptions.current).forEach((chatRoomId) => {
-        const subscriptionData = subscriptions.current[chatRoomId];
-        if (!subscriptionData.unsubscribe) {
-          const subscription = client.subscribe(
-            `/topic/chat/${chatRoomId}`,
-            (message) => {
-              subscriptionData.callbacks.forEach((callback) =>
-                callback(JSON.parse(message.body))
-              );
-            }
-          );
-          subscriptionData.unsubscribe = () => subscription.unsubscribe();
-        }
-      });
     });
 
     return () => {
@@ -63,32 +48,28 @@ export const WebSocketProvider = ({ children }) => {
 
     if (!subscriptions.current[chatRoomId]) {
       subscriptions.current[chatRoomId] = {
-        callbacks: [],
+        count: 0,
         unsubscribe: null,
       };
     }
 
     const subscriptionData = subscriptions.current[chatRoomId];
-    subscriptionData.callbacks.push(callback);
+    subscriptionData.count += 1;
 
     if (!subscriptionData.unsubscribe) {
       const subscription = stompClient.subscribe(
         `/topic/chat/${chatRoomId}`,
         (message) => {
-          subscriptionData.callbacks.forEach((cb) =>
-            cb(JSON.parse(message.body))
-          );
+          console.log("WebSocket message received:", message); // Debug log
+          callback(JSON.parse(message.body));
         }
       );
       subscriptionData.unsubscribe = () => subscription.unsubscribe();
     }
 
     return () => {
-      // Remove callback on unsubscription
-      subscriptionData.callbacks = subscriptionData.callbacks.filter(
-        (cb) => cb !== callback
-      );
-      if (subscriptionData.callbacks.length === 0) {
+      subscriptionData.count -= 1;
+      if (subscriptionData.count === 0) {
         subscriptionData.unsubscribe();
         subscriptionData.unsubscribe = null;
       }
@@ -103,7 +84,7 @@ export const WebSocketProvider = ({ children }) => {
 
   return (
     <WebSocketContext.Provider
-      value={{ subscribeToChatRoom, subscribeToUser, sendMessage, connected }}
+      value={{ subscribeToChatRoom, sendMessage, subscribeToUser, connected }}
     >
       {children}
     </WebSocketContext.Provider>

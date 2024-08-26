@@ -43,6 +43,13 @@ const LoginSignUpPage = () => {
       const data = await response.json();
       console.log(data);
 
+      const { userId, username, authenticationToken, refreshToken } = data;
+
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("username", username);
+      localStorage.setItem("authenticationToken", authenticationToken);
+      localStorage.setItem("refreshToken", refreshToken);
+
       if (isLogin) {
         updateUserId(data.userId); // Set user ID in context
         navigate(`/chat-rooms`);

@@ -1,41 +1,36 @@
-// src/components/ChatRoom.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_MESSAGES_OF_CHAT_ROOM } from "../graphql/queries";
 import { useWebSocket } from "../context/WebSocketContext";
-import { useUser } from "../context/UserContext"; // Import the UserContext
+import { useUser } from "../context/UserContext";
+import { useChatRoom } from "../context/ChatRoomContext";
 
-const ChatRoom = ({ chatRoomId, initialMessages = [] }) => {
-  const { userId } = useUser(); // Get the userId from context
-  const { subscribeToChatRoom, sendMessage, connected } = useWebSocket();
-  const [messages, setMessages] = useState(initialMessages);
+const ChatRoom = ({ chatRoomId }) => {
+  const { userId } = useUser();
+  const { subscribeToChatRoom, subscribeToUser, sendMessage, connected } =
+    useWebSocket();
+  const { chatRooms, messages, addMessageToRoom, mergeChatRooms } =
+    useChatRoom();
+
+  const sentMessages = useRef(new Set());
+
+  useEffect(() => {
+    const unsubscribe = subscribeToChatRoom(chatRoomId, (message) => {
+      if (!sentMessages.current.has(message.id)) {
+        addMessageToRoom(chatRoomId, message);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [chatRoomId, subscribeToChatRoom]);
 
   const { loading, error, data } = useQuery(GET_MESSAGES_OF_CHAT_ROOM, {
     variables: { chatRoomId },
     skip: !connected,
     fetchPolicy: "network-only",
   });
-
-  useEffect(() => {
-    setMessages((prevMessages) => {
-      const newMessages = initialMessages.filter(
-        (msg) => !prevMessages.some((prevMsg) => prevMsg.id === msg.id)
-      );
-      return [...prevMessages, ...newMessages];
-    });
-  }, [initialMessages]);
-
-  useEffect(() => {
-    if (!connected) return;
-
-    const unsubscribe = subscribeToChatRoom(chatRoomId, (receivedMessage) => {
-      setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-    });
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, [chatRoomId, subscribeToChatRoom, connected]);
 
   const handleSendMessage = (messageContent) => {
     if (!userId) {
@@ -51,22 +46,36 @@ const ChatRoom = ({ chatRoomId, initialMessages = [] }) => {
       timestamp: new Date().toISOString(),
     };
 
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    sentMessages.current.add(newMessage.id);
 
-    sendMessage(`/app/chat/sendMessage/${chatRoomId}`, newMessage);
+    if (sendMessage) {
+      sendMessage(`/app/chat/sendMessage/${chatRoomId}`, newMessage);
+    } else {
+      console.error("WebSocket not connected, unable to send message");
+    }
   };
 
   useEffect(() => {
-    if (data) {
-      const { getMessagesOfChatRoom: chatMessages } = data;
-      setMessages((prevMessages) => {
-        const newMessages = chatMessages.filter(
-          (msg) => !prevMessages.some((prevMsg) => prevMsg.id === msg.id)
-        );
-        return [...prevMessages, ...newMessages];
+    if (!data || !connected) return;
+
+    subscribeToUser(userId, (newChatRoom) => {
+      mergeChatRooms([newChatRoom]);
+    });
+
+    chatRooms.forEach((room) => {
+      subscribeToChatRoom(room.id, (receivedMessage) => {
+        addMessageToRoom(room.id, receivedMessage);
       });
-    }
-  }, [data]);
+    });
+  }, [data, connected, subscribeToChatRoom, subscribeToUser, userId]);
+
+  useEffect(() => {
+    if (!data || !connected) return;
+
+    const { getMessagesOfChatRoom: chatMessages } = data;
+
+    addMessageToRoom(chatRoomId, chatMessages);
+  }, [data, connected, addMessageToRoom, chatRoomId]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -97,6 +106,7 @@ const ChatRoom = ({ chatRoomId, initialMessages = [] }) => {
           type="text"
           name="messageContent"
           placeholder="Type your message..."
+          required
         />
         <button type="submit">Send</button>
       </form>
