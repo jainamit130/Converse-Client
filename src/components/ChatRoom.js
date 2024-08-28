@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_MESSAGES_OF_CHAT_ROOM } from "../graphql/queries";
 import { useWebSocket } from "../context/WebSocketContext";
@@ -7,24 +7,16 @@ import { useChatRoom } from "../context/ChatRoomContext";
 
 const ChatRoom = ({ chatRoomId }) => {
   const { userId } = useUser();
-  const { subscribeToChatRoom, subscribeToUser, sendMessage, connected } =
-    useWebSocket();
-  const { chatRooms, messages, addMessageToRoom, mergeChatRooms } =
-    useChatRoom();
+  const { sendMessage, connected } = useWebSocket();
+  const { messages, addMessageToRoom } = useChatRoom();
 
-  const sentMessages = useRef(new Set());
+  const [chatRoomMessages, setChatRoomMessages] = useState(
+    messages[chatRoomId] || []
+  );
 
   useEffect(() => {
-    const unsubscribe = subscribeToChatRoom(chatRoomId, (message) => {
-      if (!sentMessages.current.has(message.id)) {
-        addMessageToRoom(chatRoomId, message);
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [chatRoomId, subscribeToChatRoom]);
+    setChatRoomMessages(messages[chatRoomId] || []);
+  }, [messages[chatRoomId]]);
 
   const { loading, error, data } = useQuery(GET_MESSAGES_OF_CHAT_ROOM, {
     variables: { chatRoomId },
@@ -46,8 +38,6 @@ const ChatRoom = ({ chatRoomId }) => {
       timestamp: new Date().toISOString(),
     };
 
-    sentMessages.current.add(newMessage.id);
-
     if (sendMessage) {
       sendMessage(`/app/chat/sendMessage/${chatRoomId}`, newMessage);
     } else {
@@ -58,24 +48,13 @@ const ChatRoom = ({ chatRoomId }) => {
   useEffect(() => {
     if (!data || !connected) return;
 
-    subscribeToUser(userId, (newChatRoom) => {
-      mergeChatRooms([newChatRoom]);
-    });
+    // Add messages to the room at the start
+    data.getMessagesOfChatRoom.forEach((chatMessage) =>
+      addMessageToRoom(chatRoomId, chatMessage, true)
+    );
 
-    chatRooms.forEach((room) => {
-      subscribeToChatRoom(room.id, (receivedMessage) => {
-        addMessageToRoom(room.id, receivedMessage);
-      });
-    });
-  }, [data, connected, subscribeToChatRoom, subscribeToUser, userId]);
-
-  useEffect(() => {
-    if (!data || !connected) return;
-
-    const { getMessagesOfChatRoom: chatMessages } = data;
-
-    addMessageToRoom(chatRoomId, chatMessages);
-  }, [data, connected, addMessageToRoom, chatRoomId]);
+    // Any additional logic can follow here
+  }, [data, connected, chatRoomId, chatRoomMessages, addMessageToRoom]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -84,8 +63,8 @@ const ChatRoom = ({ chatRoomId }) => {
     <div>
       <h2>Chat Room: {chatRoomId}</h2>
       <div>
-        {messages && messages.length > 0 ? (
-          messages.map((message) => (
+        {chatRoomMessages && chatRoomMessages.length > 0 ? (
+          chatRoomMessages.map((message) => (
             <div key={message.id}>
               <p>{message.content}</p>
             </div>

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 
 const ChatRoomContext = createContext();
 
@@ -6,48 +6,59 @@ export const ChatRoomProvider = ({ children }) => {
   const [chatRooms, setChatRooms] = useState([]);
   const [messages, setMessages] = useState({});
 
-  // Function to merge new chat rooms or update existing ones
-  const mergeChatRooms = (newChatRooms) => {
+  const mergeChatRooms = useCallback((newChatRooms) => {
+    const chatRoomsArray = Array.isArray(newChatRooms)
+      ? newChatRooms
+      : [newChatRooms];
+
     setChatRooms((prevChatRooms) => {
       const updatedRooms = [...prevChatRooms];
 
-      newChatRooms.forEach((newRoom) => {
+      chatRoomsArray.forEach((newRoom) => {
         const existingRoomIndex = updatedRooms.findIndex(
           (room) => room.id === newRoom.id
         );
 
         if (existingRoomIndex !== -1) {
-          // Update existing chat room
           updatedRooms[existingRoomIndex] = {
             ...updatedRooms[existingRoomIndex],
             ...newRoom,
           };
         } else {
-          // Add new chat room
           updatedRooms.push(newRoom);
         }
       });
 
       return updatedRooms;
     });
-  };
+  }, []);
 
-  // Function to update messages for a specific chat room
-  const addMessageToRoom = (chatRoomId, message) => {
-    setMessages((prevMessages) => ({
-      ...prevMessages,
-      [chatRoomId]: [...(prevMessages[chatRoomId] || []), message],
-    }));
+  const addMessageToRoom = useCallback((chatRoomId, message, base = false) => {
+    setMessages((prevMessages) => {
+      const currentMessages = prevMessages[chatRoomId] || [];
 
-    // Update the latest message in the chat rooms
-    setChatRooms((prevChatRooms) =>
-      prevChatRooms.map((chatRoom) =>
-        chatRoom.id === chatRoomId
-          ? { ...chatRoom, latestMessage: message }
-          : chatRoom
-      )
-    );
-  };
+      const messageExists = currentMessages.some(
+        (msg) => msg.id === message.id
+      );
+
+      if (messageExists) return prevMessages;
+
+      const updatedMessages = {
+        ...prevMessages,
+        [chatRoomId]: [...currentMessages, message],
+      };
+
+      if (base) {
+        const { [chatRoomId]: updatedRoom, ...rest } = updatedMessages;
+        return {
+          [chatRoomId]: updatedRoom,
+          ...rest,
+        };
+      }
+
+      return updatedMessages;
+    });
+  }, []);
 
   return (
     <ChatRoomContext.Provider

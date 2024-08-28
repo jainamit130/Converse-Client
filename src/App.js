@@ -13,9 +13,9 @@ import { ChatRoomProvider } from "./context/ChatRoomContext";
 function App() {
   return (
     <ApolloProvider client={client}>
-      <WebSocketProvider>
-        <UserProvider>
-          <ChatRoomProvider>
+      <UserProvider>
+        <ChatRoomProvider>
+          <WebSocketProvider>
             {" "}
             {/* Wrap ChatRoomProvider */}
             <Router>
@@ -25,9 +25,9 @@ function App() {
                 <Route path="/add-users" element={<AddUser />} />
               </Routes>
             </Router>
-          </ChatRoomProvider>
-        </UserProvider>
-      </WebSocketProvider>
+          </WebSocketProvider>
+        </ChatRoomProvider>
+      </UserProvider>
     </ApolloProvider>
   );
 }

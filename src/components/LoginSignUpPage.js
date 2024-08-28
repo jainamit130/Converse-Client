@@ -41,7 +41,6 @@ const LoginSignUpPage = () => {
       }
 
       const data = await response.json();
-      console.log(data);
 
       const { userId, username, authenticationToken, refreshToken } = data;
 

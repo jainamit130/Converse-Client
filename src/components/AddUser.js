@@ -26,7 +26,6 @@ const AddUser = () => {
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
 
-  // Search handler
   const handleSearch = () => {
     axios
       .get(`http://localhost:8080/converse/users/search?q=${searchTerm}`)
@@ -34,22 +33,17 @@ const AddUser = () => {
       .catch((error) => console.error("Error searching users:", error));
   };
 
-  // Handle user selection
   const handleSelectUser = (user) => {
     if (selectedUserIds.includes(user.id)) {
-      // Deselect user
       setSelectedUserIds(selectedUserIds.filter((id) => id !== user.id));
       setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
     } else {
-      // Select user
       setSelectedUserIds([...selectedUserIds, user.id]);
       setSelectedUsers([...selectedUsers, user]);
     }
   };
 
-  // Handle group creation and user addition
   const handleSubmit = () => {
-    // First create the group
     axios
       .post(
         "http://localhost:8080/chat/groups/create",
