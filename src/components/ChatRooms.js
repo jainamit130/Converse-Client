@@ -5,7 +5,6 @@ import ChatRoom from "./ChatRoom";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useChatRoom } from "../context/ChatRoomContext";
-import { useWebSocket } from "../context/WebSocketContext";
 
 const ChatRooms = () => {
   const { userId } = useUser();
@@ -13,9 +12,9 @@ const ChatRooms = () => {
     variables: { userId },
   });
   const { chatRooms, messages, mergeChatRooms } = useChatRoom();
-  const { subscribeToUser, subscribeToChatRoom } = useWebSocket();
   const navigate = useNavigate();
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
+  const [selectedChatRoomName, setSelectedChatRoomName] = useState(null);
 
   useEffect(() => {
     if (data) {
@@ -27,7 +26,8 @@ const ChatRooms = () => {
     navigate(`/add-users?userId=${userId}`);
   };
 
-  const handleChatRoomClick = (chatRoomId) => {
+  const handleChatRoomClick = (chatRoomId, chatRoomName) => {
+    setSelectedChatRoomName(chatRoomName);
     setSelectedChatRoomId(chatRoomId);
   };
 
@@ -40,11 +40,11 @@ const ChatRooms = () => {
         <h1>Chat Rooms</h1>
         <button onClick={handleCreateGroup}>+ Create Group</button>
       </div>
-      {chatRooms.map((room) => (
+      {Array.from(chatRooms.values()).map((room) => (
         <div
           key={room.id}
           className="chat-room-tile"
-          onClick={() => handleChatRoomClick(room.id)}
+          onClick={() => handleChatRoomClick(room.id, room.name)}
         >
           <h3>{room.name}</h3>
           <p>{room.latestMessage?.content || "No messages yet"}</p>
@@ -58,6 +58,7 @@ const ChatRooms = () => {
         <ChatRoom
           key={selectedChatRoomId}
           chatRoomId={selectedChatRoomId}
+          chatRoomName={selectedChatRoomName}
           initialMessages={messages[selectedChatRoomId] || []}
         />
       )}

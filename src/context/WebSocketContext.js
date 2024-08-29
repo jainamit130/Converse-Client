@@ -82,14 +82,22 @@ export const WebSocketProvider = ({ children }) => {
         (message) => {
           const parsedMessage = JSON.parse(message.body);
           addMessageToRoom(chatRoomId, parsedMessage);
+          setChatRooms((prevChatRooms) => {
+            const updatedRooms = new Map(prevChatRooms);
 
-          setChatRooms((prevChatRooms) =>
-            prevChatRooms.map((room) =>
-              chatRoomId === room.id
-                ? { ...room, latestMessage: parsedMessage }
-                : room
-            )
-          );
+            const existingRoom = updatedRooms.get(chatRoomId);
+
+            if (existingRoom) {
+              const updatedRoom = {
+                ...existingRoom,
+                latestMessage: parsedMessage,
+              };
+
+              updatedRooms.set(chatRoomId, updatedRoom);
+            }
+
+            return updatedRooms;
+          });
         }
       );
 

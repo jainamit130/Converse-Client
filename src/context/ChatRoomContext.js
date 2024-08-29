@@ -3,7 +3,7 @@ import React, { createContext, useCallback, useContext, useState } from "react";
 const ChatRoomContext = createContext();
 
 export const ChatRoomProvider = ({ children }) => {
-  const [chatRooms, setChatRooms] = useState([]);
+  const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState({});
 
   const mergeChatRooms = useCallback((newChatRooms) => {
@@ -12,20 +12,17 @@ export const ChatRoomProvider = ({ children }) => {
       : [newChatRooms];
 
     setChatRooms((prevChatRooms) => {
-      const updatedRooms = [...prevChatRooms];
+      const updatedRooms = new Map(prevChatRooms); // Convert previous state to a Map
 
       chatRoomsArray.forEach((newRoom) => {
-        const existingRoomIndex = updatedRooms.findIndex(
-          (room) => room.id === newRoom.id
-        );
+        const existingRoom = updatedRooms.get(newRoom.id);
 
-        if (existingRoomIndex !== -1) {
-          updatedRooms[existingRoomIndex] = {
-            ...updatedRooms[existingRoomIndex],
-            ...newRoom,
-          };
+        if (existingRoom) {
+          // Merge the existing room with the new data
+          updatedRooms.set(newRoom.id, { ...existingRoom, ...newRoom });
         } else {
-          updatedRooms.push(newRoom);
+          // Add the new room if it doesn't exist
+          updatedRooms.set(newRoom.id, newRoom);
         }
       });
 

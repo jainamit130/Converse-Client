@@ -5,10 +5,10 @@ import { useWebSocket } from "../context/WebSocketContext";
 import { useUser } from "../context/UserContext";
 import { useChatRoom } from "../context/ChatRoomContext";
 
-const ChatRoom = ({ chatRoomId }) => {
+const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   const { userId } = useUser();
   const { sendMessage, connected } = useWebSocket();
-  const { messages, addMessageToRoom } = useChatRoom();
+  const { messages, addMessageToRoom, chatRooms } = useChatRoom();
 
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
@@ -48,12 +48,9 @@ const ChatRoom = ({ chatRoomId }) => {
   useEffect(() => {
     if (!data || !connected) return;
 
-    // Add messages to the room at the start
     data.getMessagesOfChatRoom.forEach((chatMessage) =>
       addMessageToRoom(chatRoomId, chatMessage, true)
     );
-
-    // Any additional logic can follow here
   }, [data, connected, chatRoomId, chatRoomMessages, addMessageToRoom]);
 
   if (loading) return <p>Loading...</p>;
@@ -61,7 +58,7 @@ const ChatRoom = ({ chatRoomId }) => {
 
   return (
     <div>
-      <h2>Chat Room: {chatRoomId}</h2>
+      <h2>Chat Room: {chatRoomName}</h2>
       <div>
         {chatRoomMessages && chatRoomMessages.length > 0 ? (
           chatRoomMessages.map((message) => (
