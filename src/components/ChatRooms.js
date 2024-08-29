@@ -5,6 +5,7 @@ import ChatRoom from "./ChatRoom";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useChatRoom } from "../context/ChatRoomContext";
+import "./ChatRooms.css";
 
 const ChatRooms = () => {
   const { userId } = useUser();
@@ -35,33 +36,41 @@ const ChatRooms = () => {
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div className="chat-rooms">
-      <div>
-        <h1>Chat Rooms</h1>
-        <button onClick={handleCreateGroup}>+ Create Group</button>
-      </div>
-      {Array.from(chatRooms.values()).map((room) => (
-        <div
-          key={room.id}
-          className="chat-room-tile"
-          onClick={() => handleChatRoomClick(room.id, room.name)}
-        >
-          <h3>{room.name}</h3>
-          <p>{room.latestMessage?.content || "No messages yet"}</p>
-          <p>
-            <small>{new Date(room.createdAt).toLocaleString()}</small>
-          </p>
+    <div className="chat-layout">
+      <div className="chat-rooms-sidebar">
+        <div className="sidebar-header">
+          <h2>Chats</h2>
+          <button onClick={handleCreateGroup}>+ Create Group</button>
         </div>
-      ))}
+        <div className="chat-room-list">
+          {Array.from(chatRooms.values()).map((room) => (
+            <div
+              key={room.id}
+              className="chat-room-tile"
+              onClick={() => handleChatRoomClick(room.id, room.name)}
+            >
+              <h3>{room.name}</h3>
+              <p>{room.latestMessage?.content || "No messages yet"}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
-      {selectedChatRoomId && (
-        <ChatRoom
-          key={selectedChatRoomId}
-          chatRoomId={selectedChatRoomId}
-          chatRoomName={selectedChatRoomName}
-          initialMessages={messages[selectedChatRoomId] || []}
-        />
-      )}
+      <div className="chat-section">
+        {!selectedChatRoomId ? (
+          <div className="chat-header">
+            <h2>Converse Made by Amit</h2>
+            <p>Open any chat to see messages here</p>
+          </div>
+        ) : (
+          <ChatRoom
+            key={selectedChatRoomId}
+            chatRoomId={selectedChatRoomId}
+            chatRoomName={selectedChatRoomName}
+            initialMessages={messages[selectedChatRoomId] || []}
+          />
+        )}
+      </div>
     </div>
   );
 };

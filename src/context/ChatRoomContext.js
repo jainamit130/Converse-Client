@@ -18,10 +18,8 @@ export const ChatRoomProvider = ({ children }) => {
         const existingRoom = updatedRooms.get(newRoom.id);
 
         if (existingRoom) {
-          // Merge the existing room with the new data
           updatedRooms.set(newRoom.id, { ...existingRoom, ...newRoom });
         } else {
-          // Add the new room if it doesn't exist
           updatedRooms.set(newRoom.id, newRoom);
         }
       });
