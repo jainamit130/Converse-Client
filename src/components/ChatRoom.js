@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_MESSAGES_OF_CHAT_ROOM } from "../graphql/queries";
 import { useWebSocket } from "../context/WebSocketContext";
 import { useUser } from "../context/UserContext";
 import { useChatRoom } from "../context/ChatRoomContext";
+import profileIcon from "../assets/profileIcon.webp";
 import { parseDate, formatMessageDate, formatTime } from "../util/dateUtil.js";
 import "./ChatRoom.css";
 
@@ -23,11 +24,19 @@ const groupMessagesByDate = (messages) => {
 const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   const { userId } = useUser();
   const { sendMessage, connected } = useWebSocket();
+  const [message, setMessage] = useState("");
   const { messages, addMessageToRoom } = useChatRoom();
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
   );
+  const chatMessagesRef = useRef(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+
   const groupedMessages = groupMessagesByDate(chatRoomMessages);
+
+  const handleChange = (event) => {
+    setMessage(event.target.value);
+  };
 
   useEffect(() => {
     setChatRoomMessages(messages[chatRoomId] || []);
@@ -40,11 +49,6 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   });
 
   const handleSendMessage = (messageContent) => {
-    if (!userId) {
-      console.error("User ID is not available");
-      return;
-    }
-
     const newMessage = {
       id: `${Math.random()}`,
       content: messageContent,
@@ -55,61 +59,70 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
 
     if (sendMessage) {
       sendMessage(`/app/chat/sendMessage/${chatRoomId}`, newMessage);
-    } else {
-      console.error("WebSocket not connected, unable to send message");
+      setMessage("");
     }
   };
 
   useEffect(() => {
     if (!data || !connected) return;
-
     data.getMessagesOfChatRoom.forEach((chatMessage) =>
       addMessageToRoom(chatRoomId, chatMessage, true)
     );
-  }, [data, connected, chatRoomId, chatRoomMessages, addMessageToRoom]);
+  }, [data, connected, chatRoomId, addMessageToRoom]);
+
+  useEffect(() => {
+    console.log("Effect triggered:", {
+      chatRoomMessages,
+      chatRoomId,
+      isAtBottom,
+    });
+    const chatMessagesContainer = chatMessagesRef.current;
+    console.log(chatMessagesContainer);
+    if (chatMessagesContainer) {
+      if (isAtBottom) {
+        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+      }
+    }
+  }, [chatRoomMessages, chatRoomId, isAtBottom]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div>
-      <h2>Chat Room: {chatRoomName}</h2>
-      <div>
-        {chatRoomMessages && chatRoomMessages.length > 0 ? (
-          <div className="chat-room">
-            {/* Map over each date group */}
-            {Object.entries(groupedMessages).map(([date, messages]) => (
-              <div key={date}>
-                {/* Date Header */}
-                <div className="date-header">{date}</div>
+    <div className="chat-section">
+      <div className="chat-details">
+        <img src={profileIcon} className="chatRoomIcon" />
+        <div>
+          <div className="chat-room-name">{chatRoomName}</div>
+          <div className="typing-status">{userId} typing</div>
+        </div>
+      </div>
 
-                {/* Messages under this date */}
-                {messages.map((message) => {
-                  const messageDate = parseDate(message.timestamp);
-                  const formattedTime = formatTime(messageDate);
-
-                  return (
-                    <div
-                      key={message.id}
-                      className={`message ${
-                        message.senderId === userId
-                          ? "message-right"
-                          : "message-left"
-                      }`}
-                    >
-                      <p>
-                        {message.user.username}: {message.content}
-                      </p>
-                      <div className="message-time">{formattedTime}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
+      <div className="chat-messages" ref={chatMessagesRef}>
+        {Object.entries(groupedMessages).map(([date, messages]) => (
+          <div key={date}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <div className="date-header">{date}</div>
+            </div>
+            {messages.map((message) => {
+              const messageDate = parseDate(message.timestamp);
+              const formattedTime = formatTime(messageDate);
+              return (
+                <div
+                  key={message.id}
+                  className={`message ${
+                    message.senderId === userId
+                      ? "message-right"
+                      : "message-left"
+                  }`}
+                >
+                  <div className="messageContent">{message.content}</div>
+                  <div className="message-time">{formattedTime}</div>
+                </div>
+              );
+            })}
           </div>
-        ) : (
-          <p>No messages yet.</p>
-        )}
+        ))}
       </div>
       <form
         onSubmit={(e) => {
@@ -118,14 +131,18 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
           handleSendMessage(messageContent);
           e.target.reset();
         }}
+        className="chat-input"
       >
         <input
           type="text"
+          value={message}
+          onChange={handleChange}
+          style={{ outline: "None", border: "None" }}
           name="messageContent"
           placeholder="Type your message..."
           required
         />
-        <button type="submit">Send</button>
+        {message.trim().length > 0 && <button type="submit">Send</button>}
       </form>
     </div>
   );

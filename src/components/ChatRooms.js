@@ -3,6 +3,7 @@ import { useQuery } from "@apollo/client";
 import { GET_CHAT_ROOMS_OF_USER } from "../graphql/queries";
 import ChatRoom from "./ChatRoom";
 import { useUser } from "../context/UserContext";
+import GroupIcon from "../assets/GroupIcon.png";
 import { useNavigate } from "react-router-dom";
 import { useChatRoom } from "../context/ChatRoomContext";
 import "./ChatRooms.css";
@@ -49,8 +50,20 @@ const ChatRooms = () => {
               className="chat-room-tile"
               onClick={() => handleChatRoomClick(room.id, room.name)}
             >
-              <h3>{room.name}</h3>
-              <p>{room.latestMessage?.content || "No messages yet"}</p>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <img src={GroupIcon} className="chatRoomIcon" />
+                <div>
+                  <div className="chatRoomTitle">{room.name}</div>
+                  <div className="latestMessage">
+                    {room.latestMessage?.content || "No messages yet"}
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -59,8 +72,29 @@ const ChatRooms = () => {
       <div className="chat-section">
         {!selectedChatRoomId ? (
           <div className="chat-header">
-            <h2>Converse Made by Amit</h2>
-            <p>Open any chat to see messages here</p>
+            <div className="converse">
+              <div style={{ textAlign: "right" }}>
+                <h1
+                  style={{
+                    marginBottom: "0px",
+                    fontSize: "80px",
+                    fontStyle: "italic",
+                    fontFamily: "cursive",
+                  }}
+                >
+                  Converse
+                </h1>
+                <p
+                  style={{
+                    marginTop: "0px",
+                    fontSize: "13px",
+                  }}
+                >
+                  Made by Amit
+                </p>
+              </div>
+              <h3>Open any chat to see messages here</h3>
+            </div>
           </div>
         ) : (
           <ChatRoom
