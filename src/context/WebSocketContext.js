@@ -16,8 +16,25 @@ export const WebSocketProvider = ({ children }) => {
   const { addMessageToRoom, mergeChatRooms, chatRooms, setChatRooms } =
     useChatRoom();
   const [connected, setConnected] = useState(false);
-  const [allSubscriptions, setAllSubscriptions] = useState([]);
   const subscriptions = useRef({});
+
+  const handleTyping = (chatRoomId, event) => {
+    const isCharacterKey =
+      event.key.length === 1 &&
+      !event.ctrlKey &&
+      !event.altKey &&
+      !event.metaKey;
+
+    if (isCharacterKey) {
+      const username = localStorage.getItem("username");
+      stompClient.send(`/app/typing/${chatRoomId}`, {}, username);
+    }
+  };
+
+  const handleStopTyping = (chatRoomId) => {
+    const username = localStorage.getItem("username");
+    stompClient.send(`/app/stopTyping/${chatRoomId}`, {}, username);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("authenticationToken");
@@ -50,10 +67,7 @@ export const WebSocketProvider = ({ children }) => {
   useEffect(() => {
     if (stompClient && connected) {
       chatRooms.forEach((chatRoom) => {
-        setAllSubscriptions((prevSubs) => [
-          ...prevSubs,
-          subscribeToChatRoom(chatRoom.id),
-        ]);
+        subscribeToChatRoom(chatRoom.id);
       });
     }
   }, [stompClient, connected, chatRooms]);
@@ -69,22 +83,23 @@ export const WebSocketProvider = ({ children }) => {
     if (!subscriptions.current[chatRoomId]) {
       subscriptions.current[chatRoomId] = {
         count: 0,
-        unsubscribe: null,
+        unsubscribeChat: null,
+        unsubscribeTyping: null,
       };
     }
 
     const subscriptionData = subscriptions.current[chatRoomId];
     subscriptionData.count += 1;
 
-    if (!subscriptionData.unsubscribe) {
-      const subscription = stompClient.subscribe(
+    if (!subscriptionData.unsubscribeChat) {
+      const chatSubscription = stompClient.subscribe(
         `/topic/chat/${chatRoomId}`,
         (message) => {
           const parsedMessage = JSON.parse(message.body);
           addMessageToRoom(chatRoomId, parsedMessage);
+
           setChatRooms((prevChatRooms) => {
             const updatedRooms = new Map(prevChatRooms);
-
             const existingRoom = updatedRooms.get(chatRoomId);
 
             if (existingRoom) {
@@ -101,14 +116,46 @@ export const WebSocketProvider = ({ children }) => {
         }
       );
 
-      subscriptionData.unsubscribe = () => subscription.unsubscribe();
+      subscriptionData.unsubscribeChat = () => chatSubscription.unsubscribe();
+    }
+
+    if (!subscriptionData.unsubscribeTyping) {
+      const typingSubscription = stompClient.subscribe(
+        `/topic/typing/${chatRoomId}`,
+        (message) => {
+          const listOfTypingUsers = JSON.parse(message.body);
+
+          setChatRooms((prevChatRooms) => {
+            const updatedChatRooms = new Map(prevChatRooms);
+            const chatRoom = updatedChatRooms.get(chatRoomId);
+
+            if (chatRoom) {
+              updatedChatRooms.set(chatRoomId, {
+                ...chatRoom,
+                typingUsers: listOfTypingUsers,
+              });
+            }
+
+            return updatedChatRooms;
+          });
+        }
+      );
+
+      subscriptionData.unsubscribeTyping = () =>
+        typingSubscription.unsubscribe();
     }
 
     return () => {
       subscriptionData.count -= 1;
       if (subscriptionData.count === 0) {
-        subscriptionData.unsubscribe();
-        subscriptionData.unsubscribe = null;
+        if (subscriptionData.unsubscribeChat) {
+          subscriptionData.unsubscribeChat();
+          subscriptionData.unsubscribeChat = null;
+        }
+        if (subscriptionData.unsubscribeTyping) {
+          subscriptionData.unsubscribeTyping();
+          subscriptionData.unsubscribeTyping = null;
+        }
       }
     };
   };
@@ -121,7 +168,14 @@ export const WebSocketProvider = ({ children }) => {
 
   return (
     <WebSocketContext.Provider
-      value={{ subscribeToChatRoom, sendMessage, subscribeToUser, connected }}
+      value={{
+        subscribeToChatRoom,
+        sendMessage,
+        subscribeToUser,
+        connected,
+        handleStopTyping,
+        handleTyping,
+      }}
     >
       {children}
     </WebSocketContext.Provider>

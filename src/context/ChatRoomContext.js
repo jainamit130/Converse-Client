@@ -7,9 +7,21 @@ export const ChatRoomProvider = ({ children }) => {
   const [messages, setMessages] = useState({});
 
   const mergeChatRooms = useCallback((newChatRooms) => {
-    const chatRoomsArray = Array.isArray(newChatRooms)
-      ? newChatRooms
-      : [newChatRooms];
+    let chatRoomsArray = [];
+
+    if (Array.isArray(newChatRooms)) {
+      chatRoomsArray = newChatRooms.map((room) => ({
+        ...room,
+        typingUsers: [],
+      }));
+    } else {
+      chatRoomsArray = [
+        {
+          ...newChatRooms,
+          typingUsers: [],
+        },
+      ];
+    }
 
     setChatRooms((prevChatRooms) => {
       const updatedRooms = new Map(prevChatRooms); // Convert previous state to a Map

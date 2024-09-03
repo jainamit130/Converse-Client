@@ -7,6 +7,7 @@ import GroupIcon from "../assets/GroupIcon.png";
 import { useNavigate } from "react-router-dom";
 import { useChatRoom } from "../context/ChatRoomContext";
 import "./ChatRooms.css";
+import TypingIndicator from "./TypingIndicator";
 
 const ChatRooms = () => {
   const { userId } = useUser();
@@ -44,28 +45,40 @@ const ChatRooms = () => {
           <button onClick={handleCreateGroup}>+ Create Group</button>
         </div>
         <div className="chat-room-list">
-          {Array.from(chatRooms.values()).map((room) => (
-            <div
-              key={room.id}
-              className="chat-room-tile"
-              onClick={() => handleChatRoomClick(room.id, room.name)}
-            >
+          {Array.from(chatRooms.values()).map((room) => {
+            const chatRoom = chatRooms.get(room.id);
+
+            return (
               <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
+                key={room.id}
+                className="chat-room-tile"
+                onClick={() => handleChatRoomClick(room.id, room.name)}
               >
-                <img src={GroupIcon} className="chatRoomIcon" />
-                <div>
-                  <div className="chatRoomTitle">{room.name}</div>
-                  <div className="latestMessage">
-                    {room.latestMessage?.content || "No messages yet"}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <img
+                    src={GroupIcon}
+                    className="chatRoomIcon"
+                    alt="Group Icon"
+                  />
+                  <div>
+                    <div className="chatRoomTitle">{room.name}</div>
+                    {chatRoom?.typingUsers.length > 0 ? (
+                      <TypingIndicator typingUsers={chatRoom.typingUsers} />
+                    ) : (
+                      <div className="latestMessage">
+                        {room.latestMessage?.content || "No messages yet"}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

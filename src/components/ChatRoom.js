@@ -7,6 +7,7 @@ import { useChatRoom } from "../context/ChatRoomContext";
 import profileIcon from "../assets/profileIcon.webp";
 import { parseDate, formatMessageDate, formatTime } from "../util/dateUtil.js";
 import "./ChatRoom.css";
+import TypingIndicator from "./TypingIndicator.js";
 
 const groupMessagesByDate = (messages) => {
   return messages.reduce((acc, message) => {
@@ -23,15 +24,16 @@ const groupMessagesByDate = (messages) => {
 
 const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   const { userId } = useUser();
-  const { sendMessage, connected } = useWebSocket();
+  const { sendMessage, connected, handleStopTyping, handleTyping } =
+    useWebSocket();
   const [message, setMessage] = useState("");
-  const { messages, addMessageToRoom } = useChatRoom();
+  const { messages, addMessageToRoom, chatRooms } = useChatRoom();
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
   );
+  const [typingUsers, setTypingUsers] = useState([]);
   const chatMessagesRef = useRef(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
-
   const groupedMessages = groupMessagesByDate(chatRoomMessages);
 
   const handleChange = (event) => {
@@ -41,6 +43,13 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   useEffect(() => {
     setChatRoomMessages(messages[chatRoomId] || []);
   }, [messages[chatRoomId]]);
+
+  useEffect(() => {
+    const chatRoom = chatRooms.get(chatRoomId);
+    if (chatRoom) {
+      setTypingUsers(chatRoom.typingUsers || []);
+    }
+  }, [chatRooms, chatRoomId]);
 
   const { loading, error, data } = useQuery(GET_MESSAGES_OF_CHAT_ROOM, {
     variables: { chatRoomId },
@@ -64,6 +73,10 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, document.body.scrollHeight);
+  }, [chatRoomId]);
+
+  useEffect(() => {
     if (!data || !connected) return;
     data.getMessagesOfChatRoom.forEach((chatMessage) =>
       addMessageToRoom(chatRoomId, chatMessage, true)
@@ -71,19 +84,13 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
   useEffect(() => {
-    console.log("Effect triggered:", {
-      chatRoomMessages,
-      chatRoomId,
-      isAtBottom,
-    });
     const chatMessagesContainer = chatMessagesRef.current;
-    console.log(chatMessagesContainer);
     if (chatMessagesContainer) {
       if (isAtBottom) {
         chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
       }
     }
-  }, [chatRoomMessages, chatRoomId, isAtBottom]);
+  }, [chatRoomMessages, chatRoomId, chatMessagesRef, isAtBottom]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -94,7 +101,9 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
         <img src={profileIcon} className="chatRoomIcon" />
         <div>
           <div className="chat-room-name">{chatRoomName}</div>
-          <div className="typing-status">{userId} typing</div>
+          <div className="typing-status">
+            <TypingIndicator typingUsers={typingUsers} />
+          </div>
         </div>
       </div>
 
@@ -134,6 +143,8 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
         className="chat-input"
       >
         <input
+          onKeyDown={(event) => handleTyping(chatRoomId, event)}
+          onBlur={() => handleStopTyping(chatRoomId)}
           type="text"
           value={message}
           onChange={handleChange}
