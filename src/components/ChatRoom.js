@@ -8,6 +8,7 @@ import profileIcon from "../assets/profileIcon.webp";
 import { parseDate, formatMessageDate, formatTime } from "../util/dateUtil.js";
 import "./ChatRoom.css";
 import TypingIndicator from "./TypingIndicator.js";
+import ScrollToBottom from "../util/ScrollToBottom.js";
 
 const groupMessagesByDate = (messages) => {
   return messages.reduce((acc, message) => {
@@ -33,7 +34,6 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   );
   const [typingUsers, setTypingUsers] = useState([]);
   const chatMessagesRef = useRef(null);
-  const [isAtBottom, setIsAtBottom] = useState(true);
   const groupedMessages = groupMessagesByDate(chatRoomMessages);
 
   const handleChange = (event) => {
@@ -83,15 +83,6 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
     );
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
-  useEffect(() => {
-    const chatMessagesContainer = chatMessagesRef.current;
-    if (chatMessagesContainer) {
-      if (isAtBottom) {
-        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-      }
-    }
-  }, [chatRoomMessages, chatRoomId, chatMessagesRef, isAtBottom]);
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -132,9 +123,11 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
             })}
           </div>
         ))}
+        <ScrollToBottom />
       </div>
       <form
         onSubmit={(e) => {
+          handleStopTyping(chatRoomId);
           e.preventDefault();
           const messageContent = e.target.elements.messageContent.value;
           handleSendMessage(messageContent);
@@ -144,7 +137,6 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
       >
         <input
           onKeyDown={(event) => handleTyping(chatRoomId, event)}
-          onBlur={() => handleStopTyping(chatRoomId)}
           type="text"
           value={message}
           onChange={handleChange}

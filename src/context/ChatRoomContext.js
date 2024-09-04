@@ -5,6 +5,7 @@ const ChatRoomContext = createContext();
 export const ChatRoomProvider = ({ children }) => {
   const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState({});
+  const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
 
   const mergeChatRooms = useCallback((newChatRooms) => {
     let chatRoomsArray = [];
@@ -75,6 +76,8 @@ export const ChatRoomProvider = ({ children }) => {
         messages,
         addMessageToRoom,
         mergeChatRooms,
+        selectedChatRoomId,
+        setSelectedChatRoomId,
       }}
     >
       {children}

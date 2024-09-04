@@ -14,9 +14,14 @@ const ChatRooms = () => {
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
     variables: { userId },
   });
-  const { chatRooms, messages, mergeChatRooms } = useChatRoom();
+  const {
+    chatRooms,
+    messages,
+    mergeChatRooms,
+    selectedChatRoomId,
+    setSelectedChatRoomId,
+  } = useChatRoom();
   const navigate = useNavigate();
-  const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
   const [selectedChatRoomName, setSelectedChatRoomName] = useState(null);
 
   useEffect(() => {

@@ -13,12 +13,45 @@ const WebSocketContext = createContext(null);
 
 export const WebSocketProvider = ({ children }) => {
   const [stompClient, setStompClient] = useState(null);
-  const { addMessageToRoom, mergeChatRooms, chatRooms, setChatRooms } =
-    useChatRoom();
+  const {
+    addMessageToRoom,
+    mergeChatRooms,
+    chatRooms,
+    setChatRooms,
+    selectedChatRoomId,
+  } = useChatRoom();
   const [connected, setConnected] = useState(false);
   const subscriptions = useRef({});
 
+  const typingTimeoutRef = useRef(null);
+
+  const markMessageUnread = async (chatRoomId) => {
+    const userId = localStorage.getItem("userId");
+    const url =
+      "http://localhost:8081/chat/groups/messages/markUnread/" +
+      chatRoomId +
+      "/" +
+      userId;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+    } catch (error) {
+      console.error("There was an error!", error);
+    }
+  };
+
   const handleTyping = (chatRoomId, event) => {
+    clearTimeout(typingTimeoutRef.current);
+
     const isCharacterKey =
       event.key.length === 1 &&
       !event.ctrlKey &&
@@ -29,12 +62,22 @@ export const WebSocketProvider = ({ children }) => {
       const username = localStorage.getItem("username");
       stompClient.send(`/app/typing/${chatRoomId}`, {}, username);
     }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      handleStopTyping(chatRoomId);
+    }, 1000);
   };
 
   const handleStopTyping = (chatRoomId) => {
     const username = localStorage.getItem("username");
     stompClient.send(`/app/stopTyping/${chatRoomId}`, {}, username);
   };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(typingTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("authenticationToken");
@@ -95,6 +138,9 @@ export const WebSocketProvider = ({ children }) => {
       const chatSubscription = stompClient.subscribe(
         `/topic/chat/${chatRoomId}`,
         (message) => {
+          if (chatRoomId !== selectedChatRoomId) {
+            markMessageUnread(chatRoomId);
+          }
           const parsedMessage = JSON.parse(message.body);
           addMessageToRoom(chatRoomId, parsedMessage);
 
@@ -175,6 +221,7 @@ export const WebSocketProvider = ({ children }) => {
         connected,
         handleStopTyping,
         handleTyping,
+        typingTimeoutRef,
       }}
     >
       {children}
