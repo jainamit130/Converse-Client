@@ -9,6 +9,7 @@ import { parseDate, formatMessageDate, formatTime } from "../util/dateUtil.js";
 import "./ChatRoom.css";
 import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
+import { useMarkAllMessagesRead } from "../hooks/hooks.js";
 
 const groupMessagesByDate = (messages) => {
   return messages.reduce((acc, message) => {
@@ -33,8 +34,12 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
     messages[chatRoomId] || []
   );
   const [typingUsers, setTypingUsers] = useState([]);
+  const handleMarkAllMessagesRead = useMarkAllMessagesRead(chatRoomId, userId);
   const chatMessagesRef = useRef(null);
   const groupedMessages = groupMessagesByDate(chatRoomMessages);
+
+  // Retrieve unreadMessageCount from chatRooms context
+  const unreadMessageCount = chatRooms.get(chatRoomId)?.unreadMessageCount || 0;
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -42,6 +47,7 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
 
   useEffect(() => {
     setChatRoomMessages(messages[chatRoomId] || []);
+    handleMarkAllMessagesRead();
   }, [messages[chatRoomId]]);
 
   useEffect(() => {
@@ -99,6 +105,13 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
       </div>
 
       <div className="chat-messages" ref={chatMessagesRef}>
+        {/* Display unread message count */}
+        {unreadMessageCount > 0 && (
+          <div className="unread-message-count">
+            {unreadMessageCount} Unread Messages
+          </div>
+        )}
+
         {Object.entries(groupedMessages).map(([date, messages]) => (
           <div key={date}>
             <div style={{ display: "flex", justifyContent: "center" }}>
