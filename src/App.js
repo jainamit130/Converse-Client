@@ -9,24 +9,27 @@ import AddUser from "./components/AddUser";
 import LoginSignUpPage from "./components/LoginSignUpPage";
 import { UserProvider } from "./context/UserContext";
 import { ChatRoomProvider } from "./context/ChatRoomContext";
+import { PageActivityProvider } from "./context/PageActivityContext";
 
 function App() {
   return (
     <ApolloProvider client={client}>
       <UserProvider>
-        <ChatRoomProvider>
-          <WebSocketProvider>
-            {" "}
-            {/* Wrap ChatRoomProvider */}
-            <Router>
-              <Routes>
-                <Route path="/" element={<LoginSignUpPage />} />
-                <Route path="/chat-rooms" element={<ChatRooms />} />
-                <Route path="/add-users" element={<AddUser />} />
-              </Routes>
-            </Router>
-          </WebSocketProvider>
-        </ChatRoomProvider>
+        <PageActivityProvider>
+          <ChatRoomProvider>
+            <WebSocketProvider>
+              {" "}
+              {/* Wrap ChatRoomProvider */}
+              <Router>
+                <Routes>
+                  <Route path="/" element={<LoginSignUpPage />} />
+                  <Route path="/chat-rooms" element={<ChatRooms />} />
+                  <Route path="/add-users" element={<AddUser />} />
+                </Routes>
+              </Router>
+            </WebSocketProvider>
+          </ChatRoomProvider>
+        </PageActivityProvider>
       </UserProvider>
     </ApolloProvider>
   );

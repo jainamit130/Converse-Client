@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import useRedis from "../hooks/useRedis";
 
 const LoginSignUpPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -50,7 +51,7 @@ const LoginSignUpPage = () => {
       localStorage.setItem("refreshToken", refreshToken);
 
       if (isLogin) {
-        updateUserId(data.userId); // Set user ID in context
+        updateUserId(data.userId);
         navigate(`/chat-rooms`);
       } else {
         setMessage("Signup successful! Please login.");

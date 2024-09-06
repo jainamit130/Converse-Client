@@ -9,7 +9,7 @@ import { parseDate, formatMessageDate, formatTime } from "../util/dateUtil.js";
 import "./ChatRoom.css";
 import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
-import { useMarkAllMessagesRead } from "../hooks/hooks.js";
+import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessagesRead.js";
 
 const groupMessagesByDate = (messages) => {
   return messages.reduce((acc, message) => {
@@ -38,7 +38,6 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   const chatMessagesRef = useRef(null);
   const groupedMessages = groupMessagesByDate(chatRoomMessages);
 
-  // Retrieve unreadMessageCount from chatRooms context
   const unreadMessageCount = chatRooms.get(chatRoomId)?.unreadMessageCount || 0;
 
   const handleChange = (event) => {
