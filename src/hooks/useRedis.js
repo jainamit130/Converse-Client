@@ -10,9 +10,12 @@ const useRedis = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${BASE_URL}/save/${key}?value=${value}`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `${BASE_URL}/save/lastSeen/${key}?timestamp=${value}`,
+        {
+          method: "POST",
+        }
+      );
       const data = await response.text();
       return data; // "Data saved"
     } catch (err) {
@@ -27,7 +30,7 @@ const useRedis = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${BASE_URL}/get/${key}`, {
+      const response = await fetch(`${BASE_URL}/get/lastSeen/${key}`, {
         method: "GET",
       });
       const data = await response.json();
@@ -44,7 +47,7 @@ const useRedis = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${BASE_URL}/remove/${key}`, {
+      const response = await fetch(`${BASE_URL}/update/lastSeen/${key}`, {
         method: "POST",
       });
       const data = await response.text();

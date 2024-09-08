@@ -5,3 +5,9 @@ export const MARK_ALL_MESSAGES_READ = gql`
     markAllMessagesRead(chatRoomId: $chatRoomId, userId: $userId)
   }
 `;
+
+export const MARK_ALL_MESSAGES_DELIVERED = gql`
+  mutation MarkAllMessagesDelivered($userId: String!) {
+    markAllMessagesDelivered(userId: $userId)
+  }
+`;

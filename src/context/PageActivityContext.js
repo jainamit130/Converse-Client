@@ -2,22 +2,25 @@ import React, { createContext, useContext, useEffect } from "react";
 import usePageVisibilityAndInactivity from "../hooks/usePageVisibilityAndInactivity"; // Import your hook
 import useRedis from "../hooks/useRedis";
 import { useUser } from "./UserContext";
+import { useMarkAllMessagesDelivered } from "../hooks/useMarkAllMessages";
 
 const PageActivityContext = createContext();
 
 export const PageActivityProvider = ({ children }) => {
+  const { userId } = useUser(); // Destructure userId first
   const { isVisible, isInactive } = usePageVisibilityAndInactivity(30000); // 30-second timeout
   const { removeDataFromRedis, saveDataToRedis } = useRedis();
-  const { userId } = useUser();
+  const handleMarkAllMessagesDelivered = useMarkAllMessagesDelivered(userId);
 
   useEffect(() => {
     const timestamp = new Date().toISOString();
     if (isVisible || !isInactive) {
+      handleMarkAllMessagesDelivered();
       saveDataToRedis(userId, timestamp);
     } else {
       removeDataFromRedis(userId);
     }
-  }, [isVisible, isInactive]);
+  }, [isVisible, isInactive, userId]); // Make sure to add userId as a dependency
 
   return (
     <PageActivityContext.Provider value={{ isVisible, isInactive }}>

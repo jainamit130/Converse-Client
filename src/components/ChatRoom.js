@@ -9,7 +9,7 @@ import { parseDate, formatMessageDate, formatTime } from "../util/dateUtil.js";
 import "./ChatRoom.css";
 import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
-import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessagesRead.js";
+import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
 
 const groupMessagesByDate = (messages) => {
   return messages.reduce((acc, message) => {
@@ -46,7 +46,7 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
 
   useEffect(() => {
     setChatRoomMessages(messages[chatRoomId] || []);
-    handleMarkAllMessagesRead();
+    if (chatRoomMessages.unreadMessageCount > 0) handleMarkAllMessagesRead();
   }, [messages[chatRoomId]]);
 
   useEffect(() => {
