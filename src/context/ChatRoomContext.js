@@ -1,4 +1,14 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import useRedis from "../hooks/useRedis";
+import { useUser } from "./UserContext";
+import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages";
 
 const ChatRoomContext = createContext();
 
@@ -6,6 +16,29 @@ export const ChatRoomProvider = ({ children }) => {
   const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState({});
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
+  const { markChatRoomActive, markChatRoomInactive } = useRedis();
+  const { userId } = useUser();
+  const handleMarkAllMessagesRead = useMarkAllMessagesRead(
+    selectedChatRoomId,
+    userId
+  );
+  const prevChatRoomIdRef = useRef(null);
+
+  useEffect(() => {
+    console.log(messages);
+  }, [messages[selectedChatRoomId]]);
+
+  useEffect(() => {
+    if (prevChatRoomIdRef.current !== null) {
+      markChatRoomInactive(prevChatRoomIdRef.current, userId);
+    }
+
+    if (selectedChatRoomId !== null) {
+      markChatRoomActive(selectedChatRoomId, userId);
+    }
+
+    prevChatRoomIdRef.current = selectedChatRoomId;
+  }, [selectedChatRoomId, userId]);
 
   const mergeChatRooms = useCallback((newChatRooms) => {
     let chatRoomsArray = [];

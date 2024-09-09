@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
-import useRedis from "../hooks/useRedis";
 
 const LoginSignUpPage = () => {
   const [isLogin, setIsLogin] = useState(true);

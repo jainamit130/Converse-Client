@@ -6,7 +6,7 @@ const useRedis = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const saveDataToRedis = async (key, value) => {
+  const saveLastSeen = async (key, value) => {
     setLoading(true);
     setError(null);
     try {
@@ -17,7 +17,7 @@ const useRedis = () => {
         }
       );
       const data = await response.text();
-      return data; // "Data saved"
+      return data;
     } catch (err) {
       setError(err);
       console.error("Error saving data:", err);
@@ -26,7 +26,7 @@ const useRedis = () => {
     }
   };
 
-  const getDataFromRedis = async (key) => {
+  const getLastSeen = async (key) => {
     setLoading(true);
     setError(null);
     try {
@@ -43,7 +43,7 @@ const useRedis = () => {
     }
   };
 
-  const removeDataFromRedis = async (key) => {
+  const updateLastSeen = async (key) => {
     setLoading(true);
     setError(null);
     try {
@@ -60,10 +60,52 @@ const useRedis = () => {
     }
   };
 
+  const markChatRoomActive = async (chatRoomId, userId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${BASE_URL}/save/activeChatRoom/${chatRoomId}/${userId}`,
+        {
+          method: "POST",
+        }
+      );
+      const data = await response.text();
+      return data;
+    } catch (err) {
+      setError(err);
+      console.error("Error saving data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const markChatRoomInactive = async (chatRoomId, userId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${BASE_URL}/update/activeChatRoom/${chatRoomId}/${userId}`,
+        {
+          method: "POST",
+        }
+      );
+      const data = await response.text();
+      return data;
+    } catch (err) {
+      setError(err);
+      console.error("Error removing data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
-    saveDataToRedis,
-    getDataFromRedis,
-    removeDataFromRedis,
+    saveLastSeen,
+    getLastSeen,
+    updateLastSeen,
+    markChatRoomActive,
+    markChatRoomInactive,
     loading,
     error,
   };

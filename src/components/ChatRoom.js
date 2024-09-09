@@ -10,6 +10,7 @@ import "./ChatRoom.css";
 import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
+import useRedis from "../hooks/useRedis.js";
 
 const groupMessagesByDate = (messages) => {
   return messages.reduce((acc, message) => {
@@ -37,7 +38,6 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(chatRoomId, userId);
   const chatMessagesRef = useRef(null);
   const groupedMessages = groupMessagesByDate(chatRoomMessages);
-
   const unreadMessageCount = chatRooms.get(chatRoomId)?.unreadMessageCount || 0;
 
   const handleChange = (event) => {

@@ -9,16 +9,16 @@ const PageActivityContext = createContext();
 export const PageActivityProvider = ({ children }) => {
   const { userId } = useUser(); // Destructure userId first
   const { isVisible, isInactive } = usePageVisibilityAndInactivity(30000); // 30-second timeout
-  const { removeDataFromRedis, saveDataToRedis } = useRedis();
+  const { updateLastSeen, saveLastSeen } = useRedis();
   const handleMarkAllMessagesDelivered = useMarkAllMessagesDelivered(userId);
 
   useEffect(() => {
     const timestamp = new Date().toISOString();
     if (isVisible || !isInactive) {
       handleMarkAllMessagesDelivered();
-      saveDataToRedis(userId, timestamp);
+      saveLastSeen(userId, timestamp);
     } else {
-      removeDataFromRedis(userId);
+      updateLastSeen(userId);
     }
   }, [isVisible, isInactive, userId]); // Make sure to add userId as a dependency
 
