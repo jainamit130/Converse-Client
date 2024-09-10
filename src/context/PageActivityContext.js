@@ -7,20 +7,18 @@ import { useMarkAllMessagesDelivered } from "../hooks/useMarkAllMessages";
 const PageActivityContext = createContext();
 
 export const PageActivityProvider = ({ children }) => {
-  const { userId } = useUser(); // Destructure userId first
-  const { isVisible, isInactive } = usePageVisibilityAndInactivity(30000); // 30-second timeout
+  const { userId } = useUser();
+  const { isVisible, isInactive } = usePageVisibilityAndInactivity(30000);
   const { updateLastSeen, saveLastSeen } = useRedis();
-  const handleMarkAllMessagesDelivered = useMarkAllMessagesDelivered(userId);
 
   useEffect(() => {
     const timestamp = new Date().toISOString();
     if (isVisible || !isInactive) {
-      handleMarkAllMessagesDelivered();
       saveLastSeen(userId, timestamp);
     } else {
       updateLastSeen(userId);
     }
-  }, [isVisible, isInactive, userId]); // Make sure to add userId as a dependency
+  }, [isVisible, isInactive, userId]);
 
   return (
     <PageActivityContext.Provider value={{ isVisible, isInactive }}>

@@ -8,11 +8,16 @@ import React, {
 } from "react";
 import useRedis from "../hooks/useRedis";
 import { useUser } from "./UserContext";
-import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages";
+import {
+  useMarkAllMessagesDelivered,
+  useMarkAllMessagesRead,
+} from "../hooks/useMarkAllMessages";
+import { usePageActivity } from "./PageActivityContext";
 
 const ChatRoomContext = createContext();
 
 export const ChatRoomProvider = ({ children }) => {
+  const { isVisible, isInactive } = usePageActivity();
   const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState({});
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
@@ -22,11 +27,26 @@ export const ChatRoomProvider = ({ children }) => {
     selectedChatRoomId,
     userId
   );
+  const handleMarkAllMessagesDelivered = useMarkAllMessagesDelivered(userId);
   const prevChatRoomIdRef = useRef(null);
 
   useEffect(() => {
-    console.log(messages);
-  }, [messages[selectedChatRoomId]]);
+    if (isVisible || !isInactive) {
+      handleMarkAllMessagesDelivered();
+      // User came online => 2 Cases selectedChatRoomId = null or not null
+      // if selectedChatRoomId===null => Do Nothing
+      // if selectedChatRoomId!==null => mark this chatRoom active
+      if (selectedChatRoomId !== null) {
+        markChatRoomActive(selectedChatRoomId, userId);
+        if (chatRooms.get(selectedChatRoomId).unreadMessageCount > 0)
+          handleMarkAllMessagesRead();
+      }
+    } else {
+      if (selectedChatRoomId !== null) {
+        markChatRoomInactive(selectedChatRoomId, userId);
+      }
+    }
+  }, [isVisible, isInactive]);
 
   useEffect(() => {
     if (prevChatRoomIdRef.current !== null) {
@@ -34,6 +54,12 @@ export const ChatRoomProvider = ({ children }) => {
     }
 
     if (selectedChatRoomId !== null) {
+      if (
+        chatRooms &&
+        chatRooms.get(selectedChatRoomId).unreadMessageCount > 0
+      ) {
+        handleMarkAllMessagesRead();
+      }
       markChatRoomActive(selectedChatRoomId, userId);
     }
 
@@ -58,7 +84,7 @@ export const ChatRoomProvider = ({ children }) => {
     }
 
     setChatRooms((prevChatRooms) => {
-      const updatedRooms = new Map(prevChatRooms); // Convert previous state to a Map
+      const updatedRooms = new Map(prevChatRooms);
 
       chatRoomsArray.forEach((newRoom) => {
         const existingRoom = updatedRooms.get(newRoom.id);
