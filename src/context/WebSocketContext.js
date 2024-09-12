@@ -25,30 +25,6 @@ export const WebSocketProvider = ({ children }) => {
 
   const typingTimeoutRef = useRef(null);
 
-  const markMessageUnread = async (chatRoomId) => {
-    const userId = localStorage.getItem("userId");
-    const url =
-      "http://localhost:8081/chat/groups/messages/markUnread/" +
-      chatRoomId +
-      "/" +
-      userId;
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-    } catch (error) {
-      console.error("There was an error!", error);
-    }
-  };
-
   const handleTyping = (chatRoomId, event) => {
     clearTimeout(typingTimeoutRef.current);
 
@@ -138,9 +114,6 @@ export const WebSocketProvider = ({ children }) => {
       const chatSubscription = stompClient.subscribe(
         `/topic/chat/${chatRoomId}`,
         (message) => {
-          if (chatRoomId !== selectedChatRoomId) {
-            markMessageUnread(chatRoomId);
-          }
           const parsedMessage = JSON.parse(message.body);
           addMessageToRoom(chatRoomId, parsedMessage);
 

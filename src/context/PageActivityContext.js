@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect } from "react";
 import usePageVisibilityAndInactivity from "../hooks/usePageVisibilityAndInactivity"; // Import your hook
 import useRedis from "../hooks/useRedis";
 import { useUser } from "./UserContext";
-import { useMarkAllMessagesDelivered } from "../hooks/useMarkAllMessages";
 
 const PageActivityContext = createContext();
 

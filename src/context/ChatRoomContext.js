@@ -30,21 +30,24 @@ export const ChatRoomProvider = ({ children }) => {
   const handleMarkAllMessagesDelivered = useMarkAllMessagesDelivered(userId);
   const prevChatRoomIdRef = useRef(null);
 
+  const deliveredRef = useRef(false);
+
   useEffect(() => {
     if (isVisible || !isInactive) {
-      handleMarkAllMessagesDelivered();
-      // User came online => 2 Cases selectedChatRoomId = null or not null
-      // if selectedChatRoomId===null => Do Nothing
-      // if selectedChatRoomId!==null => mark this chatRoom active
-      if (selectedChatRoomId !== null) {
-        markChatRoomActive(selectedChatRoomId, userId);
-        if (chatRooms.get(selectedChatRoomId).unreadMessageCount > 0)
-          handleMarkAllMessagesRead();
+      if (!deliveredRef.current) {
+        handleMarkAllMessagesDelivered();
+        deliveredRef.current = true;
       }
     } else {
-      if (selectedChatRoomId !== null) {
-        markChatRoomInactive(selectedChatRoomId, userId);
-      }
+      deliveredRef.current = false;
+    }
+
+    if (selectedChatRoomId !== null) {
+      markChatRoomActive(selectedChatRoomId, userId);
+      if (chatRooms.get(selectedChatRoomId)?.unreadMessageCount > 0)
+        handleMarkAllMessagesRead();
+    } else if (selectedChatRoomId !== null) {
+      markChatRoomInactive(selectedChatRoomId, userId);
     }
   }, [isVisible, isInactive]);
 

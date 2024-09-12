@@ -30,7 +30,8 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   const { sendMessage, connected, handleStopTyping, handleTyping } =
     useWebSocket();
   const [message, setMessage] = useState("");
-  const { messages, addMessageToRoom, chatRooms } = useChatRoom();
+  const { messages, addMessageToRoom, chatRooms, selectedChatRoomId } =
+    useChatRoom();
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
   );
@@ -46,7 +47,8 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
 
   useEffect(() => {
     setChatRoomMessages(messages[chatRoomId] || []);
-    if (chatRoomMessages.unreadMessageCount > 0) handleMarkAllMessagesRead();
+    if (chatRooms && chatRooms.get(selectedChatRoomId).unreadMessageCount > 0)
+      handleMarkAllMessagesRead();
   }, [messages[chatRoomId]]);
 
   useEffect(() => {
