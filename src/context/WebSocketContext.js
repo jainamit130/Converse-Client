@@ -104,66 +104,97 @@ export const WebSocketProvider = ({ children }) => {
         count: 0,
         unsubscribeChat: null,
         unsubscribeTyping: null,
+        unsubscribeMessageStatus: null,  // Add a new unsubscribe function for message status
       };
     }
-
+  
     const subscriptionData = subscriptions.current[chatRoomId];
     subscriptionData.count += 1;
-
+  
+    // Subscribe to chat messages
     if (!subscriptionData.unsubscribeChat) {
       const chatSubscription = stompClient.subscribe(
         `/topic/chat/${chatRoomId}`,
         (message) => {
           const parsedMessage = JSON.parse(message.body);
           addMessageToRoom(chatRoomId, parsedMessage);
-
+  
           setChatRooms((prevChatRooms) => {
             const updatedRooms = new Map(prevChatRooms);
             const existingRoom = updatedRooms.get(chatRoomId);
-
+  
             if (existingRoom) {
               const updatedRoom = {
                 ...existingRoom,
                 latestMessage: parsedMessage,
               };
-
+  
               updatedRooms.set(chatRoomId, updatedRoom);
             }
-
+  
             return updatedRooms;
           });
         }
       );
-
+  
       subscriptionData.unsubscribeChat = () => chatSubscription.unsubscribe();
     }
-
+  
+    // Subscribe to typing events
     if (!subscriptionData.unsubscribeTyping) {
       const typingSubscription = stompClient.subscribe(
         `/topic/typing/${chatRoomId}`,
         (message) => {
           const listOfTypingUsers = JSON.parse(message.body);
-
+  
           setChatRooms((prevChatRooms) => {
             const updatedChatRooms = new Map(prevChatRooms);
             const chatRoom = updatedChatRooms.get(chatRoomId);
-
+  
             if (chatRoom) {
               updatedChatRooms.set(chatRoomId, {
                 ...chatRoom,
                 typingUsers: listOfTypingUsers,
               });
             }
-
+  
             return updatedChatRooms;
           });
         }
       );
-
-      subscriptionData.unsubscribeTyping = () =>
-        typingSubscription.unsubscribe();
+  
+      subscriptionData.unsubscribeTyping = () => typingSubscription.unsubscribe();
     }
-
+  
+    // Subscribe to message status updates
+    if (!subscriptionData.unsubscribeMessageStatus) {
+      const messageStatusSubscription = stompClient.subscribe(
+        `/topic/message/${chatRoomId}`,
+        (message) => {
+          const messageStatus = JSON.parse(message.body);
+          const { readerId, timestamp, isDelivered } = messageStatus;
+  
+          // Update the chat room with the message status (e.g., delivered/read status)
+          setChatRooms((prevChatRooms) => {
+            const updatedChatRooms = new Map(prevChatRooms);
+            const chatRoom = updatedChatRooms.get(chatRoomId);
+  
+            if (chatRoom) {
+              updatedChatRooms.set(chatRoomId, {
+                ...chatRoom,
+                messageStatus: { readerId, timestamp, isDelivered },
+              });
+            }
+  
+            return updatedChatRooms;
+          });
+        }
+      );
+  
+      subscriptionData.unsubscribeMessageStatus = () =>
+        messageStatusSubscription.unsubscribe();
+    }
+  
     return () => {
       subscriptionData.count -= 1;
       if (subscriptionData.count === 0) {
@@ -175,9 +206,14 @@ export const WebSocketProvider = ({ children }) => {
           subscriptionData.unsubscribeTyping();
           subscriptionData.unsubscribeTyping = null;
         }
+        if (subscriptionData.unsubscribeMessageStatus) {
+          subscriptionData.unsubscribeMessageStatus();
+          subscriptionData.unsubscribeMessageStatus = null;
+        }
       }
     };
   };
+  
 
   const sendMessage = (destination, body) => {
     if (stompClient && connected) {
