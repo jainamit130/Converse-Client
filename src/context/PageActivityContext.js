@@ -1,26 +1,31 @@
 import React, { createContext, useContext, useEffect } from "react";
-import usePageVisibilityAndInactivity from "../hooks/usePageVisibilityAndInactivity"; // Import your hook
+import usePageInactivity from "../hooks/usePageInactivity"; // Import your hook
 import useRedis from "../hooks/useRedis";
 import { useUser } from "./UserContext";
 
 const PageActivityContext = createContext();
 
 export const PageActivityProvider = ({ children }) => {
-  const { userId } = useUser();
-  const { isVisible, isInactive } = usePageVisibilityAndInactivity(30000);
+  const { userId, isLogin } = useUser();
+  const { isInactive } = usePageInactivity(30000);
   const { updateLastSeen, saveLastSeen } = useRedis();
 
   useEffect(() => {
+    if (!userId) {
+      console.log("Exiting early");
+      return;
+    }
+
     const timestamp = new Date().toISOString();
-    if (isVisible || !isInactive) {
+    if (!isInactive) {
       saveLastSeen(userId, timestamp);
     } else {
       updateLastSeen(userId);
     }
-  }, [isVisible, isInactive, userId]);
+  }, [isInactive, userId]);
 
   return (
-    <PageActivityContext.Provider value={{ isVisible, isInactive }}>
+    <PageActivityContext.Provider value={{ isInactive }}>
       {children}
     </PageActivityContext.Provider>
   );

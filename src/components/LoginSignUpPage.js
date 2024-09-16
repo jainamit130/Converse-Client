@@ -4,17 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
 const LoginSignUpPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-  const { updateUserId } = useUser();
+  const { updateUserId, isLogin, setIsLogin } = useUser();
 
   const togglePage = () => {
     setIsLogin(!isLogin);
   };
-
   const handle = async (e) => {
     e.preventDefault();
 
@@ -40,20 +38,24 @@ const LoginSignUpPage = () => {
         throw new Error("Network response was not ok");
       }
 
-      const data = await response.json();
+      // For signup, handle plain text response
+      if (!isLogin) {
+        const text = await response.text(); // Read as plain text
+        console.log("Signup response:", text); // Log or handle signup success
+        setMessage("Signup successful! Please login.");
+      }
+      // For login, handle JSON response
+      else {
+        const data = await response.json(); // Read as JSON for login
+        const { userId, username, authenticationToken, refreshToken } = data;
 
-      const { userId, username, authenticationToken, refreshToken } = data;
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("username", username);
+        localStorage.setItem("authenticationToken", authenticationToken);
+        localStorage.setItem("refreshToken", refreshToken);
 
-      localStorage.setItem("userId", userId);
-      localStorage.setItem("username", username);
-      localStorage.setItem("authenticationToken", authenticationToken);
-      localStorage.setItem("refreshToken", refreshToken);
-
-      if (isLogin) {
         updateUserId(data.userId);
         navigate(`/chat-rooms`);
-      } else {
-        setMessage("Signup successful! Please login.");
       }
     } catch (error) {
       console.error("There was an error!", error);

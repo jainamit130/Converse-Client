@@ -17,12 +17,12 @@ import { usePageActivity } from "./PageActivityContext";
 const ChatRoomContext = createContext();
 
 export const ChatRoomProvider = ({ children }) => {
-  const { isVisible, isInactive } = usePageActivity();
+  const { isInactive } = usePageActivity();
   const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState({});
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
   const { markChatRoomActive, markChatRoomInactive } = useRedis();
-  const { userId } = useUser();
+  const { userId, isLogin } = useUser();
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(
     selectedChatRoomId,
     userId
@@ -33,7 +33,11 @@ export const ChatRoomProvider = ({ children }) => {
   const deliveredRef = useRef(false);
 
   useEffect(() => {
-    if (isVisible || !isInactive) {
+    if (!isLogin) {
+      return;
+    }
+
+    if (!isInactive) {
       if (!deliveredRef.current) {
         handleMarkAllMessagesDelivered();
         deliveredRef.current = true;
@@ -49,7 +53,7 @@ export const ChatRoomProvider = ({ children }) => {
     } else if (selectedChatRoomId !== null) {
       markChatRoomInactive(selectedChatRoomId, userId);
     }
-  }, [isVisible, isInactive]);
+  }, [isInactive]);
 
   useEffect(() => {
     if (prevChatRoomIdRef.current !== null) {

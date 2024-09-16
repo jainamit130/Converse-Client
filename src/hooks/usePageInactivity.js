@@ -1,20 +1,7 @@
 import { useState, useEffect } from "react";
 
-const usePageVisibilityAndInactivity = (inactiveTimeout = 60000) => {
-  const [isVisible, setIsVisible] = useState(true);
+const usePageInactivity = (inactiveTimeout = 60000) => {
   const [isInactive, setIsInactive] = useState(false);
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      setIsVisible(document.visibilityState === "visible");
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, []);
 
   useEffect(() => {
     let timeoutId;
@@ -22,7 +9,6 @@ const usePageVisibilityAndInactivity = (inactiveTimeout = 60000) => {
     const resetInactivityTimer = () => {
       setIsInactive(false);
       clearTimeout(timeoutId);
-
       timeoutId = setTimeout(() => {
         setIsInactive(true);
       }, inactiveTimeout);
@@ -48,7 +34,7 @@ const usePageVisibilityAndInactivity = (inactiveTimeout = 60000) => {
     };
   }, [inactiveTimeout]);
 
-  return { isVisible, isInactive };
+  return { isInactive };
 };
 
-export default usePageVisibilityAndInactivity;
+export default usePageInactivity;

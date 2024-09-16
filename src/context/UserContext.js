@@ -7,14 +7,17 @@ export const UserProvider = ({ children }) => {
     String(localStorage.getItem("userId")) || null
   );
 
+  const [isLogin, setIsLogin] = useState(false);
+
   const updateUserId = (id) => {
     const userIdString = String(id);
-    setUserId(userIdString);
     localStorage.setItem("userId", userIdString);
+    setIsLogin(true);
+    setUserId(userIdString);
   };
 
   return (
-    <UserContext.Provider value={{ userId, updateUserId }}>
+    <UserContext.Provider value={{ userId, updateUserId, isLogin, setIsLogin }}>
       {children}
     </UserContext.Provider>
   );
