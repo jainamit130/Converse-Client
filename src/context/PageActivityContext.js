@@ -12,7 +12,6 @@ export const PageActivityProvider = ({ children }) => {
 
   useEffect(() => {
     if (!userId) {
-      console.log("Exiting early");
       return;
     }
 

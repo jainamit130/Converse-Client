@@ -47,8 +47,7 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
 
   useEffect(() => {
     setChatRoomMessages(messages[chatRoomId] || []);
-    if (chatRooms && chatRooms.get(selectedChatRoomId).unreadMessageCount > 0)
-      handleMarkAllMessagesRead();
+    handleMarkAllMessagesRead();
   }, [messages[chatRoomId]]);
 
   useEffect(() => {

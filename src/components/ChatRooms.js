@@ -22,6 +22,7 @@ const ChatRooms = () => {
     setSelectedChatRoomId,
   } = useChatRoom();
   const navigate = useNavigate();
+
   const [selectedChatRoomName, setSelectedChatRoomName] = useState(null);
 
   useEffect(() => {

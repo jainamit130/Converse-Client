@@ -33,7 +33,7 @@ export const ChatRoomProvider = ({ children }) => {
   const deliveredRef = useRef(false);
 
   useEffect(() => {
-    if (!isLogin) {
+    if (!userId) {
       return;
     }
 
