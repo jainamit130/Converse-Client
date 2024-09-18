@@ -107,32 +107,44 @@ export const ChatRoomProvider = ({ children }) => {
     });
   }, []);
 
-  const addMessageToRoom = useCallback((chatRoomId, message, base = false) => {
-    setMessages((prevMessages) => {
-      const currentMessages = prevMessages[chatRoomId] || [];
+  const addMessageToRoom = useCallback(
+    (chatRoomId, messageOrMessages, base = false) => {
+      setMessages((prevMessages) => {
+        const currentMessages = prevMessages[chatRoomId] || [];
+        let updatedMessages;
+        const chatRoom = chatRooms.get(chatRoomId);
+        const messagesLoaded = chatRoom?.messagesLoaded;
 
-      const messageExists = currentMessages.some(
-        (msg) => msg.id === message.id
-      );
+        if (Array.isArray(messageOrMessages) && base && !messagesLoaded) {
+          // If it's an array and base is true, append to the bottom
+          updatedMessages = {
+            ...prevMessages,
+            [chatRoomId]: [...messageOrMessages, ...currentMessages],
+          };
 
-      if (messageExists) return prevMessages;
+          // Set messages as loaded for this chat room
+          setChatRooms((prevChatRooms) => {
+            const updatedChatRoom = prevChatRooms.get(chatRoomId) || {};
+            updatedChatRoom.messagesLoaded = true;
 
-      const updatedMessages = {
-        ...prevMessages,
-        [chatRoomId]: [...currentMessages, message],
-      };
+            const newChatRooms = new Map(prevChatRooms);
+            newChatRooms.set(chatRoomId, updatedChatRoom);
 
-      if (base) {
-        const { [chatRoomId]: updatedRoom, ...rest } = updatedMessages;
-        return {
-          [chatRoomId]: updatedRoom,
-          ...rest,
-        };
-      }
+            return newChatRooms;
+          });
+        } else if (!Array.isArray(messageOrMessages)) {
+          // If it's a single message, prepend it to the top
+          updatedMessages = {
+            ...prevMessages,
+            [chatRoomId]: [...currentMessages, messageOrMessages],
+          };
+        }
 
-      return updatedMessages;
-    });
-  }, []);
+        return updatedMessages;
+      });
+    },
+    [chatRooms]
+  );
 
   return (
     <ChatRoomContext.Provider

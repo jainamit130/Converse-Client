@@ -10,7 +10,6 @@ import "./ChatRoom.css";
 import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
-import useRedis from "../hooks/useRedis.js";
 
 const groupMessagesByDate = (messages) => {
   return messages.reduce((acc, message) => {
@@ -57,9 +56,12 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
     }
   }, [chatRooms, chatRoomId]);
 
+  const chatRoom = chatRooms.get(chatRoomId);
+  const messagesLoaded = chatRoom?.messagesLoaded || false;
+  const fromCount = messages[chatRoomId]?.length || 0;
   const { loading, error, data } = useQuery(GET_MESSAGES_OF_CHAT_ROOM, {
-    variables: { chatRoomId },
-    skip: !connected,
+    variables: { chatRoomId, fromCount },
+    skip: !connected || messagesLoaded,
     fetchPolicy: "network-only",
   });
 
@@ -84,9 +86,7 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
 
   useEffect(() => {
     if (!data || !connected) return;
-    data.getMessagesOfChatRoom.forEach((chatMessage) =>
-      addMessageToRoom(chatRoomId, chatMessage, true)
-    );
+    addMessageToRoom(chatRoomId, data.getMessagesOfChatRoom, true);
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
   if (loading) return <p>Loading...</p>;
