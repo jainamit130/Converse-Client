@@ -8,6 +8,7 @@ import React, {
 import { Stomp } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useChatRoom } from "./ChatRoomContext";
+import { useUser } from "./UserContext";
 
 const WebSocketContext = createContext(null);
 
@@ -20,6 +21,7 @@ export const WebSocketProvider = ({ children }) => {
     setChatRooms,
     selectedChatRoomId,
   } = useChatRoom();
+  const { userId } = useUser();
   const [connected, setConnected] = useState(false);
   const subscriptions = useRef({});
 
@@ -124,9 +126,16 @@ export const WebSocketProvider = ({ children }) => {
             const existingRoom = updatedRooms.get(chatRoomId);
 
             if (existingRoom) {
+              const unreadMessageCount =
+                selectedChatRoomId !== chatRoomId &&
+                userId !== parsedMessage.senderId
+                  ? existingRoom.unreadMessageCount + 1
+                  : existingRoom.unreadMessageCount;
+
               const updatedRoom = {
                 ...existingRoom,
                 latestMessage: parsedMessage,
+                unreadMessageCount: unreadMessageCount,
               };
 
               updatedRooms.set(chatRoomId, updatedRoom);
