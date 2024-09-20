@@ -48,12 +48,33 @@ export const ChatRoomProvider = ({ children }) => {
 
     if (selectedChatRoomId !== null) {
       markChatRoomActive(selectedChatRoomId, userId);
-      if (chatRooms.get(selectedChatRoomId)?.unreadMessageCount > 0)
+      const chatRoom = chatRooms.get(selectedChatRoomId);
+      if (chatRoom?.unreadMessageCount > 0) {
         handleMarkAllMessagesRead();
+      }
     } else if (selectedChatRoomId !== null) {
       markChatRoomInactive(selectedChatRoomId, userId);
     }
   }, [isInactive]);
+
+  useEffect(() => {
+    if (prevChatRoomIdRef.current === null) {
+      return;
+    }
+    const chatRoom = chatRooms.get(prevChatRoomIdRef.current);
+    markChatRoomRead(setChatRooms, prevChatRoomIdRef.current, chatRoom);
+  }, [selectedChatRoomId]);
+
+  const markChatRoomRead = (setChatRooms, prevChatRoomId, chatRoom) => {
+    setChatRooms((prevChatRooms) => {
+      const newChatRooms = new Map(prevChatRooms);
+      newChatRooms.set(prevChatRoomId, {
+        ...chatRoom,
+        unreadMessageCount: 0,
+      });
+      return newChatRooms;
+    });
+  };
 
   useEffect(() => {
     if (prevChatRoomIdRef.current !== null) {
