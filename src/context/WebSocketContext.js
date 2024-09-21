@@ -9,6 +9,7 @@ import { Stomp } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useChatRoom } from "./ChatRoomContext";
 import { useUser } from "./UserContext";
+import { usePageActivity } from "./PageActivityContext";
 
 const WebSocketContext = createContext(null);
 
@@ -22,6 +23,7 @@ export const WebSocketProvider = ({ children }) => {
     selectedChatRoomId,
   } = useChatRoom();
   const { userId } = useUser();
+  const { isInactive } = usePageActivity();
   const [connected, setConnected] = useState(false);
   const subscriptions = useRef({});
 
@@ -127,8 +129,9 @@ export const WebSocketProvider = ({ children }) => {
 
             if (existingRoom) {
               const unreadMessageCount =
-                selectedChatRoomId !== chatRoomId &&
-                userId !== parsedMessage.senderId
+                (selectedChatRoomId !== chatRoomId &&
+                  userId !== parsedMessage.senderId) ||
+                isInactive
                   ? existingRoom.unreadMessageCount + 1
                   : existingRoom.unreadMessageCount;
 

@@ -11,7 +11,8 @@ import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
 
-const groupMessagesByDate = (messages) => {
+const groupMessagesByDate = (messages, unreadMessageCount) => {
+  let remainingMessages = messages.length - unreadMessageCount;
   return messages.reduce((acc, message) => {
     const messageDate = formatMessageDate(parseDate(message.timestamp));
 
@@ -19,6 +20,10 @@ const groupMessagesByDate = (messages) => {
       acc[messageDate] = [];
     }
 
+    if (remainingMessages === 0) {
+      acc[messageDate].push({ unreadMarker: true });
+    }
+    remainingMessages--;
     acc[messageDate].push(message);
     return acc;
   }, {});
@@ -37,8 +42,11 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   const [typingUsers, setTypingUsers] = useState([]);
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(chatRoomId, userId);
   const chatMessagesRef = useRef(null);
-  const groupedMessages = groupMessagesByDate(chatRoomMessages);
   const unreadMessageCount = chatRooms.get(chatRoomId)?.unreadMessageCount || 0;
+  const groupedMessages = groupMessagesByDate(
+    chatRoomMessages,
+    unreadMessageCount
+  );
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -105,21 +113,31 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
       </div>
 
       <div className="chat-messages" ref={chatMessagesRef}>
-        {/* Display unread message count */}
-        {unreadMessageCount > 0 && (
-          <div className="unread-message-count">
-            {unreadMessageCount} Unread Messages
-          </div>
-        )}
-
         {Object.entries(groupedMessages).map(([date, messages]) => (
           <div key={date}>
             <div style={{ display: "flex", justifyContent: "center" }}>
               <div className="date-header">{date}</div>
             </div>
-            {messages.map((message) => {
+            {messages.map((message, index) => {
+              if (message.unreadMarker) {
+                return (
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <div
+                        key={`unread-${date}-${index}`}
+                        className="unread-message-marker"
+                      >
+                        {unreadMessageCount} Unread Messages
+                      </div>
+                    </div>
+                    <div className="unread-message-line"></div>
+                  </div>
+                );
+              }
+
               const messageDate = parseDate(message.timestamp);
               const formattedTime = formatTime(messageDate);
+
               return (
                 <div
                   key={message.id}

@@ -4,6 +4,7 @@ import { GET_CHAT_ROOMS_OF_USER } from "../graphql/queries";
 import ChatRoom from "./ChatRoom";
 import { useUser } from "../context/UserContext";
 import GroupIcon from "../assets/GroupIcon.png";
+import newChat from "../assets/newChat.png";
 import { useNavigate } from "react-router-dom";
 import { useChatRoom } from "../context/ChatRoomContext";
 import "./ChatRooms.css";
@@ -48,7 +49,12 @@ const ChatRooms = () => {
       <div className="chat-rooms-sidebar">
         <div className="sidebar-header">
           <h2>Chats</h2>
-          <button onClick={handleCreateGroup}>+ Create Group</button>
+          <img
+            onClick={handleCreateGroup}
+            src={newChat}
+            className="newChatIcon"
+            title="new chat"
+          />
         </div>
         <div className="chat-room-list">
           {Array.from(chatRooms.values()).map((room) => {
