@@ -26,6 +26,17 @@ export const GET_MESSAGES_OF_CHAT_ROOM = gql`
       id
       senderId
       timestamp
+      deliveredRecipients
+      readRecipients
+      deliveryReceiptsByTime {
+        key
+        value
+      }
+
+      readReceiptsByTime {
+        key
+        value
+      }
       content
       user {
         id
