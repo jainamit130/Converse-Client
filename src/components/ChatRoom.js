@@ -10,6 +10,7 @@ import "./ChatRoom.css";
 import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
+import MessageInfoPanel from "./MessageInfoPanel";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   let remainingMessages = messages.length - unreadMessageCount;
@@ -47,6 +48,9 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
     chatRoomMessages,
     unreadMessageCount
   );
+
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -97,11 +101,21 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
     addMessageToRoom(chatRoomId, data.getMessagesOfChatRoom, true);
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
+  const openMessageInfoPanel = (message) => {
+    setSelectedMessage(message);
+    setIsPanelOpen(true);
+  };
+
+  const closeMessageInfoPanel = () => {
+    setIsPanelOpen(false);
+    setSelectedMessage(null);
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div className="chat-section">
+    <div className="chat-messages-section">
       <div className="chat-details">
         <img src={profileIcon} className="chatRoomIcon" />
         <div>
@@ -121,12 +135,9 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
             {messages.map((message, index) => {
               if (message.unreadMarker) {
                 return (
-                  <div>
+                  <div key={`unread-${date}-${index}`}>
                     <div style={{ display: "flex", justifyContent: "center" }}>
-                      <div
-                        key={`unread-${date}-${index}`}
-                        className="unread-message-marker"
-                      >
+                      <div className="unread-message-marker">
                         {unreadMessageCount} Unread Messages
                       </div>
                     </div>
@@ -146,6 +157,7 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
                       ? "message-right"
                       : "message-left"
                   }`}
+                  onClick={() => openMessageInfoPanel(message)}
                 >
                   <div className="messageContent">{message.content}</div>
                   <div className="message-time">{formattedTime}</div>
@@ -178,6 +190,13 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
         />
         {message.trim().length > 0 && <button type="submit">Send</button>}
       </form>
+
+      {isPanelOpen && (
+        <MessageInfoPanel
+          message={selectedMessage}
+          onClose={closeMessageInfoPanel}
+        />
+      )}
     </div>
   );
 };

@@ -1,27 +1,53 @@
 .chat-layout {
   display: flex;
   height: 100vh;
-  overflow: hidden; 
+  overflow: hidden;
+  box-sizing: border-box; /* Ensure consistent sizing */
 }
 
-.converse{
-  border-radius: 20px;
-  background-color: #ffffff;
-  color:rgb(80, 126, 20)
+.unreadMessages{
+  margin-top: 11px;
+  margin-right: 10px;
+  height: 20px;
+  width: 20px;
+  border-radius: 50px;
+  background-color: green;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  margin-left: auto;
 }
 
 .chat-rooms-sidebar {
   background-color: white;
   display: flex;
   flex-direction: column;
-  width: 29%;
   max-width: 400px;
+  height: 100%;
+  width: 100%;
   box-sizing: border-box;
   overflow-y: auto; 
+  border-right: 1px solid #ddd; /* Optional: Add a border for clarity */
 }
 
+.chat-section {
+  position: relative;
+  background-image: url('../assets/ChatBackground.png');
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow-y: auto;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box; 
+}
+
+/* Other styles remain the same */
+
 .sidebar-header {
-  padding: 10px 10px 10px 10px;
+  padding: 10px;
   color: rgb(0, 0, 0);
   display: flex;
   justify-content: space-between;
@@ -42,10 +68,11 @@
   opacity: 0.8;
   display: flex;
   color: #000000;
-  justify-content: flex-start;
+  width: 100%;
+  justify-content: space-between;
   cursor: pointer;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-  transition: #2a2b3f 0.2s;
+  transition: background-color 0.2s;
   padding: 10px;
   box-sizing: border-box;
 }
@@ -54,15 +81,6 @@
   background-color: #aaaaaa;
 }
 
-.chat-section {
-  background-image: url('../assets/ChatBackground.png');
-  flex-grow: 1; 
-  display: flex;
-    height:100%;
-  flex-direction: column;
-  justify-content: flex-end;
-  overflow-y: auto; 
-}
 .chat-header {
   height: 100vh;
   background-image: url('../assets/ChatBackground.png');
@@ -107,19 +125,19 @@
   height: 18px;
 }
 
-.chatRoomIcon{
+.chatRoomIcon {
   width: 40px;
   height: 40px;
   margin-left: 5px;
   margin-right: 5px;
 }
 
-.chatRoomTitle{
+.chatRoomTitle {
   font-size: 17px;
   font-weight: 500;
 }
 
-.latestMessage{
+.latestMessage {
   font-size: 15px;
   color: #4b4b4b;
 }

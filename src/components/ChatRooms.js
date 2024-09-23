@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useChatRoom } from "../context/ChatRoomContext";
 import "./ChatRooms.css";
 import TypingIndicator from "./TypingIndicator";
+import { usePageActivity } from "../context/PageActivityContext";
 
 const ChatRooms = () => {
   const { userId } = useUser();
@@ -23,7 +24,7 @@ const ChatRooms = () => {
     setSelectedChatRoomId,
   } = useChatRoom();
   const navigate = useNavigate();
-
+  const { isInactive } = usePageActivity();
   const [selectedChatRoomName, setSelectedChatRoomName] = useState(null);
 
   useEffect(() => {
@@ -69,25 +70,34 @@ const ChatRooms = () => {
                 <div
                   style={{
                     display: "flex",
+                    justifyContent: "space-between",
                     alignItems: "center",
                   }}
                 >
-                  <img
-                    src={GroupIcon}
-                    className="chatRoomIcon"
-                    alt="Group Icon"
-                  />
-                  <div>
-                    <div className="chatRoomTitle">{room.name}</div>
-                    {chatRoom?.typingUsers.length > 0 ? (
-                      <TypingIndicator typingUsers={chatRoom.typingUsers} />
-                    ) : (
-                      <div className="latestMessage">
-                        {room.latestMessage?.content || "No messages yet"}
-                      </div>
-                    )}
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src={GroupIcon}
+                      className="chatRoomIcon"
+                      alt="Group Icon"
+                    />
+                    <div>
+                      <div className="chatRoomTitle">{room.name}</div>
+                      {chatRoom?.typingUsers.length > 0 ? (
+                        <TypingIndicator typingUsers={chatRoom.typingUsers} />
+                      ) : (
+                        <div className="latestMessage">
+                          {room.latestMessage?.content || "No messages yet"}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
+                {(selectedChatRoomId !== room.id || isInactive) &&
+                  room.unreadMessageCount > 0 && (
+                    <div className="unreadMessages">
+                      {room.unreadMessageCount}
+                    </div>
+                  )}
               </div>
             );
           })}

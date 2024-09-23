@@ -10,6 +10,7 @@ import SockJS from "sockjs-client";
 import { useChatRoom } from "./ChatRoomContext";
 import { useUser } from "./UserContext";
 import { usePageActivity } from "./PageActivityContext";
+import { sortChatRooms } from "../util/chatUtil";
 
 const WebSocketContext = createContext(null);
 
@@ -108,14 +109,13 @@ export const WebSocketProvider = ({ children }) => {
         count: 0,
         unsubscribeChat: null,
         unsubscribeTyping: null,
-        unsubscribeMessageStatus: null, // Add a new unsubscribe function for message status
+        unsubscribeMessageStatus: null,
       };
     }
 
     const subscriptionData = subscriptions.current[chatRoomId];
     subscriptionData.count += 1;
 
-    // Subscribe to chat messages
     if (!subscriptionData.unsubscribeChat) {
       const chatSubscription = stompClient.subscribe(
         `/topic/chat/${chatRoomId}`,
@@ -143,8 +143,9 @@ export const WebSocketProvider = ({ children }) => {
 
               updatedRooms.set(chatRoomId, updatedRoom);
             }
-
-            return updatedRooms;
+            const sortedRooms = sortChatRooms(updatedRooms);
+            console.log(sortedRooms);
+            return sortedRooms;
           });
         }
       );
@@ -152,7 +153,6 @@ export const WebSocketProvider = ({ children }) => {
       subscriptionData.unsubscribeChat = () => chatSubscription.unsubscribe();
     }
 
-    // Subscribe to typing events
     if (!subscriptionData.unsubscribeTyping) {
       const typingSubscription = stompClient.subscribe(
         `/topic/typing/${chatRoomId}`,

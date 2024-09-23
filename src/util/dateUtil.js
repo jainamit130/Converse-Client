@@ -36,3 +36,8 @@ export const formatMessageDate = (date) => {
   }
   return formatFullDate(date);
 };
+
+export const formatMessageTimestamp = (timestamp) => {
+  const date = parseDate(timestamp);
+  return `${formatFullDate(date)}, ${formatTime(date)}`;
+};

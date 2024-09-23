@@ -1,21 +1,25 @@
 import { useState } from "react";
-
-const BASE_URL = "http://localhost:8080/user";
+import config from "../config/environment";
+import { useChatRoom } from "../context/ChatRoomContext";
+import { useAppState } from "../context/AppStateContext";
 
 const useRedis = () => {
   const [loading, setLoading] = useState(false);
+  const { lastChatRoomId } = useAppState();
   const [error, setError] = useState(null);
+  const BASE_URL = config.BASE_URL;
 
   const saveLastSeen = async (key, value) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        `${BASE_URL}/save/lastSeen/${key}?timestamp=${value}`,
-        {
-          method: "POST",
-        }
-      );
+      const url = `${BASE_URL}/user/save/lastSeen/${key}?timestamp=${value}`;
+      if (lastChatRoomId) {
+        url += `?prevChatRoomId=${lastChatRoomId}`;
+      }
+      const response = await fetch(url, {
+        method: "POST",
+      });
       const data = await response.text();
       return data;
     } catch (err) {
@@ -30,7 +34,7 @@ const useRedis = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${BASE_URL}/get/lastSeen/${key}`, {
+      const response = await fetch(`${BASE_URL}/user/get/lastSeen/${key}`, {
         method: "GET",
       });
       const data = await response.json();
@@ -47,7 +51,11 @@ const useRedis = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${BASE_URL}/update/lastSeen/${key}`, {
+      const url = `${BASE_URL}/user/update/lastSeen/${key}`;
+      if (lastChatRoomId) {
+        url += `?prevChatRoomId=${lastChatRoomId}`;
+      }
+      const response = await fetch(url, {
         method: "POST",
       });
       const data = await response.text();
@@ -60,16 +68,19 @@ const useRedis = () => {
     }
   };
 
-  const markChatRoomActive = async (chatRoomId, userId) => {
+  const markChatRoomActive = async (chatRoomId, userId, prevChatRoomId) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        `${BASE_URL}/save/activeChatRoom/${chatRoomId}/${userId}`,
-        {
-          method: "POST",
-        }
-      );
+      let url = `${BASE_URL}/user/save/activeChatRoom/${chatRoomId}/${userId}`;
+      if (prevChatRoomId) {
+        url += `?prevChatRoomId=${prevChatRoomId}`;
+      }
+
+      const response = await fetch(url, {
+        method: "POST",
+      });
+
       const data = await response.text();
       return data;
     } catch (err) {
@@ -85,7 +96,7 @@ const useRedis = () => {
     setError(null);
     try {
       const response = await fetch(
-        `${BASE_URL}/update/activeChatRoom/${chatRoomId}/${userId}`,
+        `${BASE_URL}/user/update/activeChatRoom/${chatRoomId}/${userId}`,
         {
           method: "POST",
         }
