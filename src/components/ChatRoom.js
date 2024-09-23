@@ -10,8 +10,6 @@ import "./ChatRoom.css";
 import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
-import { FiChevronDown } from "react-icons/fi";
-import MessageDetailsPanel from "./MessageDetailsPanel"; // Import the new component
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   let remainingMessages = messages.length - unreadMessageCount;
@@ -49,10 +47,6 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
     chatRoomMessages,
     unreadMessageCount
   );
-
-  // State for message details panel
-  const [selectedMessage, setSelectedMessage] = useState(null);
-  const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -103,116 +97,87 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
     addMessageToRoom(chatRoomId, data.getMessagesOfChatRoom, true);
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
-  const handleMessageDetails = (message) => {
-    setSelectedMessage(message);
-    setIsDetailsPanelOpen(true);
-  };
-
-  const handleCloseDetailsPanel = () => {
-    setIsDetailsPanelOpen(false);
-    setSelectedMessage(null);
-  };
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div className="chat-container">
-      <div className="chat-section">
-        <div className="chat-details">
-          <img src={profileIcon} className="chatRoomIcon" />
-          <div>
-            <div className="chat-room-name">{chatRoomName}</div>
-            <div className="typing-status">
-              <TypingIndicator typingUsers={typingUsers} />
-            </div>
+    <div className="chat-section">
+      <div className="chat-details">
+        <img src={profileIcon} className="chatRoomIcon" />
+        <div>
+          <div className="chat-room-name">{chatRoomName}</div>
+          <div className="typing-status">
+            <TypingIndicator typingUsers={typingUsers} />
           </div>
         </div>
+      </div>
 
-        <div className="chat-messages" ref={chatMessagesRef}>
-          {Object.entries(groupedMessages).map(([date, messages]) => (
-            <div key={date}>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <div className="date-header">{date}</div>
-              </div>
-              {messages.map((message, index) => {
-                if (message.unreadMarker) {
-                  return (
-                    <div>
-                      <div
-                        style={{ display: "flex", justifyContent: "center" }}
-                      >
-                        <div
-                          key={`unread-${date}-${index}`}
-                          className="unread-message-marker"
-                        >
-                          {unreadMessageCount} Unread Messages
-                        </div>
-                      </div>
-                      <div className="unread-message-line"></div>
-                    </div>
-                  );
-                }
-
-                const messageDate = parseDate(message.timestamp);
-                const formattedTime = formatTime(messageDate);
-
+      <div className="chat-messages" ref={chatMessagesRef}>
+        {Object.entries(groupedMessages).map(([date, messages]) => (
+          <div key={date}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <div className="date-header">{date}</div>
+            </div>
+            {messages.map((message, index) => {
+              if (message.unreadMarker) {
                 return (
-                  <div
-                    key={message.id}
-                    className={`message ${
-                      message.senderId === userId
-                        ? "message-right"
-                        : "message-left"
-                    }`}
-                  >
-                    <div className="messageContent">
-                      {message.content}
-                      {message.senderId === userId && (
-                        <button
-                          className="message-details-button"
-                          onClick={() => handleMessageDetails(message)}
-                        >
-                          <FiChevronDown />
-                        </button>
-                      )}
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      <div
+                        key={`unread-${date}-${index}`}
+                        className="unread-message-marker"
+                      >
+                        {unreadMessageCount} Unread Messages
+                      </div>
                     </div>
-                    <div className="message-time">{formattedTime}</div>
+                    <div className="unread-message-line"></div>
                   </div>
                 );
-              })}
-            </div>
-          ))}
-          <ScrollToBottom />
-        </div>
-        <form
-          onSubmit={(e) => {
-            handleStopTyping(chatRoomId);
-            e.preventDefault();
-            const messageContent = e.target.elements.messageContent.value;
-            handleSendMessage(messageContent);
-            e.target.reset();
-          }}
-          className="chat-input"
-        >
-          <input
-            onKeyDown={(event) => handleTyping(chatRoomId, event)}
-            type="text"
-            value={message}
-            onChange={handleChange}
-            name="messageContent"
-            placeholder="Type your message..."
-            autoFocus
-          />
-          <button type="submit">Send</button>
-        </form>
+              }
+
+              const messageDate = parseDate(message.timestamp);
+              const formattedTime = formatTime(messageDate);
+
+              return (
+                <div
+                  key={message.id}
+                  className={`message ${
+                    message.senderId === userId
+                      ? "message-right"
+                      : "message-left"
+                  }`}
+                >
+                  <div className="messageContent">{message.content}</div>
+                  <div className="message-time">{formattedTime}</div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+        <ScrollToBottom />
       </div>
-      {isDetailsPanelOpen && (
-        <MessageDetailsPanel
-          selectedMessage={selectedMessage}
-          onClose={handleCloseDetailsPanel}
+      <form
+        onSubmit={(e) => {
+          handleStopTyping(chatRoomId);
+          e.preventDefault();
+          const messageContent = e.target.elements.messageContent.value;
+          handleSendMessage(messageContent);
+          e.target.reset();
+        }}
+        className="chat-input"
+      >
+        <input
+          onKeyDown={(event) => handleTyping(chatRoomId, event)}
+          type="text"
+          value={message}
+          onChange={handleChange}
+          style={{ outline: "None", border: "None" }}
+          name="messageContent"
+          placeholder="Type your message..."
+          required
         />
-      )}
+        {message.trim().length > 0 && <button type="submit">Send</button>}
+      </form>
     </div>
   );
 };
