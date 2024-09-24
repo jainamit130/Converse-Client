@@ -1,21 +1,21 @@
 import { useState } from "react";
 import config from "../config/environment";
-import { useChatRoom } from "../context/ChatRoomContext";
-import { useAppState } from "../context/AppStateContext";
 
 const useRedis = () => {
   const [loading, setLoading] = useState(false);
-  const { lastChatRoomId } = useAppState();
   const [error, setError] = useState(null);
   const BASE_URL = config.BASE_URL;
 
-  const saveLastSeen = async (key, value) => {
+  const saveLastSeen = async (key, value, optional) => {
+    if (key === null) {
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
-      const url = `${BASE_URL}/user/save/lastSeen/${key}?timestamp=${value}`;
-      if (lastChatRoomId) {
-        url += `?prevChatRoomId=${lastChatRoomId}`;
+      let url = `${BASE_URL}/user/save/lastSeen/${key}?timestamp=${value}`;
+      if (optional) {
+        url += `&prevChatRoomId=${optional}`;
       }
       const response = await fetch(url, {
         method: "POST",
@@ -47,13 +47,13 @@ const useRedis = () => {
     }
   };
 
-  const updateLastSeen = async (key) => {
+  const updateLastSeen = async (key, optional) => {
     setLoading(true);
     setError(null);
     try {
-      const url = `${BASE_URL}/user/update/lastSeen/${key}`;
-      if (lastChatRoomId) {
-        url += `?prevChatRoomId=${lastChatRoomId}`;
+      let url = `${BASE_URL}/user/update/lastSeen/${key}`;
+      if (optional) {
+        url += `?prevChatRoomId=${optional}`;
       }
       const response = await fetch(url, {
         method: "POST",

@@ -14,7 +14,6 @@ import {
 } from "../hooks/useMarkAllMessages";
 import { usePageActivity } from "./PageActivityContext";
 import { sortChatRooms } from "../util/chatUtil";
-import { useAppState } from "./AppStateContext";
 
 const ChatRoomContext = createContext();
 
@@ -23,8 +22,12 @@ export const ChatRoomProvider = ({ children }) => {
   const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState({});
   const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
-  const { setLastChatRoomId } = useAppState();
-  const { markChatRoomActive, markChatRoomInactive } = useRedis();
+  const {
+    updateLastSeen,
+    saveLastSeen,
+    markChatRoomActive,
+    markChatRoomInactive,
+  } = useRedis();
   const { userId, isLogin } = useUser();
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(
     selectedChatRoomId,
@@ -40,12 +43,15 @@ export const ChatRoomProvider = ({ children }) => {
       return;
     }
 
+    const timestamp = new Date().toISOString();
     if (!isInactive) {
+      saveLastSeen(userId, timestamp, selectedChatRoomId);
       if (!deliveredRef.current) {
         handleMarkAllMessagesDelivered();
         deliveredRef.current = true;
       }
     } else {
+      updateLastSeen(userId, selectedChatRoomId);
       deliveredRef.current = false;
     }
 
@@ -64,7 +70,6 @@ export const ChatRoomProvider = ({ children }) => {
     if (prevChatRoomIdRef.current === null) {
       return;
     }
-    setLastChatRoomId(selectedChatRoomId);
     const chatRoom = chatRooms.get(prevChatRoomIdRef.current);
     markChatRoomRead(setChatRooms, prevChatRoomIdRef.current, chatRoom);
   }, [selectedChatRoomId]);

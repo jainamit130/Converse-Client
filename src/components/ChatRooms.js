@@ -42,6 +42,14 @@ const ChatRooms = () => {
     setSelectedChatRoomId(chatRoomId);
   };
 
+  useEffect(() => {
+    if (selectedChatRoomId !== null) {
+      if (chatRooms[selectedChatRoomId]?.unreadMessageCount > 0) {
+        console.log(chatRooms[selectedChatRoomId]?.unreadMessageCount);
+      }
+    }
+  }, [isInactive]);
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
