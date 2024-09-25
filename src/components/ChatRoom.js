@@ -35,8 +35,7 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
   const { sendMessage, connected, handleStopTyping, handleTyping } =
     useWebSocket();
   const [message, setMessage] = useState("");
-  const { messages, addMessageToRoom, chatRooms, selectedChatRoomId } =
-    useChatRoom();
+  const { messages, addMessageToRoom, chatRooms } = useChatRoom();
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
   );

@@ -7,17 +7,34 @@ export const UserProvider = ({ children }) => {
     String(localStorage.getItem("userId")) || null
   );
 
+  const [activeChatRoomId, setActiveChatRoomId] = useState(null);
+
   const [isLogin, setIsLogin] = useState(false);
 
   const updateUserId = (id) => {
     const userIdString = String(id);
-    localStorage.setItem("userId", userIdString);
     setIsLogin(true);
     setUserId(userIdString);
   };
 
+  const updateActiveChatRoom = (chatRoomId) => {
+    const chatRoomIdString = String(chatRoomId);
+    localStorage.setItem("activeChatRoom", chatRoomIdString);
+    setActiveChatRoomId(chatRoomIdString);
+  };
+
   return (
-    <UserContext.Provider value={{ userId, updateUserId, isLogin, setIsLogin }}>
+    <UserContext.Provider
+      value={{
+        userId,
+        updateUserId,
+        isLogin,
+        setIsLogin,
+        activeChatRoomId,
+        setActiveChatRoomId,
+        updateActiveChatRoom,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

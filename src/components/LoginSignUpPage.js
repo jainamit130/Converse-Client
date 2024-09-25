@@ -38,10 +38,9 @@ const LoginSignUpPage = () => {
         throw new Error("Network response was not ok");
       }
 
-      // For signup, handle plain text response
       if (!isLogin) {
-        const text = await response.text(); // Read as plain text
-        console.log("Signup response:", text); // Log or handle signup success
+        const text = await response.text();
+        console.log("Signup response:", text);
         setMessage("Signup successful! Please login.");
       }
       // For login, handle JSON response

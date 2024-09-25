@@ -10,19 +10,14 @@ import { useChatRoom } from "../context/ChatRoomContext";
 import "./ChatRooms.css";
 import TypingIndicator from "./TypingIndicator";
 import { usePageActivity } from "../context/PageActivityContext";
+import { useWebSocket } from "../context/WebSocketContext";
 
 const ChatRooms = () => {
-  const { userId } = useUser();
+  const { userId, activeChatRoomId, updateActiveChatRoom } = useUser();
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
     variables: { userId },
   });
-  const {
-    chatRooms,
-    messages,
-    mergeChatRooms,
-    selectedChatRoomId,
-    setSelectedChatRoomId,
-  } = useChatRoom();
+  const { chatRooms, messages, mergeChatRooms } = useChatRoom();
   const navigate = useNavigate();
   const { isInactive } = usePageActivity();
   const [selectedChatRoomName, setSelectedChatRoomName] = useState(null);
@@ -39,7 +34,7 @@ const ChatRooms = () => {
 
   const handleChatRoomClick = (chatRoomId, chatRoomName) => {
     setSelectedChatRoomName(chatRoomName);
-    setSelectedChatRoomId(chatRoomId);
+    updateActiveChatRoom(chatRoomId);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -92,7 +87,7 @@ const ChatRooms = () => {
                     </div>
                   </div>
                 </div>
-                {(selectedChatRoomId !== room.id || isInactive) &&
+                {(activeChatRoomId !== room.id || isInactive) &&
                   room.unreadMessageCount > 0 && (
                     <div className="unreadMessages">
                       {room.unreadMessageCount}
@@ -105,7 +100,7 @@ const ChatRooms = () => {
       </div>
 
       <div className="chat-section">
-        {!selectedChatRoomId ? (
+        {!activeChatRoomId ? (
           <div className="chat-header">
             <div className="converse">
               <div style={{ textAlign: "right" }}>
@@ -133,10 +128,10 @@ const ChatRooms = () => {
           </div>
         ) : (
           <ChatRoom
-            key={selectedChatRoomId}
-            chatRoomId={selectedChatRoomId}
+            key={activeChatRoomId}
+            chatRoomId={activeChatRoomId}
             chatRoomName={selectedChatRoomName}
-            initialMessages={messages[selectedChatRoomId] || []}
+            initialMessages={messages[activeChatRoomId] || []}
           />
         )}
       </div>
