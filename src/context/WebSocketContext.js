@@ -16,14 +16,9 @@ const WebSocketContext = createContext(null);
 
 export const WebSocketProvider = ({ children }) => {
   const [stompClient, setStompClient] = useState(null);
-  const {
-    addMessageToRoom,
-    mergeChatRooms,
-    chatRooms,
-    setChatRooms,
-    selectedChatRoomId,
-  } = useChatRoom();
-  const { userId } = useUser();
+  const { addMessageToRoom, mergeChatRooms, chatRooms, setChatRooms } =
+    useChatRoom();
+  const { userId, activeChatRoomId } = useUser();
   const { isInactive } = usePageActivity();
   const [connected, setConnected] = useState(false);
   const subscriptions = useRef({});
@@ -129,7 +124,7 @@ export const WebSocketProvider = ({ children }) => {
 
             if (existingRoom) {
               const unreadMessageCount =
-                (selectedChatRoomId !== chatRoomId &&
+                (activeChatRoomId !== chatRoomId &&
                   userId !== parsedMessage.senderId) ||
                 isInactive
                   ? existingRoom.unreadMessageCount + 1

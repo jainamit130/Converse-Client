@@ -21,16 +21,15 @@ export const ChatRoomProvider = ({ children }) => {
   const { isInactive } = usePageActivity();
   const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState({});
-  const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
   const {
     updateLastSeen,
     saveLastSeen,
     markChatRoomActive,
     markChatRoomInactive,
   } = useRedis();
-  const { userId, isLogin } = useUser();
+  const { userId, activeChatRoomId } = useUser();
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(
-    selectedChatRoomId,
+    activeChatRoomId,
     userId
   );
   const handleMarkAllMessagesDelivered = useMarkAllMessagesDelivered(userId);
@@ -45,24 +44,24 @@ export const ChatRoomProvider = ({ children }) => {
 
     const timestamp = new Date().toISOString();
     if (!isInactive) {
-      saveLastSeen(userId, timestamp, selectedChatRoomId);
+      saveLastSeen(userId, timestamp, activeChatRoomId);
       if (!deliveredRef.current) {
         handleMarkAllMessagesDelivered();
         deliveredRef.current = true;
       }
     } else {
-      updateLastSeen(userId, selectedChatRoomId);
+      updateLastSeen(userId, activeChatRoomId);
       deliveredRef.current = false;
     }
 
-    if (selectedChatRoomId !== null) {
-      markChatRoomActive(selectedChatRoomId, userId);
-      const chatRoom = chatRooms.get(selectedChatRoomId);
+    if (activeChatRoomId !== null) {
+      markChatRoomActive(activeChatRoomId, userId);
+      const chatRoom = chatRooms.get(activeChatRoomId);
       if (chatRoom?.unreadMessageCount > 0) {
         handleMarkAllMessagesRead();
       }
-    } else if (selectedChatRoomId !== null) {
-      markChatRoomInactive(selectedChatRoomId, userId);
+    } else if (activeChatRoomId !== null) {
+      markChatRoomInactive(activeChatRoomId, userId);
     }
   }, [isInactive]);
 
@@ -72,7 +71,7 @@ export const ChatRoomProvider = ({ children }) => {
     }
     const chatRoom = chatRooms.get(prevChatRoomIdRef.current);
     markChatRoomRead(setChatRooms, prevChatRoomIdRef.current, chatRoom);
-  }, [selectedChatRoomId]);
+  }, [activeChatRoomId]);
 
   const markChatRoomRead = (setChatRooms, prevChatRoomId, chatRoom) => {
     setChatRooms((prevChatRooms) => {
@@ -86,18 +85,18 @@ export const ChatRoomProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (selectedChatRoomId !== null) {
+    if (activeChatRoomId !== null) {
       if (
         chatRooms &&
-        chatRooms.get(selectedChatRoomId).unreadMessageCount > 0
+        chatRooms.get(activeChatRoomId)?.unreadMessageCount > 0
       ) {
         handleMarkAllMessagesRead();
       }
-      markChatRoomActive(selectedChatRoomId, userId, prevChatRoomIdRef.current);
+      markChatRoomActive(activeChatRoomId, userId, prevChatRoomIdRef.current);
     }
 
-    prevChatRoomIdRef.current = selectedChatRoomId;
-  }, [selectedChatRoomId, userId]);
+    prevChatRoomIdRef.current = activeChatRoomId;
+  }, [activeChatRoomId, userId]);
 
   const mergeChatRooms = useCallback((newChatRooms) => {
     let chatRoomsArray = [];
@@ -181,8 +180,6 @@ export const ChatRoomProvider = ({ children }) => {
         messages,
         addMessageToRoom,
         mergeChatRooms,
-        selectedChatRoomId,
-        setSelectedChatRoomId,
       }}
     >
       {children}
