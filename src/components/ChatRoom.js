@@ -22,6 +22,7 @@ const groupMessagesByDate = (messages, unreadMessageCount) => {
     }
 
     if (remainingMessages === 0) {
+      console.log(acc[messageDate]);
       acc[messageDate].push({ unreadMarker: true });
     }
     remainingMessages--;
@@ -30,12 +31,15 @@ const groupMessagesByDate = (messages, unreadMessageCount) => {
   }, {});
 };
 
-const ChatRoom = ({ chatRoomId, chatRoomName }) => {
-  const { userId } = useUser();
+const ChatRoom = () => {
+  const { userId, activeChatRoomId, activeChatRoomName } = useUser();
+  const chatRoomId = activeChatRoomId;
+  const chatRoomName = activeChatRoomName;
   const { sendMessage, connected, handleStopTyping, handleTyping } =
     useWebSocket();
   const [message, setMessage] = useState("");
-  const { messages, addMessageToRoom, chatRooms } = useChatRoom();
+  const { messages, addMessageToRoom, chatRooms, markChatRoomRead } =
+    useChatRoom();
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
   );
@@ -88,6 +92,7 @@ const ChatRoom = ({ chatRoomId, chatRoomName }) => {
     if (sendMessage) {
       sendMessage(`/app/chat/sendMessage/${chatRoomId}`, newMessage);
       setMessage("");
+      markChatRoomRead(chatRoomId);
     }
   };
 

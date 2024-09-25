@@ -69,14 +69,14 @@ export const ChatRoomProvider = ({ children }) => {
     if (prevChatRoomIdRef.current === null) {
       return;
     }
-    const chatRoom = chatRooms.get(prevChatRoomIdRef.current);
-    markChatRoomRead(setChatRooms, prevChatRoomIdRef.current, chatRoom);
+    markChatRoomRead(prevChatRoomIdRef.current);
   }, [activeChatRoomId]);
 
-  const markChatRoomRead = (setChatRooms, prevChatRoomId, chatRoom) => {
+  const markChatRoomRead = (chatRoomId) => {
+    const chatRoom = chatRooms.get(chatRoomId);
     setChatRooms((prevChatRooms) => {
       const newChatRooms = new Map(prevChatRooms);
-      newChatRooms.set(prevChatRoomId, {
+      newChatRooms.set(chatRoomId, {
         ...chatRoom,
         unreadMessageCount: 0,
       });
@@ -176,6 +176,7 @@ export const ChatRoomProvider = ({ children }) => {
     <ChatRoomContext.Provider
       value={{
         chatRooms,
+        markChatRoomRead,
         setChatRooms,
         messages,
         addMessageToRoom,

@@ -19,7 +19,6 @@ const ChatRooms = () => {
   const { chatRooms, messages, mergeChatRooms } = useChatRoom();
   const navigate = useNavigate();
   const { isInactive } = usePageActivity();
-  const [selectedChatRoomName, setSelectedChatRoomName] = useState(null);
 
   useEffect(() => {
     if (data) {
@@ -32,8 +31,7 @@ const ChatRooms = () => {
   };
 
   const handleChatRoomClick = (chatRoomId, chatRoomName) => {
-    setSelectedChatRoomName(chatRoomName);
-    updateActiveChatRoom(chatRoomId);
+    updateActiveChatRoom(chatRoomId, chatRoomName);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -86,7 +84,7 @@ const ChatRooms = () => {
                     </div>
                   </div>
                 </div>
-                {(activeChatRoomId !== room.id || isInactive) &&
+                {activeChatRoomId !== room.id &&
                   room.unreadMessageCount > 0 && (
                     <div className="unreadMessages">
                       {room.unreadMessageCount}
@@ -128,8 +126,6 @@ const ChatRooms = () => {
         ) : (
           <ChatRoom
             key={activeChatRoomId}
-            chatRoomId={activeChatRoomId}
-            chatRoomName={selectedChatRoomName}
             initialMessages={messages[activeChatRoomId] || []}
           />
         )}

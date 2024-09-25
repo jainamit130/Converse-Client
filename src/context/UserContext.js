@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
   );
 
   const [activeChatRoomId, setActiveChatRoomId] = useState(null);
+  const [activeChatRoomName, setActiveChatRoomName] = useState(null);
 
   const [isLogin, setIsLogin] = useState(false);
 
@@ -17,10 +18,12 @@ export const UserProvider = ({ children }) => {
     setUserId(userIdString);
   };
 
-  const updateActiveChatRoom = (chatRoomId) => {
+  const updateActiveChatRoom = (chatRoomId, chatRoomName) => {
     const chatRoomIdString = String(chatRoomId);
     localStorage.setItem("activeChatRoom", chatRoomIdString);
+    localStorage.setItem("activeChatRoomName", chatRoomName);
     setActiveChatRoomId(chatRoomIdString);
+    setActiveChatRoomName(chatRoomName);
   };
 
   return (
@@ -31,7 +34,7 @@ export const UserProvider = ({ children }) => {
         isLogin,
         setIsLogin,
         activeChatRoomId,
-        setActiveChatRoomId,
+        activeChatRoomName,
         updateActiveChatRoom,
       }}
     >
