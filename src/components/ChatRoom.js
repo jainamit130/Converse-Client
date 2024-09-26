@@ -11,6 +11,8 @@ import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
 import MessageInfoPanel from "./MessageInfoPanel";
+import { useNavigate } from "react-router-dom";
+import useGetOnlineUsers from "../hooks/useGetOnlineUsers.js";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   let remainingMessages = messages.length - unreadMessageCount;
@@ -22,7 +24,6 @@ const groupMessagesByDate = (messages, unreadMessageCount) => {
     }
 
     if (remainingMessages === 0) {
-      console.log(acc[messageDate]);
       acc[messageDate].push({ unreadMarker: true });
     }
     remainingMessages--;
@@ -35,6 +36,7 @@ const ChatRoom = () => {
   const { userId, activeChatRoomId, activeChatRoomName } = useUser();
   const chatRoomId = activeChatRoomId;
   const chatRoomName = activeChatRoomName;
+  const { getOnlineUsers } = useGetOnlineUsers();
   const { sendMessage, connected, handleStopTyping, handleTyping } =
     useWebSocket();
   const [message, setMessage] = useState("");
@@ -51,6 +53,7 @@ const ChatRoom = () => {
     chatRoomMessages,
     unreadMessageCount
   );
+  const navigate = useNavigate();
 
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -58,6 +61,12 @@ const ChatRoom = () => {
   const handleChange = (event) => {
     setMessage(event.target.value);
   };
+
+  useEffect(() => {
+    if (activeChatRoomId === null) {
+      navigate("/chat-rooms");
+    }
+  }, [activeChatRoomId]);
 
   useEffect(() => {
     setChatRoomMessages(messages[chatRoomId] || []);

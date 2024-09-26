@@ -49,6 +49,16 @@ export const WebSocketProvider = ({ children }) => {
     stompClient.send(`/app/stopTyping/${chatRoomId}`, {}, username);
   };
 
+  const handleSubscribeUser = (chatRoomId) => {
+    const username = localStorage.getItem("username");
+    stompClient.send(`/app/subscribeUser/${chatRoomId}`, {}, username);
+  };
+
+  const handleUnsubscribeUser = (chatRoomId) => {
+    const username = localStorage.getItem("username");
+    stompClient.send(`/app/unsubscribeUser/${chatRoomId}`, {}, username);
+  };
+
   useEffect(() => {
     return () => {
       clearTimeout(typingTimeoutRef.current);
@@ -82,6 +92,35 @@ export const WebSocketProvider = ({ children }) => {
       }
     }
   }, [stompClient, connected]);
+
+  useEffect(() => {
+    let unsubscribeFromOnlineStatus;
+    if (activeChatRoomId) {
+      unsubscribeFromOnlineStatus = subscribeToOnlineStatus(activeChatRoomId);
+    }
+
+    return () => {
+      if (unsubscribeFromOnlineStatus) {
+        unsubscribeFromOnlineStatus();
+      }
+    };
+  }, [activeChatRoomId]);
+
+  const subscribeToOnlineStatus = (chatRoomId) => {
+    const onlineStatusSubscription = stompClient.subscribe(
+      `/topic/online/${chatRoomId}`,
+      (message) => {
+        handleSubscribeUser(chatRoomId);
+        const onlineUsers = JSON.parse(message.body);
+        console.log(onlineUsers);
+      }
+    );
+
+    return () => {
+      onlineStatusSubscription.unsubscribe();
+      handleUnsubscribeUser(chatRoomId);
+    };
+  };
 
   useEffect(() => {
     if (stompClient && connected) {
@@ -121,10 +160,11 @@ export const WebSocketProvider = ({ children }) => {
           setChatRooms((prevChatRooms) => {
             const updatedRooms = new Map(prevChatRooms);
             const existingRoom = updatedRooms.get(chatRoomId);
+            const activeChatRoom = localStorage.getItem("activeChatRoom");
 
             if (existingRoom) {
               const unreadMessageCount =
-                (activeChatRoomId !== chatRoomId &&
+                (activeChatRoom !== chatRoomId &&
                   userId !== parsedMessage.senderId) ||
                 isInactive
                   ? existingRoom.unreadMessageCount + 1
@@ -139,7 +179,6 @@ export const WebSocketProvider = ({ children }) => {
               updatedRooms.set(chatRoomId, updatedRoom);
             }
             const sortedRooms = sortChatRooms(updatedRooms);
-            console.log(sortedRooms);
             return sortedRooms;
           });
         }

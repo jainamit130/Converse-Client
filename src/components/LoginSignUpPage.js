@@ -1,4 +1,3 @@
-// src/components/LoginSignUpPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
@@ -7,16 +6,18 @@ const LoginSignUpPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isLoginPage, setIsLoginPage] = useState(true);
   const navigate = useNavigate();
-  const { updateUserId, isLogin, setIsLogin } = useUser();
+  const { updateUserId, setActiveChatRoomId, setActiveChatRoomName } =
+    useUser();
 
   const togglePage = () => {
-    setIsLogin(!isLogin);
+    setIsLoginPage(!isLoginPage);
   };
   const handle = async (e) => {
     e.preventDefault();
 
-    const url = isLogin
+    const url = isLoginPage
       ? "http://localhost:8081/converse/auth/login"
       : "http://localhost:8081/converse/auth/signup";
 
@@ -38,20 +39,21 @@ const LoginSignUpPage = () => {
         throw new Error("Network response was not ok");
       }
 
-      if (!isLogin) {
+      if (!isLoginPage) {
         const text = await response.text();
         console.log("Signup response:", text);
         setMessage("Signup successful! Please login.");
-      }
-      // For login, handle JSON response
-      else {
-        const data = await response.json(); // Read as JSON for login
+      } else {
+        const data = await response.json();
         const { userId, username, authenticationToken, refreshToken } = data;
 
         localStorage.setItem("userId", userId);
         localStorage.setItem("username", username);
         localStorage.setItem("authenticationToken", authenticationToken);
         localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("isLogin", true);
+        setActiveChatRoomId(null);
+        setActiveChatRoomName(null);
 
         updateUserId(data.userId);
         navigate(`/chat-rooms`);
@@ -65,7 +67,7 @@ const LoginSignUpPage = () => {
   return (
     <div style={styles.container}>
       <div style={styles.loginBox}>
-        <h2 style={styles.title}>{isLogin ? "Login" : "Sign Up"}</h2>
+        <h2 style={styles.title}>{isLoginPage ? "Login" : "Sign Up"}</h2>
         <form onSubmit={handle}>
           <div style={styles.inputGroup}>
             <label style={styles.label}>Username</label>
@@ -88,14 +90,14 @@ const LoginSignUpPage = () => {
             />
           </div>
           <button type="submit" style={styles.button}>
-            {isLogin ? "Login" : "Sign Up"}
+            {isLoginPage ? "Login" : "Sign Up"}
           </button>
         </form>
         {message && <p>{message}</p>}
         <p style={styles.switchText}>
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+          {isLoginPage ? "Don't have an account?" : "Already have an account?"}{" "}
           <button style={styles.link} onClick={togglePage}>
-            {isLogin ? "Sign Up" : "Login"}
+            {isLoginPage ? "Sign Up" : "Login"}
           </button>
         </p>
       </div>
@@ -103,8 +105,6 @@ const LoginSignUpPage = () => {
   );
 };
 
-const styles = {
-  // Styles remain the same
-};
+const styles = {};
 
 export default LoginSignUpPage;

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 const UserContext = createContext();
 
@@ -7,23 +7,41 @@ export const UserProvider = ({ children }) => {
     String(localStorage.getItem("userId")) || null
   );
 
-  const [activeChatRoomId, setActiveChatRoomId] = useState(null);
-  const [activeChatRoomName, setActiveChatRoomName] = useState(null);
+  const [activeChatRoomId, setActiveChatRoomId] = useState(() => {
+    const storedData = localStorage.getItem("activeChatRoom");
+    return storedData ? storedData : null;
+  });
 
-  const [isLogin, setIsLogin] = useState(false);
+  const [activeChatRoomName, setActiveChatRoomName] = useState(() => {
+    const storedData = localStorage.getItem("activeChatRoomName");
+    return storedData ? storedData : null;
+  });
+
+  const [isLogin, setIsLogin] = useState(() => {
+    const savedLoginStatus = localStorage.getItem("isLogin");
+    return savedLoginStatus === "true";
+  });
+
+  useEffect(() => {
+    if (activeChatRoomId) {
+      localStorage.setItem("activeChatRoom", activeChatRoomId);
+    } else {
+      localStorage.removeItem("activeChatRoom");
+    }
+  }, [activeChatRoomId]);
+
+  useEffect(() => {
+    if (activeChatRoomName) {
+      localStorage.setItem("activeChatRoomName", activeChatRoomName);
+    } else {
+      localStorage.removeItem("activeChatRoomName");
+    }
+  }, [activeChatRoomName]);
 
   const updateUserId = (id) => {
     const userIdString = String(id);
     setIsLogin(true);
     setUserId(userIdString);
-  };
-
-  const updateActiveChatRoom = (chatRoomId, chatRoomName) => {
-    const chatRoomIdString = String(chatRoomId);
-    localStorage.setItem("activeChatRoom", chatRoomIdString);
-    localStorage.setItem("activeChatRoomName", chatRoomName);
-    setActiveChatRoomId(chatRoomIdString);
-    setActiveChatRoomName(chatRoomName);
   };
 
   return (
@@ -34,8 +52,9 @@ export const UserProvider = ({ children }) => {
         isLogin,
         setIsLogin,
         activeChatRoomId,
+        setActiveChatRoomId,
         activeChatRoomName,
-        updateActiveChatRoom,
+        setActiveChatRoomName,
       }}
     >
       {children}

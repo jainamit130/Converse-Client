@@ -14,6 +14,7 @@ import {
 } from "../hooks/useMarkAllMessages";
 import { usePageActivity } from "./PageActivityContext";
 import { sortChatRooms } from "../util/chatUtil";
+import { useNavigate } from "react-router-dom";
 
 const ChatRoomContext = createContext();
 
@@ -27,7 +28,7 @@ export const ChatRoomProvider = ({ children }) => {
     markChatRoomActive,
     markChatRoomInactive,
   } = useRedis();
-  const { userId, activeChatRoomId } = useUser();
+  const { userId, isLogin, activeChatRoomId, setActiveChatRoomId } = useUser();
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(
     activeChatRoomId,
     userId
@@ -38,10 +39,11 @@ export const ChatRoomProvider = ({ children }) => {
   const deliveredRef = useRef(false);
 
   useEffect(() => {
-    if (!userId) {
+    if (!userId || !isLogin) {
       return;
     }
 
+    const activeChatRoomId = localStorage.getItem("activeChatRoom");
     const timestamp = new Date().toISOString();
     if (!isInactive) {
       saveLastSeen(userId, timestamp, activeChatRoomId);
@@ -51,6 +53,7 @@ export const ChatRoomProvider = ({ children }) => {
       }
     } else {
       updateLastSeen(userId, activeChatRoomId);
+      setActiveChatRoomId(null);
       deliveredRef.current = false;
     }
 
@@ -63,12 +66,13 @@ export const ChatRoomProvider = ({ children }) => {
     } else if (activeChatRoomId !== null) {
       markChatRoomInactive(activeChatRoomId, userId);
     }
-  }, [isInactive]);
+  }, [isInactive, isLogin]);
 
   useEffect(() => {
     if (prevChatRoomIdRef.current === null) {
       return;
     }
+
     markChatRoomRead(prevChatRoomIdRef.current);
   }, [activeChatRoomId]);
 

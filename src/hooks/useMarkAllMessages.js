@@ -15,7 +15,6 @@ export const useMarkAllMessagesRead = (chatRoomId, userId) => {
           userId: userId,
         },
       });
-      console.log("Messages marked as read");
     } catch (error) {
       console.error("Error marking messages as read", error);
     }
@@ -34,7 +33,6 @@ export const useMarkAllMessagesDelivered = (userId) => {
           userId: userId,
         },
       });
-      console.log("Messages marked as delivered");
     } catch (error) {
       console.error("Error marking messages as delivered", error);
     }
