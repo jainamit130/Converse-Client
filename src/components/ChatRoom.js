@@ -4,15 +4,16 @@ import { GET_MESSAGES_OF_CHAT_ROOM } from "../graphql/queries";
 import { useWebSocket } from "../context/WebSocketContext";
 import { useUser } from "../context/UserContext";
 import { useChatRoom } from "../context/ChatRoomContext";
-import profileIcon from "../assets/profileIcon.webp";
 import { parseDate, formatMessageDate, formatTime } from "../util/dateUtil.js";
 import "./ChatRoom.css";
-import TypingIndicator from "./TypingIndicator.js";
 import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
 import MessageInfoPanel from "./MessageInfoPanel";
 import { useNavigate } from "react-router-dom";
 import useGetOnlineUsers from "../hooks/useGetOnlineUsers.js";
+import ChatRoomHeader from "./ChatRoomHeader.js";
+import TypingIndicator from "./TypingIndicator";
+import profileIcon from "../assets/profileIcon.webp";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   let remainingMessages = messages.length - unreadMessageCount;
@@ -33,7 +34,7 @@ const groupMessagesByDate = (messages, unreadMessageCount) => {
 };
 
 const ChatRoom = () => {
-  const { userId, activeChatRoomId, activeChatRoomName } = useUser();
+  const { userId, username, activeChatRoomId, activeChatRoomName } = useUser();
   const chatRoomId = activeChatRoomId;
   const chatRoomName = activeChatRoomName;
   const { getOnlineUsers } = useGetOnlineUsers();
@@ -46,6 +47,8 @@ const ChatRoom = () => {
     messages[chatRoomId] || []
   );
   const [typingUsers, setTypingUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(chatRoomId, userId);
   const chatMessagesRef = useRef(null);
   const unreadMessageCount = chatRooms.get(chatRoomId)?.unreadMessageCount || 0;
@@ -77,8 +80,17 @@ const ChatRoom = () => {
     const chatRoom = chatRooms.get(chatRoomId);
     if (chatRoom) {
       setTypingUsers(chatRoom.typingUsers || []);
+
+      // Ensure onlineUsers is an array before filtering
+      const userKey = JSON.stringify({
+        userId: userId,
+        username: username,
+      });
+      const filteredOnlineUsers = chatRoom.onlineUsers || new Set();
+      filteredOnlineUsers.delete(userKey);
+      setOnlineUsers(filteredOnlineUsers);
     }
-  }, [chatRooms, chatRoomId]);
+  }, [chatRooms, chatRoomId, userId]);
 
   const chatRoom = chatRooms.get(chatRoomId);
   const messagesLoaded = chatRoom?.messagesLoaded || false;
@@ -129,15 +141,13 @@ const ChatRoom = () => {
 
   return (
     <div className="chat-messages-section">
-      <div className="chat-details">
-        <img src={profileIcon} className="chatRoomIcon" />
-        <div>
-          <div className="chat-room-name">{chatRoomName}</div>
-          <div className="typing-status">
-            <TypingIndicator typingUsers={typingUsers} />
-          </div>
-        </div>
-      </div>
+      <ChatRoomHeader
+        key={chatRoomId}
+        userId={userId}
+        chatRoomName={chatRoomName}
+        typingUsers={typingUsers}
+        onlineUsers={onlineUsers}
+      />
 
       <div className="chat-messages" ref={chatMessagesRef}>
         {Object.entries(groupedMessages).map(([date, messages]) => (

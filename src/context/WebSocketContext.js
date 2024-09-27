@@ -49,16 +49,6 @@ export const WebSocketProvider = ({ children }) => {
     stompClient.send(`/app/stopTyping/${chatRoomId}`, {}, username);
   };
 
-  const handleSubscribeUser = (chatRoomId) => {
-    const username = localStorage.getItem("username");
-    stompClient.send(`/app/subscribeUser/${chatRoomId}`, {}, username);
-  };
-
-  const handleUnsubscribeUser = (chatRoomId) => {
-    const username = localStorage.getItem("username");
-    stompClient.send(`/app/unsubscribeUser/${chatRoomId}`, {}, username);
-  };
-
   useEffect(() => {
     return () => {
       clearTimeout(typingTimeoutRef.current);
@@ -94,31 +84,64 @@ export const WebSocketProvider = ({ children }) => {
   }, [stompClient, connected]);
 
   useEffect(() => {
-    let unsubscribeFromOnlineStatus;
-    if (activeChatRoomId) {
-      unsubscribeFromOnlineStatus = subscribeToOnlineStatus(activeChatRoomId);
-    }
-
-    return () => {
-      if (unsubscribeFromOnlineStatus) {
-        unsubscribeFromOnlineStatus();
+    if (stompClient && connected) {
+      let unsubscribeFromOnlineStatus;
+      if (activeChatRoomId) {
+        unsubscribeFromOnlineStatus = subscribeToOnlineStatus(activeChatRoomId);
       }
-    };
-  }, [activeChatRoomId]);
+
+      return () => {
+        if (unsubscribeFromOnlineStatus) {
+          unsubscribeFromOnlineStatus();
+        }
+      };
+    }
+  }, [stompClient, connected, activeChatRoomId]);
 
   const subscribeToOnlineStatus = (chatRoomId) => {
     const onlineStatusSubscription = stompClient.subscribe(
       `/topic/online/${chatRoomId}`,
       (message) => {
-        handleSubscribeUser(chatRoomId);
         const onlineUsers = JSON.parse(message.body);
-        console.log(onlineUsers);
+        //onlineUsers => {userId: '74', username: 'Yesh', status: 'ONLINE'}
+        // Set the ChatRoom with a set of online Users
+        setChatRooms((prevChatRooms) => {
+          const updatedChatRooms = new Map(prevChatRooms);
+          const chatRoom = updatedChatRooms.get(chatRoomId);
+
+          if (chatRoom) {
+            // Ensure updatedOnlineUsers is initialized as a Set if it doesn't exist
+            const updatedOnlineUsers = chatRoom.onlineUsers || new Set();
+
+            if (onlineUsers.status === "ONLINE") {
+              // Add the user to the online users set if they are online
+              const userKey = JSON.stringify({
+                userId: onlineUsers.userId,
+                username: onlineUsers.username,
+              });
+              updatedOnlineUsers.add(userKey);
+            } else if (onlineUsers.status === "OFFLINE") {
+              // Remove the user from the online users set if they are offline
+              const userKey = JSON.stringify({
+                userId: onlineUsers.userId,
+                username: onlineUsers.username,
+              });
+              updatedOnlineUsers.delete(userKey);
+            }
+
+            updatedChatRooms.set(chatRoomId, {
+              ...chatRoom,
+              onlineUsers: updatedOnlineUsers, // Update the Set of online users
+            });
+          }
+
+          return updatedChatRooms; // Return the updated state
+        });
       }
     );
 
     return () => {
       onlineStatusSubscription.unsubscribe();
-      handleUnsubscribeUser(chatRoomId);
     };
   };
 

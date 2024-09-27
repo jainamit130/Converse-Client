@@ -35,8 +35,22 @@ export const ChatRoomProvider = ({ children }) => {
   );
   const handleMarkAllMessagesDelivered = useMarkAllMessagesDelivered(userId);
   const prevChatRoomIdRef = useRef(null);
-
   const deliveredRef = useRef(false);
+
+  const updateChatRoomWithOnlineUsers = (chatRoomId, onlineUsers) => {
+    setChatRooms((prevChatRooms) => {
+      const updatedChatRooms = new Map(prevChatRooms);
+      const updatedRoom = updatedChatRooms.get(chatRoomId);
+      if (updatedRoom) {
+        updatedChatRooms.set(chatRoomId, {
+          ...updatedRoom,
+          onlineUsers: onlineUsers,
+        });
+      }
+      updatedChatRooms.set(chatRoomId, updatedRoom);
+      return updatedChatRooms;
+    });
+  };
 
   useEffect(() => {
     if (!userId || !isLogin) {
@@ -51,31 +65,33 @@ export const ChatRoomProvider = ({ children }) => {
         handleMarkAllMessagesDelivered();
         deliveredRef.current = true;
       }
+
+      if (activeChatRoomId !== null) {
+        markChatRoomActive(activeChatRoomId, userId);
+        const chatRoom = chatRooms.get(activeChatRoomId);
+        if (chatRoom?.unreadMessageCount > 0) {
+          handleMarkAllMessagesRead();
+        }
+      }
     } else {
       updateLastSeen(userId, activeChatRoomId);
       setActiveChatRoomId(null);
       deliveredRef.current = false;
-    }
-
-    if (activeChatRoomId !== null) {
-      markChatRoomActive(activeChatRoomId, userId);
-      const chatRoom = chatRooms.get(activeChatRoomId);
-      if (chatRoom?.unreadMessageCount > 0) {
-        handleMarkAllMessagesRead();
+      if (activeChatRoomId !== null) {
+        markChatRoomInactive(activeChatRoomId, userId);
       }
-    } else if (activeChatRoomId !== null) {
-      markChatRoomInactive(activeChatRoomId, userId);
     }
   }, [isInactive, isLogin]);
 
+  // Effect for marking a chat room read when switching between rooms
   useEffect(() => {
     if (prevChatRoomIdRef.current === null) {
       return;
     }
-
     markChatRoomRead(prevChatRoomIdRef.current);
   }, [activeChatRoomId]);
 
+  // Mark a chat room as read
   const markChatRoomRead = (chatRoomId) => {
     const chatRoom = chatRooms.get(chatRoomId);
     setChatRooms((prevChatRooms) => {
@@ -88,6 +104,7 @@ export const ChatRoomProvider = ({ children }) => {
     });
   };
 
+  // useEffect for marking active chat rooms and updating online users
   useEffect(() => {
     if (activeChatRoomId !== null) {
       if (
@@ -96,12 +113,21 @@ export const ChatRoomProvider = ({ children }) => {
       ) {
         handleMarkAllMessagesRead();
       }
-      markChatRoomActive(activeChatRoomId, userId, prevChatRoomIdRef.current);
+
+      (async () => {
+        const onlineUsers = await markChatRoomActive(
+          activeChatRoomId,
+          userId,
+          prevChatRoomIdRef.current
+        );
+        updateChatRoomWithOnlineUsers(activeChatRoomId, onlineUsers);
+      })();
     }
 
     prevChatRoomIdRef.current = activeChatRoomId;
   }, [activeChatRoomId, userId]);
 
+  // Function to merge new chat rooms with the current list
   const mergeChatRooms = useCallback((newChatRooms) => {
     let chatRoomsArray = [];
 
@@ -124,7 +150,6 @@ export const ChatRoomProvider = ({ children }) => {
 
       chatRoomsArray.forEach((newRoom) => {
         const existingRoom = updatedRooms.get(newRoom.id);
-
         if (existingRoom) {
           updatedRooms.set(newRoom.id, { ...existingRoom, ...newRoom });
         } else {
@@ -137,6 +162,7 @@ export const ChatRoomProvider = ({ children }) => {
     });
   }, []);
 
+  // Function to add a message to a specific chat room
   const addMessageToRoom = useCallback(
     (chatRoomId, messageOrMessages, base = false) => {
       setMessages((prevMessages) => {

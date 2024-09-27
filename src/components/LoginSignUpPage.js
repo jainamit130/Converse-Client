@@ -41,7 +41,6 @@ const LoginSignUpPage = () => {
 
       if (!isLoginPage) {
         const text = await response.text();
-        console.log("Signup response:", text);
         setMessage("Signup successful! Please login.");
       } else {
         const data = await response.json();

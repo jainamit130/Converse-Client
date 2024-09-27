@@ -81,8 +81,9 @@ const useRedis = () => {
         method: "POST",
       });
 
-      const data = await response.text();
-      return data;
+      const data = await response.json();
+      const onlineUsers = new Set(data);
+      return onlineUsers;
     } catch (err) {
       setError(err);
       console.error("Error saving data:", err);

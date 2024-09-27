@@ -7,6 +7,10 @@ export const UserProvider = ({ children }) => {
     String(localStorage.getItem("userId")) || null
   );
 
+  const [username, setUsername] = useState(
+    String(localStorage.getItem("username")) || null
+  );
+
   const [activeChatRoomId, setActiveChatRoomId] = useState(() => {
     const storedData = localStorage.getItem("activeChatRoom");
     return storedData ? storedData : null;
@@ -49,6 +53,7 @@ export const UserProvider = ({ children }) => {
       value={{
         userId,
         updateUserId,
+        username,
         isLogin,
         setIsLogin,
         activeChatRoomId,
