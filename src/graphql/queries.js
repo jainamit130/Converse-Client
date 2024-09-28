@@ -27,6 +27,7 @@ export const GET_MESSAGES_OF_CHAT_ROOM = gql`
       senderId
       timestamp
       content
+      status
       user {
         id
         username

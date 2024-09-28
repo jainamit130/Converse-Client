@@ -28,7 +28,8 @@ export const ChatRoomProvider = ({ children }) => {
     markChatRoomActive,
     markChatRoomInactive,
   } = useRedis();
-  const { userId, isLogin, activeChatRoomId, setActiveChatRoomId } = useUser();
+  const { userId, username, isLogin, activeChatRoomId, setActiveChatRoomId } =
+    useUser();
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(
     activeChatRoomId,
     userId
@@ -40,6 +41,21 @@ export const ChatRoomProvider = ({ children }) => {
   const updateChatRoomWithOnlineUsers = (chatRoomId, onlineUsers) => {
     setChatRooms((prevChatRooms) => {
       const updatedChatRooms = new Map(prevChatRooms);
+
+      const prevChatRoomId = prevChatRoomIdRef.current;
+      if (prevChatRoomId) {
+        const prevRoom = updatedChatRooms.get(prevChatRoomId);
+        if (prevRoom) {
+          const updatedOnlineUsers = new Set();
+          updatedOnlineUsers.add(username);
+          updatedChatRooms.set(prevChatRoomId, {
+            ...prevRoom,
+            onlineUsers: updatedOnlineUsers,
+          });
+        }
+      }
+
+      // Update the current chat room
       const updatedRoom = updatedChatRooms.get(chatRoomId);
       if (updatedRoom) {
         updatedChatRooms.set(chatRoomId, {
@@ -47,7 +63,7 @@ export const ChatRoomProvider = ({ children }) => {
           onlineUsers: onlineUsers,
         });
       }
-      updatedChatRooms.set(chatRoomId, updatedRoom);
+
       return updatedChatRooms;
     });
   };
@@ -75,11 +91,11 @@ export const ChatRoomProvider = ({ children }) => {
       }
     } else {
       updateLastSeen(userId, activeChatRoomId);
-      setActiveChatRoomId(null);
-      deliveredRef.current = false;
       if (activeChatRoomId !== null) {
         markChatRoomInactive(activeChatRoomId, userId);
       }
+      setActiveChatRoomId(null);
+      deliveredRef.current = false;
     }
   }, [isInactive, isLogin]);
 

@@ -102,8 +102,10 @@ export const WebSocketProvider = ({ children }) => {
     const onlineStatusSubscription = stompClient.subscribe(
       `/topic/online/${chatRoomId}`,
       (message) => {
+        console.log(message.body);
         const onlineUsers = JSON.parse(message.body);
-        //onlineUsers => {userId: '74', username: 'Yesh', status: 'ONLINE'}
+        console.log(onlineUsers);
+        //onlineUsers => {username: 'Yesh', status: 'ONLINE'}
         // Set the ChatRoom with a set of online Users
         setChatRooms((prevChatRooms) => {
           const updatedChatRooms = new Map(prevChatRooms);
@@ -115,20 +117,12 @@ export const WebSocketProvider = ({ children }) => {
 
             if (onlineUsers.status === "ONLINE") {
               // Add the user to the online users set if they are online
-              const userKey = JSON.stringify({
-                userId: onlineUsers.userId,
-                username: onlineUsers.username,
-              });
-              updatedOnlineUsers.add(userKey);
+              updatedOnlineUsers.add(onlineUsers.username);
             } else if (onlineUsers.status === "OFFLINE") {
               // Remove the user from the online users set if they are offline
-              const userKey = JSON.stringify({
-                userId: onlineUsers.userId,
-                username: onlineUsers.username,
-              });
-              updatedOnlineUsers.delete(userKey);
+              updatedOnlineUsers.delete(onlineUsers.username);
             }
-
+            console.log(updatedOnlineUsers);
             updatedChatRooms.set(chatRoomId, {
               ...chatRoom,
               onlineUsers: updatedOnlineUsers, // Update the Set of online users
@@ -234,6 +228,42 @@ export const WebSocketProvider = ({ children }) => {
 
       subscriptionData.unsubscribeTyping = () =>
         typingSubscription.unsubscribe();
+    }
+
+    if (!subscriptionData.unsubscribeMessageStatus) {
+      const messageStatusSubscription = stompClient.subscribe(
+        `/topic/message/${userId}`, // Modify if needed to match the backend topic
+        (message) => {
+          const statusUpdate = JSON.parse(message.body);
+
+          setChatRooms((prevChatRooms) => {
+            const updatedChatRooms = new Map(prevChatRooms);
+            const chatRoom = updatedChatRooms.get(statusUpdate.chatRoomId);
+
+            if (chatRoom) {
+              const updatedMessages = chatRoom.messages.map((msg) => {
+                if (msg.id === statusUpdate.messageId) {
+                  return {
+                    ...msg,
+                    status: statusUpdate.isDelivered ? "DELIVERED" : "READ",
+                  };
+                }
+                return msg;
+              });
+
+              updatedChatRooms.set(statusUpdate.chatRoomId, {
+                ...chatRoom,
+                messages: updatedMessages,
+              });
+            }
+
+            return updatedChatRooms;
+          });
+        }
+      );
+
+      subscriptionData.unsubscribeMessageStatus = () =>
+        messageStatusSubscription.unsubscribe();
     }
 
     return () => {

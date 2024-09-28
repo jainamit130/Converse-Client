@@ -10,10 +10,11 @@ import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
 import MessageInfoPanel from "./MessageInfoPanel";
 import { useNavigate } from "react-router-dom";
-import useGetOnlineUsers from "../hooks/useGetOnlineUsers.js";
 import ChatRoomHeader from "./ChatRoomHeader.js";
+import deliveredStatusIcon from "../assets/deliveredStatus.png";
 import TypingIndicator from "./TypingIndicator";
 import profileIcon from "../assets/profileIcon.webp";
+import MessageStatusIcon from "./MessageStatusIcon.js";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   let remainingMessages = messages.length - unreadMessageCount;
@@ -37,7 +38,6 @@ const ChatRoom = () => {
   const { userId, username, activeChatRoomId, activeChatRoomName } = useUser();
   const chatRoomId = activeChatRoomId;
   const chatRoomName = activeChatRoomName;
-  const { getOnlineUsers } = useGetOnlineUsers();
   const { sendMessage, connected, handleStopTyping, handleTyping } =
     useWebSocket();
   const [message, setMessage] = useState("");
@@ -80,15 +80,10 @@ const ChatRoom = () => {
     const chatRoom = chatRooms.get(chatRoomId);
     if (chatRoom) {
       setTypingUsers(chatRoom.typingUsers || []);
-
-      // Ensure onlineUsers is an array before filtering
-      const userKey = JSON.stringify({
-        userId: userId,
-        username: username,
-      });
       const filteredOnlineUsers = chatRoom.onlineUsers || new Set();
-      filteredOnlineUsers.delete(userKey);
+      filteredOnlineUsers.delete(username);
       setOnlineUsers(filteredOnlineUsers);
+      console.log(filteredOnlineUsers);
     }
   }, [chatRooms, chatRoomId, userId]);
 
@@ -143,7 +138,6 @@ const ChatRoom = () => {
     <div className="chat-messages-section">
       <ChatRoomHeader
         key={chatRoomId}
-        userId={userId}
         chatRoomName={chatRoomName}
         typingUsers={typingUsers}
         onlineUsers={onlineUsers}
@@ -183,7 +177,11 @@ const ChatRoom = () => {
                   onClick={() => openMessageInfoPanel(message)}
                 >
                   <div className="messageContent">{message.content}</div>
-                  <div className="message-time">{formattedTime}</div>
+                  <MessageStatusIcon
+                    key={message.id}
+                    status={message.status}
+                    formattedTime={formattedTime}
+                  />
                 </div>
               );
             })}
