@@ -16,8 +16,14 @@ const WebSocketContext = createContext(null);
 
 export const WebSocketProvider = ({ children }) => {
   const [stompClient, setStompClient] = useState(null);
-  const { addMessageToRoom, mergeChatRooms, chatRooms, setChatRooms } =
-    useChatRoom();
+  const {
+    addMessageToRoom,
+    mergeChatRooms,
+    messsages,
+    setMessages,
+    chatRooms,
+    setChatRooms,
+  } = useChatRoom();
   const { userId, activeChatRoomId } = useUser();
   const { isInactive } = usePageActivity();
   const [connected, setConnected] = useState(false);
@@ -102,9 +108,7 @@ export const WebSocketProvider = ({ children }) => {
     const onlineStatusSubscription = stompClient.subscribe(
       `/topic/online/${chatRoomId}`,
       (message) => {
-        console.log(message.body);
         const onlineUsers = JSON.parse(message.body);
-        console.log(onlineUsers);
         //onlineUsers => {username: 'Yesh', status: 'ONLINE'}
         // Set the ChatRoom with a set of online Users
         setChatRooms((prevChatRooms) => {
@@ -122,7 +126,6 @@ export const WebSocketProvider = ({ children }) => {
               // Remove the user from the online users set if they are offline
               updatedOnlineUsers.delete(onlineUsers.username);
             }
-            console.log(updatedOnlineUsers);
             updatedChatRooms.set(chatRoomId, {
               ...chatRoom,
               onlineUsers: updatedOnlineUsers, // Update the Set of online users
@@ -185,7 +188,7 @@ export const WebSocketProvider = ({ children }) => {
                   userId !== parsedMessage.senderId) ||
                 isInactive
                   ? existingRoom.unreadMessageCount + 1
-                  : existingRoom.unreadMessageCount;
+                  : 0;
 
               const updatedRoom = {
                 ...existingRoom,
@@ -232,32 +235,44 @@ export const WebSocketProvider = ({ children }) => {
 
     if (!subscriptionData.unsubscribeMessageStatus) {
       const messageStatusSubscription = stompClient.subscribe(
-        `/topic/message/${userId}`, // Modify if needed to match the backend topic
+        `/topic/message/${userId}`,
         (message) => {
           const statusUpdate = JSON.parse(message.body);
+          console.log(statusUpdate);
 
-          setChatRooms((prevChatRooms) => {
-            const updatedChatRooms = new Map(prevChatRooms);
-            const chatRoom = updatedChatRooms.get(statusUpdate.chatRoomId);
+          setMessages((prevMessages) => {
+            // Clone the previous state to avoid direct mutation
+            const updatedMessages = { ...prevMessages };
 
-            if (chatRoom) {
-              const updatedMessages = chatRoom.messages.map((msg) => {
-                if (msg.id === statusUpdate.messageId) {
-                  return {
-                    ...msg,
-                    status: statusUpdate.isDelivered ? "DELIVERED" : "READ",
-                  };
-                }
+            // Get messages for the specific chat room
+            const chatRoomMessages =
+              updatedMessages[statusUpdate.chatRoomId] || [];
+
+            // Convert the list of message IDs to a Set for efficient lookup
+            const messageIdsToUpdate = new Set(statusUpdate.messageIds);
+
+            // Traverse through the messages and update the status where applicable
+            const updatedChatRoomMessages = chatRoomMessages.map((msg) => {
+              // If the Set is exhausted, stop further iteration
+              if (messageIdsToUpdate.size === 0) {
                 return msg;
-              });
+              }
 
-              updatedChatRooms.set(statusUpdate.chatRoomId, {
-                ...chatRoom,
-                messages: updatedMessages,
-              });
-            }
+              // If the message ID is in the Set, update the status and remove it from the Set
+              if (messageIdsToUpdate.has(msg.id)) {
+                messageIdsToUpdate.delete(msg.id);
+                return {
+                  ...msg,
+                  status: statusUpdate.isDelivered ? "DELIVERED" : "READ",
+                };
+              }
 
-            return updatedChatRooms;
+              return msg;
+            });
+
+            updatedMessages[statusUpdate.chatRoomId] = updatedChatRoomMessages;
+
+            return updatedMessages;
           });
         }
       );

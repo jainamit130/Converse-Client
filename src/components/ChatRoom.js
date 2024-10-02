@@ -11,24 +11,22 @@ import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
 import MessageInfoPanel from "./MessageInfoPanel";
 import { useNavigate } from "react-router-dom";
 import ChatRoomHeader from "./ChatRoomHeader.js";
-import deliveredStatusIcon from "../assets/deliveredStatus.png";
-import TypingIndicator from "./TypingIndicator";
-import profileIcon from "../assets/profileIcon.webp";
 import MessageStatusIcon from "./MessageStatusIcon.js";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
-  let remainingMessages = messages.length - unreadMessageCount;
-  return messages.reduce((acc, message) => {
+  return messages.reduce((acc, message, index) => {
     const messageDate = formatMessageDate(parseDate(message.timestamp));
 
     if (!acc[messageDate]) {
       acc[messageDate] = [];
     }
 
-    if (remainingMessages === 0) {
+    // Insert the marker before the first of the last few unread messages
+    const markerIndex = messages.length - unreadMessageCount;
+    if (index === markerIndex) {
       acc[messageDate].push({ unreadMarker: true });
     }
-    remainingMessages--;
+
     acc[messageDate].push(message);
     return acc;
   }, {});
@@ -83,7 +81,6 @@ const ChatRoom = () => {
       const filteredOnlineUsers = chatRoom.onlineUsers || new Set();
       filteredOnlineUsers.delete(username);
       setOnlineUsers(filteredOnlineUsers);
-      console.log(filteredOnlineUsers);
     }
   }, [chatRooms, chatRoomId, userId]);
 
@@ -113,10 +110,6 @@ const ChatRoom = () => {
   };
 
   useEffect(() => {
-    window.scrollTo(0, document.body.scrollHeight);
-  }, [chatRoomId]);
-
-  useEffect(() => {
     if (!data || !connected) return;
     addMessageToRoom(chatRoomId, data.getMessagesOfChatRoom, true);
   }, [data, connected, chatRoomId, addMessageToRoom]);
@@ -135,7 +128,10 @@ const ChatRoom = () => {
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div className="chat-messages-section">
+    <div
+      className="chat-messages-section"
+      style={{ width: isPanelOpen ? "60.8%" : "100%" }}
+    >
       <ChatRoomHeader
         key={chatRoomId}
         chatRoomName={chatRoomName}
@@ -177,17 +173,19 @@ const ChatRoom = () => {
                   onClick={() => openMessageInfoPanel(message)}
                 >
                   <div className="messageContent">{message.content}</div>
-                  <MessageStatusIcon
-                    key={message.id}
-                    status={message.status}
-                    formattedTime={formattedTime}
-                  />
+                  {message.senderId === userId && (
+                    <MessageStatusIcon
+                      key={message.id}
+                      status={message.status}
+                      formattedTime={formattedTime}
+                    />
+                  )}
                 </div>
               );
             })}
           </div>
         ))}
-        <ScrollToBottom />
+        <ScrollToBottom chatRoomId={chatRoomId} messages={chatRoomMessages} />
       </div>
       <form
         onSubmit={(e) => {

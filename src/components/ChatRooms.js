@@ -3,12 +3,12 @@ import { useQuery } from "@apollo/client";
 import { GET_CHAT_ROOMS_OF_USER } from "../graphql/queries";
 import ChatRoom from "./ChatRoom";
 import { useUser } from "../context/UserContext";
-import GroupIcon from "../assets/GroupIcon.png";
 import newChat from "../assets/newChat.png";
 import { useNavigate } from "react-router-dom";
 import { useChatRoom } from "../context/ChatRoomContext";
 import "./ChatRooms.css";
-import TypingIndicator from "./TypingIndicator";
+import Tile from "./reusableComponents/Tile";
+import AddUser from "./AddUser";
 
 const ChatRooms = () => {
   const {
@@ -22,7 +22,11 @@ const ChatRooms = () => {
     variables: { userId },
   });
   const { chatRooms, messages, mergeChatRooms } = useChatRoom();
-  const navigate = useNavigate();
+  const [showAddUserPanel, setShowAddUserPanel] = useState(false);
+
+  const handleCloseAddUser = () => {
+    setShowAddUserPanel(false);
+  };
 
   useEffect(() => {
     if (data) {
@@ -31,7 +35,7 @@ const ChatRooms = () => {
   }, [data, mergeChatRooms]);
 
   const handleCreateGroup = () => {
-    navigate(`/add-users?userId=${userId}`);
+    setShowAddUserPanel(true);
   };
 
   const handleChatRoomClick = (chatRoomId, chatRoomName) => {
@@ -54,44 +58,24 @@ const ChatRooms = () => {
             title="new chat"
           />
         </div>
-        <div className="chat-room-list">
-          {Array.from(chatRooms.values()).map((room) => (
-            <div
-              key={room.id}
-              className="chat-room-tile"
-              onClick={() => handleChatRoomClick(room.id, room.name)}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={GroupIcon}
-                    className="chatRoomIcon"
-                    alt="Group Icon"
-                  />
-                  <div>
-                    <div className="chatRoomTitle">{room.name}</div>
-                    {room.typingUsers && room.typingUsers.length > 0 ? (
-                      <TypingIndicator typingUsers={room.typingUsers} />
-                    ) : (
-                      <div className="latestMessage">
-                        {room.latestMessage?.content || "No messages yet"}
-                      </div>
-                    )}
-                  </div>
-                </div>
+        {Array.from(chatRooms.values()).map((room) => (
+          <Tile
+            id={room.id}
+            name={room.name}
+            latestMessageTimestamp={room.latestMessage?.timestamp}
+            smallerInfo={
+              <div className="latestMessage">
+                {room.latestMessage?.user.username &&
+                  `${room.latestMessage?.user.username}: `}
+                {room.latestMessage?.content || "No messages yet"}
               </div>
-              {activeChatRoomId !== room.id && room.unreadMessageCount > 0 && (
-                <div className="unreadMessages">{room.unreadMessageCount}</div>
-              )}
-            </div>
-          ))}
-        </div>
+            }
+            typingUsers={room.typingUsers}
+            unreadMessageCount={room.unreadMessageCount}
+            activeChatRoomId={activeChatRoomId}
+            onChatRoomClick={handleChatRoomClick}
+          />
+        ))}
       </div>
 
       <div className="chat-section">
@@ -128,6 +112,7 @@ const ChatRooms = () => {
           />
         )}
       </div>
+      {showAddUserPanel && <AddUser onClose={handleCloseAddUser} />}
     </div>
   );
 };

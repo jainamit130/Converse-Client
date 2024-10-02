@@ -225,6 +225,7 @@ export const ChatRoomProvider = ({ children }) => {
         markChatRoomRead,
         setChatRooms,
         messages,
+        setMessages,
         addMessageToRoom,
         mergeChatRooms,
       }}

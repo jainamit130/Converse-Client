@@ -1,0 +1,29 @@
+.add-user-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 350px;
+    height: 100%;
+    background-color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    z-index: 100;
+    padding: 20px;
+  }
+  
+  .add-user-panel.open {
+    transform: translateX(0);
+  }
+  
+  .add-user-panel.closed {
+    transform: translateX(-100%);
+  }
+  
+  .close-btn {
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    float: right;
+  }
+  

@@ -1,18 +1,11 @@
 .chat-messages-section {
+  width: 70%;
     flex-grow: 1; 
     display: flex;
     flex-direction: column;
     overflow-y: auto;
 }
 
-.chat-room-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%; 
-    max-width: 100%;
-  }
- 
   .chat-room-name,
   .typing-status {
     margin: 0;
@@ -55,7 +48,6 @@
   }
   
   .message {
-    background-color: aqua;
     margin: 10px;
     padding: 10px;
     border-radius: 5px;
@@ -135,4 +127,8 @@
     padding: 2px;
     width:18px;
     height: 11px;
+  }
+
+  .shrink-chat .chat-messages-section {
+    flex: 0.7; /* Shrinks chat section when the panel is open */
   }

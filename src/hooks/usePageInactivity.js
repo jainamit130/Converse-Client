@@ -18,10 +18,15 @@ const usePageInactivity = (inactiveTimeout = 60000) => {
       resetInactivityTimer();
     };
 
+    const handleWindowClose = () => {
+      setIsInactive(true);
+    };
+
     window.addEventListener("mousemove", handleUserActivity);
     window.addEventListener("keydown", handleUserActivity);
     window.addEventListener("click", handleUserActivity);
     window.addEventListener("scroll", handleUserActivity);
+    window.addEventListener("beforeunload", handleWindowClose);
 
     resetInactivityTimer();
 
@@ -30,6 +35,7 @@ const usePageInactivity = (inactiveTimeout = 60000) => {
       window.removeEventListener("keydown", handleUserActivity);
       window.removeEventListener("click", handleUserActivity);
       window.removeEventListener("scroll", handleUserActivity);
+      window.removeEventListener("beforeunload", handleWindowClose);
       clearTimeout(timeoutId);
     };
   }, [inactiveTimeout]);

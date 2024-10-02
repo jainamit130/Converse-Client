@@ -3,26 +3,48 @@
     right: 0;
     top: 0;
     height: 100%;
-    width: 300px; 
+    width: 30%; 
     background-color: white;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-    padding: 20px;
     overflow-y: auto; 
     z-index: 1000; 
     transition: right 0.3s ease;
 }
 
 .close-button {
-    background-color: #f44336;
-    color: white;
-    border: none;
     padding: 10px;
     cursor: pointer;
-    margin-bottom: 20px;
+    height: 15px;
+    width: 15px;
 }
 
 .message-content {
+    min-height: 80px;
+    background-image: url('../assets/ChatBackground.png');
+    justify-content: right;
+    display: flex;
     font-family: Arial, sans-serif; 
+}
+
+.message-right {
+    padding: 10px;
+    height: max-content;
+}
+
+.infoIcon {
+    margin: 5px;
+    height: 14px;
+    width: 20px;
+}
+
+.infoPositioning{
+    display: "flex"; 
+    align-items: "center";
+}
+
+.infoTitle{
+    margin: 5px;
+    font-size: large
 }
 
 .receipt-section {

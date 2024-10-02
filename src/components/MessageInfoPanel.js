@@ -2,9 +2,15 @@ import { useEffect, useState } from "react";
 import { useMessageInfo } from "../hooks/useMessageInfo";
 import "./MessageInfoPanel.css";
 import { formatMessageTimestamp } from "../util/dateUtil";
+import readStatusIcon from "../assets/readStatus.png";
+import deliveredStatusIcon from "../assets/deliveredStatus.png";
+import closeButtonIcon from "../assets/CloseButton.png";
+import Tile from "./reusableComponents/Tile";
+import { useUser } from "../context/UserContext";
 
 const MessageInfoPanel = ({ message, onClose }) => {
   const { getMessageInfo } = useMessageInfo();
+  const { username } = useUser();
   const [messageInfo, setMessageInfo] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -17,53 +23,111 @@ const MessageInfoPanel = ({ message, onClose }) => {
     };
 
     fetchMessageInfo();
-    setIsVisible(true); // Set to visible when fetching starts
+    setIsVisible(true);
 
     return () => {
-      setIsVisible(false); // Hide when unmounting
+      setIsVisible(false);
     };
-  }, [getMessageInfo, message]);
+  }, [message]);
 
   if (!messageInfo) {
     return <div>Loading...</div>;
   }
 
-  const { deliveryReceiptsByTime = {}, readReceiptsByTime = {} } = messageInfo;
+  const recipients = {};
+
+  Object.entries(messageInfo.deliveryReceiptsByTime || {}).forEach(
+    ([timestamp, usernames]) => {
+      usernames.forEach((recipientName) => {
+        if (username !== recipientName) {
+          // Exclude sender from delivery recipients
+          if (!recipients[recipientName]) {
+            recipients[recipientName] = {};
+          }
+          recipients[recipientName].delivered = timestamp;
+        }
+      });
+    }
+  );
+
+  Object.entries(messageInfo.readReceiptsByTime || {}).forEach(
+    ([timestamp, usernames]) => {
+      usernames.forEach((recipientName) => {
+        if (username !== recipientName) {
+          // Exclude sender from read recipients
+          if (!recipients[recipientName]) {
+            recipients[recipientName] = {};
+          }
+          recipients[recipientName].read = timestamp;
+        }
+      });
+    }
+  );
 
   return (
     <div className={`message-info-panel ${isVisible ? "visible" : ""}`}>
-      <button className="close-button" onClick={onClose}>
-        Close
-      </button>
+      <div style={{ display: "flex", alignItems: "center", margin: "2px" }}>
+        <img
+          src={closeButtonIcon}
+          className="close-button"
+          alt="close"
+          onClick={onClose}
+        />
+        <span style={{ marginLeft: "10px" }}>Message info</span>
+      </div>
       <div className="message-content">
-        <h2>Message: {message.content}</h2>
-        <h3>Read Receipts</h3>
-        <div className="receipt-section">
-          {Object.entries(readReceiptsByTime).length === 0 ? (
-            <div>No read receipts available.</div>
-          ) : (
-            Object.entries(readReceiptsByTime).map(([timestamp, usernames]) => (
-              <div key={timestamp} className="receipt">
-                <strong>{formatMessageTimestamp(timestamp)}:</strong>{" "}
-                {Array.from(usernames).join(", ")}
-              </div>
-            ))
-          )}
+        <div className="message">
+          <div className="message-right">{message.content}</div>
         </div>
-        <h3>Delivery Receipts</h3>
+      </div>
+
+      {/* Read section */}
+      <div style={{ margin: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img src={readStatusIcon} className="infoIcon" alt="read status" />
+          <div className="infoTitle">Read</div>
+        </div>
         <div className="receipt-section">
-          {Object.entries(deliveryReceiptsByTime).length === 0 ? (
-            <div>No delivery receipts available.</div>
-          ) : (
-            Object.entries(deliveryReceiptsByTime).map(
-              ([timestamp, usernames]) => (
-                <div key={timestamp} className="receipt">
-                  <strong>{formatMessageTimestamp(timestamp)}:</strong>{" "}
-                  {Array.from(usernames).join(", ")}
+          {Object.entries(recipients)
+            .filter(([, receipt]) => receipt.read) // Only show if read
+            .map(([username, receipt]) => (
+              <Tile
+                key={username}
+                name={username}
+                smallerInfo={
+                  <div className="receipt">
+                    <div>Read: {formatMessageTimestamp(receipt.read)}</div>
+                    <div>
+                      Delivered: {formatMessageTimestamp(receipt.delivered)}
+                    </div>
+                  </div>
+                }
+              />
+            ))}
+        </div>
+      </div>
+
+      {/* Delivered section */}
+      <div style={{ margin: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img
+            src={deliveredStatusIcon}
+            className="infoIcon"
+            alt="delivered status"
+          />
+          <div className="infoTitle">Delivered</div>
+        </div>
+        <div className="receipt-section">
+          {Object.entries(recipients)
+            .filter(([, receipt]) => !receipt.read) // Show only delivered, not read
+            .map(([username, receipt]) => (
+              <div key={username} className="receipt">
+                <strong>{username}</strong>
+                <div>
+                  Delivered: {formatMessageTimestamp(receipt.delivered)}
                 </div>
-              )
-            )
-          )}
+              </div>
+            ))}
         </div>
       </div>
     </div>

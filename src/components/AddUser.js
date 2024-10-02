@@ -1,37 +1,25 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import "./AddUser.css";
 
-const AddUser = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const creatorId = queryParams.get("userId");
-
+const AddUser = ({ onClose }) => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const [selectedUserIds, setSelectedUserIds] = useState([creatorId]);
+  const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [groupName, setGroupName] = useState("");
-  const navigate = useNavigate();
   const token = localStorage.getItem("authenticationToken");
 
   useEffect(() => {
     axios
       .get("http://localhost:8080/converse/users/getUsers", {
         headers: {
-          Authorization: `Bearer ${token}`, // Set Bearer token in Authorization header
+          Authorization: `Bearer ${token}`,
         },
       })
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
-
-  const handleSearch = () => {
-    axios
-      .get(`http://localhost:8080/converse/users/search?q=${searchTerm}`)
-      .then((response) => setUsers(response.data))
-      .catch((error) => console.error("Error searching users:", error));
-  };
 
   const handleSelectUser = (user) => {
     if (selectedUserIds.includes(user.id)) {
@@ -58,50 +46,42 @@ const AddUser = () => {
         }
       )
       .then(() => {
-        navigate("/chat-rooms");
+        onClose();
       })
       .catch((error) => console.error("Error creating group:", error));
   };
 
   return (
-    <div>
+    <div className="add-user-panel">
+      {" "}
+      {/* Styled for slide-in */}
+      <button className="close-btn" onClick={onClose}>
+        X
+      </button>{" "}
+      {/* Close button */}
       <h1>Add Users to New Group</h1>
-      <div>
-        <input
-          type="text"
-          value={groupName}
-          onChange={(e) => setGroupName(e.target.value)}
-          placeholder="Enter group name"
-        />
-      </div>
-      <div>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search users"
-        />
-        <button onClick={handleSearch}>Search</button>
-      </div>
+      <input
+        type="text"
+        value={groupName}
+        onChange={(e) => setGroupName(e.target.value)}
+        placeholder="Enter group name"
+      />
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search users"
+      />
       <ul>
-        {users
-          .filter((user) => user.id !== creatorId)
-          .map((user) => (
-            <li key={user.id}>
-              <input
-                type="checkbox"
-                checked={selectedUserIds.includes(user.id)}
-                onChange={() => handleSelectUser(user)}
-              />
-              {user.username}
-            </li>
-          ))}
-      </ul>
-
-      <h2>Selected Users:</h2>
-      <ul>
-        {selectedUsers.map((user) => (
-          <li key={user.id}>{user.username}</li>
+        {users.map((user) => (
+          <li key={user.id}>
+            <input
+              type="checkbox"
+              checked={selectedUserIds.includes(user.id)}
+              onChange={() => handleSelectUser(user)}
+            />
+            {user.username}
+          </li>
         ))}
       </ul>
       <button onClick={handleSubmit}>

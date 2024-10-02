@@ -6,10 +6,11 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { WebSocketProvider } from "./context/WebSocketContext";
 import AddUser from "./components/AddUser";
-import LoginSignUpPage from "./components/LoginSignUpPage";
+import LoginSignUpPage from "./components/authComponents/LoginSignUpPage";
 import { UserProvider } from "./context/UserContext";
 import { ChatRoomProvider } from "./context/ChatRoomContext";
 import { PageActivityProvider } from "./context/PageActivityContext";
+import LogoutPage from "./components/authComponents/LogoutPage";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
                   <Route path="/" element={<LoginSignUpPage />} />
                   <Route path="/chat-rooms" element={<ChatRooms />} />
                   <Route path="/add-users" element={<AddUser />} />
+                  <Route path="/logout" element={<LogoutPage />} />
                 </Routes>
               </Router>
             </WebSocketProvider>
