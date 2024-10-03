@@ -6,6 +6,7 @@ import readStatusIcon from "../assets/readStatus.png";
 import deliveredStatusIcon from "../assets/deliveredStatus.png";
 import closeButtonIcon from "../assets/CloseButton.png";
 import Tile from "./reusableComponents/Tile";
+import ProfileIcon from "../assets/profileIcon.webp";
 import { useUser } from "../context/UserContext";
 
 const MessageInfoPanel = ({ message, onClose }) => {
@@ -94,6 +95,7 @@ const MessageInfoPanel = ({ message, onClose }) => {
               <Tile
                 key={username}
                 name={username}
+                icon={ProfileIcon}
                 smallerInfo={
                   <div className="receipt">
                     <div>Read: {formatMessageTimestamp(receipt.read)}</div>

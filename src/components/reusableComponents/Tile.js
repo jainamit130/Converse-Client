@@ -1,7 +1,6 @@
 import React from "react";
 import TypingIndicator from "../TypingIndicator";
 import { formatTime, parseDate } from "../../util/dateUtil";
-import GroupIcon from "../../assets/GroupIcon.png";
 
 const Tile = ({
   id,
@@ -12,6 +11,7 @@ const Tile = ({
   unreadMessageCount,
   activeChatRoomId,
   onChatRoomClick,
+  icon,
 }) => {
   const handleChatRoomClick = () => {
     if (onChatRoomClick) {
@@ -33,7 +33,7 @@ const Tile = ({
           alignItems: "center",
         }}
       >
-        <img src={GroupIcon} className="chatRoomIcon" alt="Group Icon" />
+        <img src={icon} className="chatRoomIcon" alt="Group Icon" />
         <div>
           <div
             style={{
@@ -46,7 +46,7 @@ const Tile = ({
             {formattedTime && (
               <div
                 className="latestMessageTime"
-                style={{ marginLeft: "218px" }}
+                style={{ marginLeft: "235px" }}
               >
                 {formattedTime}
               </div>

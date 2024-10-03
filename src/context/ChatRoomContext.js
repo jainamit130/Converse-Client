@@ -14,7 +14,6 @@ import {
 } from "../hooks/useMarkAllMessages";
 import { usePageActivity } from "./PageActivityContext";
 import { sortChatRooms } from "../util/chatUtil";
-import { useNavigate } from "react-router-dom";
 
 const ChatRoomContext = createContext();
 
@@ -22,6 +21,7 @@ export const ChatRoomProvider = ({ children }) => {
   const { isInactive } = usePageActivity();
   const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState({});
+  const [usernameToChatRoomMap, setUsernameToChatRoomMap] = useState(new Map());
   const {
     updateLastSeen,
     saveLastSeen,
@@ -163,22 +163,35 @@ export const ChatRoomProvider = ({ children }) => {
 
     setChatRooms((prevChatRooms) => {
       const updatedRooms = new Map(prevChatRooms);
+      const updatedUsernameMap = { ...usernameToChatRoomMap };
 
       chatRoomsArray.forEach((newRoom) => {
         const existingRoom = updatedRooms.get(newRoom.id);
+
         if (existingRoom) {
           updatedRooms.set(newRoom.id, { ...existingRoom, ...newRoom });
         } else {
           updatedRooms.set(newRoom.id, newRoom);
         }
+
+        if (
+          newRoom.chatRoomType === "INDIVIDUAL" ||
+          newRoom.chatRoomType === "SELF"
+        ) {
+          if (!updatedUsernameMap[newRoom.userId]) {
+            updatedUsernameMap[newRoom.userId] = newRoom.id;
+          }
+        }
       });
 
+      setUsernameToChatRoomMap(updatedUsernameMap);
+
+      // Sort the rooms and return the sorted list
       const sortedRooms = sortChatRooms(updatedRooms);
       return sortedRooms;
     });
   }, []);
 
-  // Function to add a message to a specific chat room
   const addMessageToRoom = useCallback(
     (chatRoomId, messageOrMessages, base = false) => {
       setMessages((prevMessages) => {
@@ -188,13 +201,11 @@ export const ChatRoomProvider = ({ children }) => {
         const messagesLoaded = chatRoom?.messagesLoaded;
 
         if (Array.isArray(messageOrMessages) && base && !messagesLoaded) {
-          // If it's an array and base is true, append to the bottom
           updatedMessages = {
             ...prevMessages,
             [chatRoomId]: [...messageOrMessages, ...currentMessages],
           };
 
-          // Set messages as loaded for this chat room
           setChatRooms((prevChatRooms) => {
             const updatedChatRoom = prevChatRooms.get(chatRoomId) || {};
             updatedChatRoom.messagesLoaded = true;
@@ -205,7 +216,6 @@ export const ChatRoomProvider = ({ children }) => {
             return newChatRooms;
           });
         } else if (!Array.isArray(messageOrMessages)) {
-          // If it's a single message, prepend it to the top
           updatedMessages = {
             ...prevMessages,
             [chatRoomId]: [...currentMessages, messageOrMessages],
@@ -227,6 +237,7 @@ export const ChatRoomProvider = ({ children }) => {
         messages,
         setMessages,
         addMessageToRoom,
+        usernameToChatRoomMap,
         mergeChatRooms,
       }}
     >

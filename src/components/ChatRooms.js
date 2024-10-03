@@ -4,11 +4,11 @@ import { GET_CHAT_ROOMS_OF_USER } from "../graphql/queries";
 import ChatRoom from "./ChatRoom";
 import { useUser } from "../context/UserContext";
 import newChat from "../assets/newChat.png";
-import { useNavigate } from "react-router-dom";
 import { useChatRoom } from "../context/ChatRoomContext";
 import "./ChatRooms.css";
 import Tile from "./reusableComponents/Tile";
 import AddUser from "./AddUser";
+import GroupIcon from "../assets/GroupIcon.png";
 
 const ChatRooms = () => {
   const {
@@ -21,10 +21,12 @@ const ChatRooms = () => {
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
     variables: { userId },
   });
-  const { chatRooms, messages, mergeChatRooms } = useChatRoom();
+  const { chatRooms, usernameToChatRoomMap, messages, mergeChatRooms } =
+    useChatRoom();
   const [showAddUserPanel, setShowAddUserPanel] = useState(false);
 
-  const handleCloseAddUser = () => {
+  const handleCloseAddUser = (chatRoomId, chatRoomName) => {
+    handleChatRoomClick(chatRoomId, chatRoomName);
     setShowAddUserPanel(false);
   };
 
@@ -70,6 +72,7 @@ const ChatRooms = () => {
                 {room.latestMessage?.content || "No messages yet"}
               </div>
             }
+            icon={GroupIcon}
             typingUsers={room.typingUsers}
             unreadMessageCount={room.unreadMessageCount}
             activeChatRoomId={activeChatRoomId}
