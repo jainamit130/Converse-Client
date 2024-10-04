@@ -99,7 +99,6 @@ const ChatRoom = () => {
       content: messageContent,
       senderId: userId,
       chatRoomId,
-      timestamp: new Date().toISOString(),
     };
 
     if (sendMessage) {

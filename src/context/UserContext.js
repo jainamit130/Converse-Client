@@ -7,6 +7,10 @@ export const UserProvider = ({ children }) => {
     String(localStorage.getItem("userId")) || null
   );
 
+  const [token, setToken] = useState(
+    localStorage.getItem("authenticationToken") || null
+  );
+
   const [username, setUsername] = useState(
     String(localStorage.getItem("username")) || null
   );
@@ -59,6 +63,7 @@ export const UserProvider = ({ children }) => {
         activeChatRoomId,
         setActiveChatRoomId,
         activeChatRoomName,
+        token,
         setActiveChatRoomName,
       }}
     >

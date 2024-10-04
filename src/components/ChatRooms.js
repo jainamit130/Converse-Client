@@ -9,6 +9,7 @@ import "./ChatRooms.css";
 import Tile from "./reusableComponents/Tile";
 import AddUser from "./AddUser";
 import GroupIcon from "../assets/GroupIcon.png";
+import ProfileIcon from "../assets/profileIcon.webp";
 
 const ChatRooms = () => {
   const {
@@ -21,13 +22,22 @@ const ChatRooms = () => {
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
     variables: { userId },
   });
-  const { chatRooms, usernameToChatRoomMap, messages, mergeChatRooms } =
-    useChatRoom();
+  const [showTempChatRoom, setShowTempChatRoom] = useState(false);
+  const [temporaryChatRoom, setTempChatRoom] = useState({});
+  const { chatRooms, messages, mergeChatRooms } = useChatRoom();
   const [showAddUserPanel, setShowAddUserPanel] = useState(false);
 
-  const handleCloseAddUser = (chatRoomId, chatRoomName) => {
-    handleChatRoomClick(chatRoomId, chatRoomName);
+  const handleCloseAddUser = (
+    chatRoomId,
+    chatRoomName,
+    tempChatRoom = null
+  ) => {
     setShowAddUserPanel(false);
+    if (chatRoomId) handleChatRoomClick(chatRoomId, chatRoomName);
+    else {
+      setShowTempChatRoom(true);
+      setTempChatRoom(tempChatRoom);
+    }
   };
 
   useEffect(() => {
@@ -43,6 +53,8 @@ const ChatRooms = () => {
   const handleChatRoomClick = (chatRoomId, chatRoomName) => {
     setActiveChatRoomId(chatRoomId);
     setActiveChatRoomName(chatRoomName);
+    setShowTempChatRoom(false);
+    setTempChatRoom(null);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -79,9 +91,22 @@ const ChatRooms = () => {
             onChatRoomClick={handleChatRoomClick}
           />
         ))}
+
+        {showTempChatRoom && (
+          <Tile
+            id="temp"
+            name={temporaryChatRoom.name}
+            smallerInfo={<div>No messages yet</div>}
+            icon={ProfileIcon}
+            onChatRoomClick={() =>
+              handleChatRoomClick(null, temporaryChatRoom.name)
+            }
+          />
+        )}
       </div>
 
       <div className="chat-section">
+        {showTempChatRoom && <ChatRoom initialMessages={[]} />}
         {!activeChatRoomId ? (
           <div className="chat-header">
             <div className="converse">

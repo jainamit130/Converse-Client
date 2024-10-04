@@ -178,9 +178,11 @@ export const ChatRoomProvider = ({ children }) => {
           newRoom.chatRoomType === "INDIVIDUAL" ||
           newRoom.chatRoomType === "SELF"
         ) {
-          if (!updatedUsernameMap[newRoom.userId]) {
-            updatedUsernameMap[newRoom.userId] = newRoom.id;
-          }
+          newRoom.userIds.forEach((userId) => {
+            if (!updatedUsernameMap[userId]) {
+              updatedUsernameMap[userId] = newRoom.id;
+            }
+          });
         }
       });
 

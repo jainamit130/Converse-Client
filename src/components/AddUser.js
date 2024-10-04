@@ -6,26 +6,26 @@ import GroupIcon from "../assets/GroupIcon.png";
 import Tile from "./reusableComponents/Tile";
 import { useUser } from "../context/UserContext";
 import { useChatRoom } from "../context/ChatRoomContext";
+import useCreateChat from "../hooks/useCreateChat";
 
 const AddUser = ({ onClose }) => {
   const [users, setUsers] = useState([]);
   const { usernameToChatRoomMap } = useChatRoom();
+  const { getUsers } = useCreateChat();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [groupName, setGroupName] = useState("");
+  const [chatRoomType, setChatRoomType] = useState("GROUP");
   const [isNewGroup, setIsNewGroup] = useState(false);
-  const { userId } = useUser();
-  const token = localStorage.getItem("authenticationToken");
+  const { userId, token } = useUser();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/converse/users/getUsers", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => setUsers(response.data))
-      .catch((error) => console.error("Error fetching users:", error));
+    const fetchUsers = async () => {
+      const data = await getUsers();
+      setUsers(data);
+    };
+
+    fetchUsers();
   }, []);
 
   const handleSelectUser = (user) => {
@@ -42,35 +42,33 @@ const AddUser = ({ onClose }) => {
     setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
   };
 
-  const createGroup = (user, chatRoomType) => {
+  const createGroup = async (user) => {
     if (chatRoomType === "INDIVIDUAL") {
       const existingChatRoomId = usernameToChatRoomMap[user.id];
       if (existingChatRoomId) {
         onClose(existingChatRoomId, user.username);
       } else {
-        const selectedUserIds = selectedUsers.map((user) => user.id);
-        axios
-          .post(
-            "http://localhost:8080/chat/groups/create",
-            {
-              groupName:
-                chatRoomType == "INDIVIDUAL" ? user.username : groupName,
-              members: selectedUserIds,
-              chatRoomType: chatRoomType,
-              createdById: userId,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          )
-          .then((response) => {
-            const chatRoomId = response.data.id;
-            const chatRoomName = response.data.name;
-            onClose(chatRoomId, chatRoomName);
-          })
-          .catch((error) => console.error("Error creating group:", error));
+        const tempChatRoom = {
+          name: user.username,
+          chatRoomType: "INDIVIDUAL",
+          createdById: userId,
+          members: [user.id, userId],
+        };
+        onClose(null, null, tempChatRoom);
+      }
+    } else {
+      const selectedUserIds = selectedUsers.map((user) => user.id);
+      try {
+        const response = await createGroup(
+          groupName,
+          selectedUserIds,
+          chatRoomType
+        );
+        const chatRoomId = response.id;
+        const chatRoomName = response.name;
+        onClose(chatRoomId, chatRoomName);
+      } catch (err) {
+        console.error("Error creating group:", err);
       }
     }
   };
