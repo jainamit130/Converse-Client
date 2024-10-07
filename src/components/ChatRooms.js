@@ -14,6 +14,7 @@ import ProfileIcon from "../assets/profileIcon.webp";
 const ChatRooms = () => {
   const {
     userId,
+    username,
     activeChatRoomId,
     setActiveChatRoomId,
     activeChatRoomName,
@@ -22,22 +23,12 @@ const ChatRooms = () => {
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
     variables: { userId },
   });
-  const [showTempChatRoom, setShowTempChatRoom] = useState(false);
-  const [temporaryChatRoom, setTempChatRoom] = useState({});
   const { chatRooms, messages, mergeChatRooms } = useChatRoom();
   const [showAddUserPanel, setShowAddUserPanel] = useState(false);
 
-  const handleCloseAddUser = (
-    chatRoomId,
-    chatRoomName,
-    tempChatRoom = null
-  ) => {
+  const handleCloseAddUser = (chatRoomId, chatRoomName) => {
     setShowAddUserPanel(false);
-    if (chatRoomId) handleChatRoomClick(chatRoomId, chatRoomName);
-    else {
-      setShowTempChatRoom(true);
-      setTempChatRoom(tempChatRoom);
-    }
+    if (chatRoomId !== null) handleChatRoomClick(chatRoomId, chatRoomName);
   };
 
   useEffect(() => {
@@ -53,8 +44,6 @@ const ChatRooms = () => {
   const handleChatRoomClick = (chatRoomId, chatRoomName) => {
     setActiveChatRoomId(chatRoomId);
     setActiveChatRoomName(chatRoomName);
-    setShowTempChatRoom(false);
-    setTempChatRoom(null);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -75,7 +64,15 @@ const ChatRooms = () => {
         {Array.from(chatRooms.values()).map((room) => (
           <Tile
             id={room.id}
-            name={room.name}
+            name={
+              room.chatRoomType === "SELF"
+                ? username
+                : room.chatRoomType === "INDIVIDUAL"
+                ? room.recipientUsername === username
+                  ? room.creatorUsername
+                  : room.recipientUsername
+                : room.name
+            }
             latestMessageTimestamp={room.latestMessage?.timestamp}
             smallerInfo={
               <div className="latestMessage">
@@ -91,22 +88,9 @@ const ChatRooms = () => {
             onChatRoomClick={handleChatRoomClick}
           />
         ))}
-
-        {showTempChatRoom && (
-          <Tile
-            id="temp"
-            name={temporaryChatRoom.name}
-            smallerInfo={<div>No messages yet</div>}
-            icon={ProfileIcon}
-            onChatRoomClick={() =>
-              handleChatRoomClick(null, temporaryChatRoom.name)
-            }
-          />
-        )}
       </div>
 
       <div className="chat-section">
-        {showTempChatRoom && <ChatRoom initialMessages={[]} />}
         {!activeChatRoomId ? (
           <div className="chat-header">
             <div className="converse">

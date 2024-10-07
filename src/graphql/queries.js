@@ -7,6 +7,8 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
       name
       chatRoomType
       userIds
+      recipientUsername
+      creatorUsername
       unreadMessageCount
       latestMessage {
         id

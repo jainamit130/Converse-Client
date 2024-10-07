@@ -18,18 +18,95 @@
   .add-user-panel.closed {
     transform: translateX(-100%);
   }
+
+  .search-container {
+    position: relative; 
+    margin-top: 20px;
+  }
   
+  .searchUsers {
+    background-color: rgb(221, 224, 225);
+    opacity: 0.7;
+    width: 100%;
+    border: transparent;
+    height: 30px;
+    border-radius: 2px;
+    margin-left: 10px;
+    padding-left: 30px;
+  }
+  
+  .searchUsers:focus {
+    outline: none; 
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    transform: translateY(-50%); 
+    cursor: pointer; 
+  }
+
+  .search-image {
+    height: 23px;
+    width: 23px;
+  }
+
+  .back-search-image{
+    height: 30px;
+    width: 20px;
+  }
+
+  .search-icon {
+    display: inline-block;
+  }
+  
+  .search-image,
+  .back-search-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: transform 0.4s ease; /* Transition for opacity and rotation */
+  }
+  
+  .search-image {
+    transform: rotate(90deg); /* Default position */
+  }
+  
+  .back-search-image {
+    transform: rotate(0deg); /* Rotated initially */
+  }
+  
+  .search-icon img.rotate-out {
+    transform: rotate(0deg); /* Rotate out */
+  }
+  
+  .search-icon img.rotate-in {
+    transform: rotate(90deg); /* Rotate in */
+  }
+  
+
+  .back-btn {
+    height: 20px;
+    width: 26px;
+    float: left;
+  }
+
+  .close-btn {
+    float: right;
+  }
+  
+  .back-btn,
   .close-btn {
     background-color: transparent;
     border: none;
     font-size: 20px;
     cursor: pointer;
-    float: right;
   }
   
   .new-group-tile {
+    margin-top: 20px;
     cursor: pointer;
-    margin-bottom: 10px;
   }
   
   .selected-user-tile {
@@ -39,10 +116,6 @@
     padding: 10px;
     background-color: lightgray; 
     margin-bottom: 5px;
-  }
-  
-  .user-tiles {
-    display: flex;
   }
   
   .selected {

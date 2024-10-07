@@ -14,9 +14,6 @@ const useCreateChat = () => {
     setError(null);
     try {
       const response = await fetch(`${BASE_URL}/converse/users/getUsers`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         method: "GET",
       });
 
@@ -34,23 +31,19 @@ const useCreateChat = () => {
     }
   };
 
-  const createGroup = async (groupName, selectedUserIds, chatRoomType) => {
+  const handleCreateGroup = async (
+    groupName,
+    selectedUserIds,
+    chatRoomType
+  ) => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        `${BASE_URL}/chat/groups/create`,
-        {
-          groupName: groupName,
-          members: selectedUserIds,
-          chatRoomType: chatRoomType,
-          createdById: userId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.post(`${BASE_URL}/chat/groups/create`, {
+        groupName: groupName,
+        members: selectedUserIds,
+        chatRoomType: chatRoomType,
+        createdById: userId,
+      });
       return response.data;
     } catch (err) {
       setError(err);
@@ -60,7 +53,7 @@ const useCreateChat = () => {
     }
   };
 
-  return { getUsers, createGroup, loading, error };
+  return { getUsers, handleCreateGroup, loading, error };
 };
 
 export default useCreateChat;

@@ -15,7 +15,7 @@ const ChatRoomHeader = ({ chatRoomName, typingUsers, onlineUsers }) => {
             {onlineUsers.size > 1 ? (
               <span>{onlineUsers.size} people online</span>
             ) : onlineUsers.size === 1 ? (
-              <span>{Array.from(onlineUsers)[0]} is online</span>
+              <span>online</span>
             ) : null}
           </div>
         )}

@@ -44,6 +44,15 @@ const ChatRoom = () => {
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
   );
+  const [chatRoomType, setChatRoomType] = useState(() => {
+    return chatRooms.get(chatRoomId)?.chatRoomType;
+  });
+  const [recipientUsername, setRecipientUsername] = useState(() => {
+    return chatRooms.get(chatRoomId)?.recipientUsername;
+  });
+  const [creatorUsername, setCreatorUsername] = useState(() => {
+    return chatRooms.get(chatRoomId)?.creatorUsername;
+  });
   const [typingUsers, setTypingUsers] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
 
@@ -70,30 +79,36 @@ const ChatRoom = () => {
   }, [activeChatRoomId]);
 
   useEffect(() => {
-    setChatRoomMessages(messages[chatRoomId] || []);
-    handleMarkAllMessagesRead();
-  }, [messages[chatRoomId]]);
+    if (chatRoomId) {
+      setChatRoomMessages(messages[chatRoomId] || []);
+      handleMarkAllMessagesRead();
+    }
+  }, [messages[chatRoomId], chatRoomId]);
 
   useEffect(() => {
-    const chatRoom = chatRooms.get(chatRoomId);
-    if (chatRoom) {
-      setTypingUsers(chatRoom.typingUsers || []);
-      const filteredOnlineUsers = chatRoom.onlineUsers || new Set();
-      filteredOnlineUsers.delete(username);
-      setOnlineUsers(filteredOnlineUsers);
+    if (chatRoomId) {
+      const chatRoom = chatRooms.get(chatRoomId);
+      if (chatRoom) {
+        setTypingUsers(chatRoom.typingUsers || []);
+        const filteredOnlineUsers = chatRoom.onlineUsers || new Set();
+        filteredOnlineUsers.delete(username);
+        setOnlineUsers(filteredOnlineUsers);
+      }
     }
   }, [chatRooms, chatRoomId, userId]);
 
   const chatRoom = chatRooms.get(chatRoomId);
   const messagesLoaded = chatRoom?.messagesLoaded || false;
   const fromCount = messages[chatRoomId]?.length || 0;
+
   const { loading, error, data } = useQuery(GET_MESSAGES_OF_CHAT_ROOM, {
     variables: { chatRoomId, fromCount },
-    skip: !connected || messagesLoaded,
+    skip: !chatRoomId || !connected || messagesLoaded,
     fetchPolicy: "network-only",
   });
 
   const handleSendMessage = (messageContent) => {
+    if (!chatRoomId) return;
     const newMessage = {
       id: `${Math.random()}`,
       content: messageContent,
@@ -109,8 +124,9 @@ const ChatRoom = () => {
   };
 
   useEffect(() => {
-    if (!data || !connected) return;
-    addMessageToRoom(chatRoomId, data.getMessagesOfChatRoom, true);
+    if (chatRoomId && data && connected) {
+      addMessageToRoom(chatRoomId, data.getMessagesOfChatRoom, true);
+    }
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
   const openMessageInfoPanel = (message) => {
@@ -133,7 +149,13 @@ const ChatRoom = () => {
     >
       <ChatRoomHeader
         key={chatRoomId}
-        chatRoomName={chatRoomName}
+        chatRoomName={
+          chatRoomType === "INDIVIDUAL"
+            ? recipientUsername === username
+              ? creatorUsername
+              : recipientUsername
+            : chatRoomName
+        }
         typingUsers={typingUsers}
         onlineUsers={onlineUsers}
       />

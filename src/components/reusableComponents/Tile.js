@@ -46,7 +46,7 @@ const Tile = ({
             {formattedTime && (
               <div
                 className="latestMessageTime"
-                style={{ marginLeft: "235px" }}
+                style={{ marginLeft: "218px" }}
               >
                 {formattedTime}
               </div>
