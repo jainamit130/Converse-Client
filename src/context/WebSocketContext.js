@@ -116,23 +116,20 @@ export const WebSocketProvider = ({ children }) => {
           const chatRoom = updatedChatRooms.get(chatRoomId);
 
           if (chatRoom) {
-            // Ensure updatedOnlineUsers is initialized as a Set if it doesn't exist
             const updatedOnlineUsers = chatRoom.onlineUsers || new Set();
 
             if (onlineUsers.status === "ONLINE") {
-              // Add the user to the online users set if they are online
               updatedOnlineUsers.add(onlineUsers.username);
             } else if (onlineUsers.status === "OFFLINE") {
-              // Remove the user from the online users set if they are offline
               updatedOnlineUsers.delete(onlineUsers.username);
             }
             updatedChatRooms.set(chatRoomId, {
               ...chatRoom,
-              onlineUsers: updatedOnlineUsers, // Update the Set of online users
+              onlineUsers: updatedOnlineUsers,
             });
           }
 
-          return updatedChatRooms; // Return the updated state
+          return updatedChatRooms;
         });
       }
     );
@@ -241,24 +238,18 @@ export const WebSocketProvider = ({ children }) => {
           console.log(statusUpdate);
 
           setMessages((prevMessages) => {
-            // Clone the previous state to avoid direct mutation
             const updatedMessages = { ...prevMessages };
 
-            // Get messages for the specific chat room
             const chatRoomMessages =
               updatedMessages[statusUpdate.chatRoomId] || [];
 
-            // Convert the list of message IDs to a Set for efficient lookup
             const messageIdsToUpdate = new Set(statusUpdate.messageIds);
 
-            // Traverse through the messages and update the status where applicable
             const updatedChatRoomMessages = chatRoomMessages.map((msg) => {
-              // If the Set is exhausted, stop further iteration
               if (messageIdsToUpdate.size === 0) {
                 return msg;
               }
 
-              // If the message ID is in the Set, update the status and remove it from the Set
               if (messageIdsToUpdate.has(msg.id)) {
                 messageIdsToUpdate.delete(msg.id);
                 return {

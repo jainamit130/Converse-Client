@@ -158,6 +158,7 @@ const ChatRoom = () => {
         }
         typingUsers={typingUsers}
         onlineUsers={onlineUsers}
+        chatRoomType={chatRoomType}
       />
 
       <div className="chat-messages" ref={chatMessagesRef}>
@@ -194,13 +195,14 @@ const ChatRoom = () => {
                   onClick={() => openMessageInfoPanel(message)}
                 >
                   <div className="messageContent">{message.content}</div>
-                  {message.senderId === userId && (
+                  {
                     <MessageStatusIcon
                       key={message.id}
+                      isSender={message.senderId === userId}
                       status={message.status}
                       formattedTime={formattedTime}
                     />
-                  )}
+                  }
                 </div>
               );
             })}

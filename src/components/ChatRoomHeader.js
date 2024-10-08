@@ -1,7 +1,12 @@
 import TypingIndicator from "./TypingIndicator";
 import profileIcon from "../assets/profileIcon.webp";
 
-const ChatRoomHeader = ({ chatRoomName, typingUsers, onlineUsers }) => {
+const ChatRoomHeader = ({
+  chatRoomName,
+  typingUsers,
+  onlineUsers,
+  chatRoomType,
+}) => {
   return (
     <div className="chat-details">
       <img src={profileIcon} className="chatRoomIcon" />
@@ -12,10 +17,12 @@ const ChatRoomHeader = ({ chatRoomName, typingUsers, onlineUsers }) => {
         </div>
         {!typingUsers.length && (
           <div className="online-status">
-            {onlineUsers.size > 1 ? (
-              <span>{onlineUsers.size} people online</span>
-            ) : onlineUsers.size === 1 ? (
-              <span>online</span>
+            {chatRoomType === "INDIVIDUAL" ? (
+              onlineUsers.size > 0 ? (
+                <span>online</span>
+              ) : null
+            ) : onlineUsers.size > 0 ? (
+              <span>{onlineUsers.size} online</span>
             ) : null}
           </div>
         )}

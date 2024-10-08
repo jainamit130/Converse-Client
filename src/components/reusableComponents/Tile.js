@@ -29,34 +29,28 @@ const Tile = ({
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          width: "100%",
           alignItems: "center",
         }}
       >
         <img src={icon} className="chatRoomIcon" alt="Group Icon" />
-        <div>
+        <div style={{ marginLeft: "10px", width: "100%" }}>
           <div
             style={{
               display: "flex",
-              width: "100%",
               alignItems: "center",
             }}
           >
-            <div className="chatRoomTitle">{name}</div>
+            <div className="chatRoomTitle smallerInfo">{name}</div>
             {formattedTime && (
-              <div
-                className="latestMessageTime"
-                style={{ marginLeft: "218px" }}
-              >
-                {formattedTime}
-              </div>
+              <div className="latestMessageTime">{formattedTime}</div>
             )}
           </div>
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
             {typingUsers && typingUsers.length > 0 ? (
               <TypingIndicator typingUsers={typingUsers} />
             ) : (
-              smallerInfo
+              <div className="smallerInfo">{smallerInfo}</div>
             )}
             {activeChatRoomId !== id && unreadMessageCount > 0 && (
               <div className="unreadMessages">{unreadMessageCount}</div>

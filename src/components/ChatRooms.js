@@ -66,7 +66,7 @@ const ChatRooms = () => {
             id={room.id}
             name={
               room.chatRoomType === "SELF"
-                ? username
+                ? username + " (You)"
                 : room.chatRoomType === "INDIVIDUAL"
                 ? room.recipientUsername === username
                   ? room.creatorUsername

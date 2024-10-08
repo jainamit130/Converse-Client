@@ -1,5 +1,5 @@
 import React from "react";
-import MessageStatusIcon from "./MessageStatusIcon"; // Assuming MessageStatusIcon is in the same directory or adjust accordingly
+import MessageStatusIcon from "./MessageStatusIcon";
 
 const Message = ({ message, userId, openMessageInfoPanel, formattedTime }) => {
   return (
@@ -11,13 +11,14 @@ const Message = ({ message, userId, openMessageInfoPanel, formattedTime }) => {
       onClick={() => openMessageInfoPanel(message)}
     >
       <div className="messageContent">{message.content}</div>
-      {message.senderId === userId && (
+      {
         <MessageStatusIcon
           key={message.id}
+          isSender={message.senderId === userId}
           status={message.status}
           formattedTime={formattedTime}
         />
-      )}
+      }
     </div>
   );
 };
