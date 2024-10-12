@@ -34,8 +34,9 @@ const groupMessagesByDate = (messages, unreadMessageCount) => {
 
 const ChatRoom = () => {
   const { userId, username, activeChatRoomId, activeChatRoomName } = useUser();
-  const chatRoomId = activeChatRoomId;
-  const chatRoomName = activeChatRoomName;
+  const [chatRoomId, setChatRoomId] = useState(activeChatRoomId);
+  const [chatRoomName, setChatRoomName] = useState(activeChatRoomName);
+
   const { sendMessage, connected, handleStopTyping, handleTyping } =
     useWebSocket();
   const [message, setMessage] = useState("");
@@ -75,6 +76,9 @@ const ChatRoom = () => {
   useEffect(() => {
     if (activeChatRoomId === null) {
       navigate("/chat-rooms");
+    } else {
+      setChatRoomId(activeChatRoomId);
+      setChatRoomName(activeChatRoomName);
     }
   }, [activeChatRoomId]);
 

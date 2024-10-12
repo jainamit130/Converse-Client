@@ -143,7 +143,6 @@ export const ChatRoomProvider = ({ children }) => {
     prevChatRoomIdRef.current = activeChatRoomId;
   }, [activeChatRoomId, userId]);
 
-  // Function to merge new chat rooms with the current list
   const mergeChatRooms = useCallback((newChatRooms) => {
     let chatRoomsArray = [];
 
@@ -178,6 +177,8 @@ export const ChatRoomProvider = ({ children }) => {
           newRoom.chatRoomType === "INDIVIDUAL" ||
           newRoom.chatRoomType === "SELF"
         ) {
+          if (newRoom.chatRoomType === "SELF") {
+          }
           newRoom.userIds.forEach((userId) => {
             if (!updatedUsernameMap[userId]) {
               updatedUsernameMap[userId] = newRoom.id;
