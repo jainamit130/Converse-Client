@@ -19,7 +19,7 @@ export const WebSocketProvider = ({ children }) => {
   const {
     addMessageToRoom,
     mergeChatRooms,
-    messsages,
+    messages,
     setMessages,
     chatRooms,
     setChatRooms,
@@ -30,6 +30,17 @@ export const WebSocketProvider = ({ children }) => {
   const subscriptions = useRef({});
 
   const typingTimeoutRef = useRef(null);
+
+  const resetWebSocketContext = () => {
+    subscriptions.current = {};
+    setMessages({});
+    setChatRooms(new Map());
+    setConnected(false);
+    if (stompClient) {
+      stompClient.disconnect();
+      setStompClient(null);
+    }
+  };
 
   const handleTyping = (chatRoomId, event) => {
     clearTimeout(typingTimeoutRef.current);
@@ -109,8 +120,6 @@ export const WebSocketProvider = ({ children }) => {
       `/topic/online/${chatRoomId}`,
       (message) => {
         const onlineUsers = JSON.parse(message.body);
-        //onlineUsers => {username: 'Yesh', status: 'ONLINE'}
-        // Set the ChatRoom with a set of online Users
         setChatRooms((prevChatRooms) => {
           const updatedChatRooms = new Map(prevChatRooms);
           const chatRoom = updatedChatRooms.get(chatRoomId);
@@ -303,6 +312,7 @@ export const WebSocketProvider = ({ children }) => {
         handleStopTyping,
         handleTyping,
         typingTimeoutRef,
+        resetWebSocketContext,
       }}
     >
       {children}

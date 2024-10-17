@@ -38,11 +38,18 @@ export const ChatRoomProvider = ({ children }) => {
   const prevChatRoomIdRef = useRef(null);
   const deliveredRef = useRef(false);
 
+  const resetChatRoomContext = useCallback(() => {
+    setChatRooms(new Map());
+    setMessages({});
+    setUsernameToChatRoomMap(new Map());
+    setActiveChatRoomId(null);
+  }, []);
+
   const updateChatRoomWithOnlineUsers = (chatRoomId, onlineUsers) => {
     setChatRooms((prevChatRooms) => {
       const updatedChatRooms = new Map(prevChatRooms);
-
       const prevChatRoomId = prevChatRoomIdRef.current;
+
       if (prevChatRoomId) {
         const prevRoom = updatedChatRooms.get(prevChatRoomId);
         if (prevRoom) {
@@ -55,7 +62,6 @@ export const ChatRoomProvider = ({ children }) => {
         }
       }
 
-      // Update the current chat room
       const updatedRoom = updatedChatRooms.get(chatRoomId);
       if (updatedRoom) {
         updatedChatRooms.set(chatRoomId, {
@@ -75,7 +81,7 @@ export const ChatRoomProvider = ({ children }) => {
 
     const activeChatRoomId = localStorage.getItem("activeChatRoom");
     const timestamp = new Date().toISOString();
-    if (!isInactive) {
+    if (!isInactive && window.location.pathname !== "/") {
       saveLastSeen(userId, timestamp, activeChatRoomId);
       if (!deliveredRef.current) {
         handleMarkAllMessagesDelivered();
@@ -91,9 +97,6 @@ export const ChatRoomProvider = ({ children }) => {
       }
     } else {
       updateLastSeen(userId, activeChatRoomId);
-      if (activeChatRoomId !== null) {
-        markChatRoomInactive(activeChatRoomId, userId);
-      }
       setActiveChatRoomId(null);
       deliveredRef.current = false;
     }
@@ -242,6 +245,7 @@ export const ChatRoomProvider = ({ children }) => {
         addMessageToRoom,
         usernameToChatRoomMap,
         mergeChatRooms,
+        resetChatRoomContext,
       }}
     >
       {children}

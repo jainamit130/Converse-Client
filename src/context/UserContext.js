@@ -52,6 +52,22 @@ export const UserProvider = ({ children }) => {
     setUserId(userIdString);
   };
 
+  const resetUser = () => {
+    setUserId(null);
+    setToken(null);
+    setUsername(null);
+    setActiveChatRoomId(null);
+    setActiveChatRoomName(null);
+    setIsLogin(false);
+
+    localStorage.removeItem("userId");
+    localStorage.removeItem("authenticationToken");
+    localStorage.removeItem("username");
+    localStorage.removeItem("activeChatRoom");
+    localStorage.removeItem("activeChatRoomName");
+    localStorage.removeItem("isLogin");
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -65,6 +81,7 @@ export const UserProvider = ({ children }) => {
         activeChatRoomName,
         token,
         setActiveChatRoomName,
+        resetUser,
       }}
     >
       {children}

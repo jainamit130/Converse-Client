@@ -1,19 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import useRedis from "../../hooks/useRedis";
+import { useChatRoom } from "../../context/ChatRoomContext";
+import { usePageActivity } from "../../context/PageActivityContext";
+import { useWebSocket } from "../../context/WebSocketContext";
 
 const LoginSignUpPage = () => {
+  const {
+    userId,
+    activeChatRoomId,
+    resetUser = () => {},
+    updateUserId = () => {},
+    setActiveChatRoomId = () => {},
+    setActiveChatRoomName = () => {},
+  } = useUser() || {};
+
+  const { resetChatRoomContext = () => {} } = useChatRoom() || {};
+
+  const { resetActivity = () => {} } = usePageActivity() || {};
+
+  const { resetWebSocketContext = () => {} } = useWebSocket() || {};
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const { saveLastSeen, updateLastSeen } = useRedis();
   const [isLoginPage, setIsLoginPage] = useState(true);
   const navigate = useNavigate();
-  const { updateUserId, setActiveChatRoomId, setActiveChatRoomName } =
-    useUser();
 
   const togglePage = () => {
     setIsLoginPage(!isLoginPage);
   };
+
+  useEffect(() => {
+    resetActivity();
+  }, []);
+
   const handle = async (e) => {
     e.preventDefault();
 
@@ -46,6 +69,11 @@ const LoginSignUpPage = () => {
         const data = await response.json();
         const { userId, username, authenticationToken, refreshToken } = data;
 
+        resetUser();
+        resetChatRoomContext();
+        resetWebSocketContext();
+        resetActivity();
+
         localStorage.setItem("userId", userId);
         localStorage.setItem("username", username);
         localStorage.setItem("authenticationToken", authenticationToken);
@@ -53,8 +81,10 @@ const LoginSignUpPage = () => {
         localStorage.setItem("isLogin", true);
         setActiveChatRoomId(null);
         setActiveChatRoomName(null);
+        const timestamp = new Date().toISOString();
+        saveLastSeen(userId, timestamp);
 
-        updateUserId(data.userId);
+        updateUserId(userId);
         navigate(`/chat-rooms`);
       }
     } catch (error) {

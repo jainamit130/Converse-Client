@@ -7,7 +7,7 @@ import "./App.css";
 import { WebSocketProvider } from "./context/WebSocketContext";
 import AddUser from "./components/AddUser";
 import LoginSignUpPage from "./components/authComponents/LoginSignUpPage";
-import { UserProvider } from "./context/UserContext";
+import { UserProvider, useUser } from "./context/UserContext";
 import { ChatRoomProvider } from "./context/ChatRoomContext";
 import { PageActivityProvider } from "./context/PageActivityContext";
 import LogoutPage from "./components/authComponents/LogoutPage";
@@ -15,24 +15,30 @@ import LogoutPage from "./components/authComponents/LogoutPage";
 function App() {
   return (
     <ApolloProvider client={client}>
-      <UserProvider>
-        <PageActivityProvider>
-          <ChatRoomProvider>
-            <WebSocketProvider>
-              {" "}
-              {/* Wrap ChatRoomProvider */}
-              <Router>
-                <Routes>
-                  <Route path="/" element={<LoginSignUpPage />} />
-                  <Route path="/chat-rooms" element={<ChatRooms />} />
-                  <Route path="/add-users" element={<AddUser />} />
-                  <Route path="/logout" element={<LogoutPage />} />
-                </Routes>
-              </Router>
-            </WebSocketProvider>
-          </ChatRoomProvider>
-        </PageActivityProvider>
-      </UserProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginSignUpPage />} />
+
+          <Route
+            path="/*"
+            element={
+              <UserProvider>
+                <PageActivityProvider>
+                  <ChatRoomProvider>
+                    <WebSocketProvider>
+                      <Routes>
+                        <Route path="/chat-rooms" element={<ChatRooms />} />
+                        <Route path="/add-users" element={<AddUser />} />
+                        <Route path="/logout" element={<LogoutPage />} />
+                      </Routes>
+                    </WebSocketProvider>
+                  </ChatRoomProvider>
+                </PageActivityProvider>
+              </UserProvider>
+            }
+          />
+        </Routes>
+      </Router>
     </ApolloProvider>
   );
 }
