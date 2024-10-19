@@ -17,12 +17,16 @@ const ChatRoomHeader = ({
         </div>
         {!typingUsers.length && (
           <div className="online-status">
-            {chatRoomType === "INDIVIDUAL" ? (
-              onlineUsers.size > 0 ? (
+            {chatRoomType === "SELF" ? (
+              <span>online</span>
+            ) : chatRoomType === "INDIVIDUAL" ? (
+              onlineUsers.size === 1 ? (
                 <span>online</span>
               ) : null
-            ) : onlineUsers.size > 0 ? (
-              <span>{onlineUsers.size} online</span>
+            ) : chatRoomType === "GROUP" ? (
+              onlineUsers.size > 0 ? (
+                <span>{onlineUsers.size} online</span>
+              ) : null
             ) : null}
           </div>
         )}

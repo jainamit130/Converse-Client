@@ -13,7 +13,7 @@ const TypingIndicator = ({ typingUsers }) => {
     <div>
       {typingUsersArray.length > 0 && (
         <div>
-          {typingUsersText} {typingVerb} typing...
+          {typingUsersText} {typingVerb} typing
         </div>
       )}
     </div>

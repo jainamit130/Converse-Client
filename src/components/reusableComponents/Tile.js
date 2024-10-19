@@ -46,7 +46,13 @@ const Tile = ({
               <div className="latestMessageTime">{formattedTime}</div>
             )}
           </div>
-          <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              color: "green",
+            }}
+          >
             {typingUsers && typingUsers.length > 0 ? (
               <TypingIndicator typingUsers={typingUsers} />
             ) : (

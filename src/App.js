@@ -16,28 +16,20 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Router>
-        <Routes>
-          <Route path="/" element={<LoginSignUpPage />} />
-
-          <Route
-            path="/*"
-            element={
-              <UserProvider>
-                <PageActivityProvider>
-                  <ChatRoomProvider>
-                    <WebSocketProvider>
-                      <Routes>
-                        <Route path="/chat-rooms" element={<ChatRooms />} />
-                        <Route path="/add-users" element={<AddUser />} />
-                        <Route path="/logout" element={<LogoutPage />} />
-                      </Routes>
-                    </WebSocketProvider>
-                  </ChatRoomProvider>
-                </PageActivityProvider>
-              </UserProvider>
-            }
-          />
-        </Routes>
+        <UserProvider>
+          <PageActivityProvider>
+            <ChatRoomProvider>
+              <WebSocketProvider>
+                <Routes>
+                  <Route path="/" element={<LoginSignUpPage />} />
+                  <Route path="/chat-rooms" element={<ChatRooms />} />
+                  <Route path="/add-users" element={<AddUser />} />
+                  <Route path="/logout" element={<LogoutPage />} />
+                </Routes>
+              </WebSocketProvider>
+            </ChatRoomProvider>
+          </PageActivityProvider>
+        </UserProvider>
       </Router>
     </ApolloProvider>
   );

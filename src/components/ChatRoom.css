@@ -13,7 +13,14 @@
     padding: 0;
   }
 
+  .online-status {
+    margin-left: 5px;
+    font-size: 13px;
+    justify-content: left;
+  }
+
   .chat-room-name{
+    justify-content: left;
     font-size: medium;
   }
 

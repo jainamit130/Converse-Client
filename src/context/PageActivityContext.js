@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useEffect } from "react";
 import usePageInactivity from "../hooks/usePageInactivity";
 
 const PageActivityContext = createContext();
@@ -8,9 +8,15 @@ export const PageActivityProvider = ({ children }) => {
     usePageInactivity(60000);
 
   const resetActivity = () => {
-    setIsInactive(false);
+    setIsInactive(true);
     resetInactivity();
   };
+
+  useEffect(() => {
+    return () => {
+      resetActivity();
+    };
+  }, []);
 
   return (
     <PageActivityContext.Provider

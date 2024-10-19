@@ -180,8 +180,6 @@ export const ChatRoomProvider = ({ children }) => {
           newRoom.chatRoomType === "INDIVIDUAL" ||
           newRoom.chatRoomType === "SELF"
         ) {
-          if (newRoom.chatRoomType === "SELF") {
-          }
           newRoom.userIds.forEach((userId) => {
             if (!updatedUsernameMap[userId]) {
               updatedUsernameMap[userId] = newRoom.id;
@@ -233,6 +231,12 @@ export const ChatRoomProvider = ({ children }) => {
     },
     [chatRooms]
   );
+
+  useEffect(() => {
+    return () => {
+      resetChatRoomContext();
+    };
+  }, []);
 
   return (
     <ChatRoomContext.Provider

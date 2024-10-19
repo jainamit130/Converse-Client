@@ -8,34 +8,21 @@ import { useWebSocket } from "../../context/WebSocketContext";
 
 const LoginSignUpPage = () => {
   const {
-    userId,
-    activeChatRoomId,
-    resetUser = () => {},
     updateUserId = () => {},
     setActiveChatRoomId = () => {},
     setActiveChatRoomName = () => {},
   } = useUser() || {};
 
-  const { resetChatRoomContext = () => {} } = useChatRoom() || {};
-
-  const { resetActivity = () => {} } = usePageActivity() || {};
-
-  const { resetWebSocketContext = () => {} } = useWebSocket() || {};
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const { saveLastSeen, updateLastSeen } = useRedis();
+  const { saveLastSeen } = useRedis();
   const [isLoginPage, setIsLoginPage] = useState(true);
   const navigate = useNavigate();
 
   const togglePage = () => {
     setIsLoginPage(!isLoginPage);
   };
-
-  useEffect(() => {
-    resetActivity();
-  }, []);
 
   const handle = async (e) => {
     e.preventDefault();
@@ -68,11 +55,6 @@ const LoginSignUpPage = () => {
       } else {
         const data = await response.json();
         const { userId, username, authenticationToken, refreshToken } = data;
-
-        resetUser();
-        resetChatRoomContext();
-        resetWebSocketContext();
-        resetActivity();
 
         localStorage.setItem("userId", userId);
         localStorage.setItem("username", username);

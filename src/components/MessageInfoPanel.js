@@ -97,7 +97,6 @@ const MessageInfoPanel = ({ message, onClose }) => {
         </div>
       </div>
 
-      {/* Read section */}
       <div style={{ margin: "20px" }}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <img src={readStatusIcon} className="infoIcon" alt="read status" />
@@ -105,7 +104,7 @@ const MessageInfoPanel = ({ message, onClose }) => {
         </div>
         <div className="receipt-section">
           {Object.entries(recipients)
-            .filter(([, receipt]) => receipt.read) // Only show if read
+            .filter(([, receipt]) => receipt.read)
             .map(([username, receipt]) => (
               <Tile
                 key={username}

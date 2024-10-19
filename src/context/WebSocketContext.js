@@ -302,6 +302,12 @@ export const WebSocketProvider = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    return () => {
+      resetWebSocketContext();
+    };
+  }, []);
+
   return (
     <WebSocketContext.Provider
       value={{
