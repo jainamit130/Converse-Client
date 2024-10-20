@@ -302,11 +302,11 @@ export const WebSocketProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    return () => {
-      resetWebSocketContext();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     resetWebSocketContext();
+  //   };
+  // }, []);
 
   return (
     <WebSocketContext.Provider
@@ -318,7 +318,7 @@ export const WebSocketProvider = ({ children }) => {
         handleStopTyping,
         handleTyping,
         typingTimeoutRef,
-        resetWebSocketContext,
+        // resetWebSocketContext,
       }}
     >
       {children}

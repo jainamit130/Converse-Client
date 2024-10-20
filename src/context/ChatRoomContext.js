@@ -38,12 +38,12 @@ export const ChatRoomProvider = ({ children }) => {
   const prevChatRoomIdRef = useRef(null);
   const deliveredRef = useRef(false);
 
-  const resetChatRoomContext = useCallback(() => {
-    setChatRooms(new Map());
-    setMessages({});
-    setUsernameToChatRoomMap(new Map());
-    setActiveChatRoomId(null);
-  }, []);
+  // const resetChatRoomContext = useCallback(() => {
+  //   setChatRooms(new Map());
+  //   setMessages({});
+  //   setUsernameToChatRoomMap(new Map());
+  //   setActiveChatRoomId(null);
+  // }, []);
 
   const updateChatRoomWithOnlineUsers = (chatRoomId, onlineUsers) => {
     setChatRooms((prevChatRooms) => {
@@ -81,7 +81,7 @@ export const ChatRoomProvider = ({ children }) => {
 
     const activeChatRoomId = localStorage.getItem("activeChatRoom");
     const timestamp = new Date().toISOString();
-    if (!isInactive && window.location.pathname !== "/") {
+    if (!isInactive) {
       saveLastSeen(userId, timestamp, activeChatRoomId);
       if (!deliveredRef.current) {
         handleMarkAllMessagesDelivered();
@@ -232,12 +232,6 @@ export const ChatRoomProvider = ({ children }) => {
     [chatRooms]
   );
 
-  useEffect(() => {
-    return () => {
-      resetChatRoomContext();
-    };
-  }, []);
-
   return (
     <ChatRoomContext.Provider
       value={{
@@ -249,7 +243,7 @@ export const ChatRoomProvider = ({ children }) => {
         addMessageToRoom,
         usernameToChatRoomMap,
         mergeChatRooms,
-        resetChatRoomContext,
+        // resetChatRoomContext,
       }}
     >
       {children}

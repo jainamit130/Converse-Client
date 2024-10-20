@@ -55,19 +55,19 @@ const LoginSignUpPage = () => {
       } else {
         const data = await response.json();
         const { userId, username, authenticationToken, refreshToken } = data;
-
-        localStorage.setItem("userId", userId);
-        localStorage.setItem("username", username);
-        localStorage.setItem("authenticationToken", authenticationToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("isLogin", true);
-        setActiveChatRoomId(null);
-        setActiveChatRoomName(null);
-        const timestamp = new Date().toISOString();
-        saveLastSeen(userId, timestamp);
-
-        updateUserId(userId);
-        navigate(`/chat-rooms`);
+        if (JSON.stringify(userId) !== localStorage.getItem("userId")) {
+          localStorage.setItem("userId", userId);
+          localStorage.setItem("username", username);
+          localStorage.setItem("authenticationToken", authenticationToken);
+          localStorage.setItem("refreshToken", refreshToken);
+          localStorage.setItem("isLogin", true);
+          setActiveChatRoomId(null);
+          setActiveChatRoomName(null);
+          updateUserId(userId);
+          const timestamp = new Date().toISOString();
+          saveLastSeen(userId, timestamp);
+        }
+        navigate("/chat-rooms");
       }
     } catch (error) {
       console.error("There was an error!", error);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import config from "../config/environment";
+import useRedis from "./useRedis";
 
 const usePageInactivity = (inactiveTimeout = 60000) => {
   const BASE_URL = config.BASE_URL;

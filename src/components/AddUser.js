@@ -24,7 +24,7 @@ const AddUser = ({ onClose }) => {
   const { handleCreateGroup } = useCreateChat();
   const [chatRoomType, setChatRoomType] = useState("INDIVIDUAL");
   const [isNewGroup, setIsNewGroup] = useState(false);
-  const { userId, token } = useUser();
+  const { username } = useUser();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -71,7 +71,10 @@ const AddUser = ({ onClose }) => {
 
       const result = await createChatRoom(null, [user.id], chatRoomType);
       chatRoomId = result.id;
-      chatRoomName = result.name;
+      chatRoomName =
+        result.recipientUsername === username
+          ? result.creatorUsername
+          : result.recipientUsername;
     } else {
       const selectedUserIds = selectedUsers.map((user) => user.id);
       const result = await createChatRoom(

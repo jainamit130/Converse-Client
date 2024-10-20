@@ -68,11 +68,11 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("isLogin");
   };
 
-  useEffect(() => {
-    return () => {
-      resetUser();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     resetUser();
+  //   };
+  // }, []);
 
   return (
     <UserContext.Provider
