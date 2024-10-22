@@ -10,25 +10,37 @@ import Tile from "./reusableComponents/Tile";
 import AddUser from "./AddUser";
 import GroupIcon from "../assets/GroupIcon.png";
 import ProfileIcon from "../assets/profileIcon.webp";
+import useCreateChat from "../hooks/useCreateChat";
 
 const ChatRooms = () => {
-  const {
-    userId,
-    username,
-    activeChatRoomId,
-    setActiveChatRoomId,
-    activeChatRoomName,
-    setActiveChatRoomName,
-  } = useUser();
+  const { userId, username, activeChatRoomId, setActiveChatRoomId } = useUser();
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
     variables: { userId },
   });
+  const [showTempChatRoom, setShowTempChatRoom] = useState(false);
   const { chatRooms, messages, mergeChatRooms } = useChatRoom();
+  const { handleCreateGroup } = useCreateChat();
   const [showAddUserPanel, setShowAddUserPanel] = useState(false);
+  const [tempChatRoom, setTempChatRoom] = useState({});
 
-  const handleCloseAddUser = (chatRoomId, chatRoomName) => {
+  const handleCloseAddUser = (chatRoomId) => {
+    if (chatRoomId === "-1") {
+      setShowTempChatRoom(true);
+    }
     setShowAddUserPanel(false);
-    if (chatRoomId !== null) handleChatRoomClick(chatRoomId, chatRoomName);
+    if (chatRoomId !== null) handleChatRoomClick(chatRoomId);
+  };
+
+  const createChatRoom = async (name, userIds, type, message) => {
+    try {
+      const response = await handleCreateGroup(name, userIds, type, message);
+      return {
+        chatRoomId: response.chatRoomId,
+      };
+    } catch (err) {
+      console.error("Error creating chat room:", err);
+      throw err;
+    }
   };
 
   useEffect(() => {
@@ -37,13 +49,11 @@ const ChatRooms = () => {
     }
   }, [data, mergeChatRooms]);
 
-  const handleCreateGroup = () => {
-    setShowAddUserPanel(true);
-  };
-
-  const handleChatRoomClick = (chatRoomId, chatRoomName) => {
+  const handleChatRoomClick = (chatRoomId) => {
+    if (chatRoomId !== "-1") {
+      setShowTempChatRoom(false);
+    }
     setActiveChatRoomId(chatRoomId);
-    setActiveChatRoomName(chatRoomName);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -55,7 +65,7 @@ const ChatRooms = () => {
         <div className="sidebar-header">
           <h2>Chats</h2>
           <img
-            onClick={handleCreateGroup}
+            onClick={() => setShowAddUserPanel(true)}
             src={newChat}
             className="newChatIcon"
             title="new chat"
@@ -88,6 +98,15 @@ const ChatRooms = () => {
             onChatRoomClick={handleChatRoomClick}
           />
         ))}
+        {showTempChatRoom && (
+          <Tile
+            id={activeChatRoomId}
+            name={tempChatRoom.name}
+            icon={GroupIcon}
+            activeChatRoomId={activeChatRoomId}
+            onChatRoomClick={handleChatRoomClick}
+          />
+        )}
       </div>
 
       <div className="chat-section">
@@ -120,11 +139,19 @@ const ChatRooms = () => {
         ) : (
           <ChatRoom
             key={activeChatRoomId}
-            initialMessages={messages[activeChatRoomId] || []}
+            handleCreateGroup={createChatRoom}
+            tempChatRoom={tempChatRoom}
+            handleChatRoomClick={handleChatRoomClick}
           />
         )}
       </div>
-      {showAddUserPanel && <AddUser onClose={handleCloseAddUser} />}
+      {showAddUserPanel && (
+        <AddUser
+          onClose={handleCloseAddUser}
+          handleCreateGroup={createChatRoom}
+          setTempChatRoom={setTempChatRoom}
+        />
+      )}
     </div>
   );
 };

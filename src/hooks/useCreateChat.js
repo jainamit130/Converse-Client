@@ -34,7 +34,8 @@ const useCreateChat = () => {
   const handleCreateGroup = async (
     groupName,
     selectedUserIds,
-    chatRoomType
+    chatRoomType,
+    latestMessage
   ) => {
     setLoading(true);
     try {
@@ -43,6 +44,7 @@ const useCreateChat = () => {
         members: selectedUserIds,
         chatRoomType: chatRoomType,
         createdById: userId,
+        latestMessage: latestMessage,
       });
       return response.data;
     } catch (err) {

@@ -12,6 +12,7 @@ import MessageInfoPanel from "./MessageInfoPanel";
 import { useNavigate } from "react-router-dom";
 import ChatRoomHeader from "./ChatRoomHeader.js";
 import MessageStatusIcon from "./MessageStatusIcon.js";
+import useCreateChat from "../hooks/useCreateChat.js";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   return messages.reduce((acc, message, index) => {
@@ -32,11 +33,9 @@ const groupMessagesByDate = (messages, unreadMessageCount) => {
   }, {});
 };
 
-const ChatRoom = () => {
-  const { userId, username, activeChatRoomId, activeChatRoomName } = useUser();
+const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
+  const { userId, username, activeChatRoomId } = useUser();
   const [chatRoomId, setChatRoomId] = useState(activeChatRoomId);
-  const [chatRoomName, setChatRoomName] = useState(activeChatRoomName);
-
   const { sendMessage, connected, handleStopTyping, handleTyping } =
     useWebSocket();
   const [message, setMessage] = useState("");
@@ -47,6 +46,9 @@ const ChatRoom = () => {
   );
   const [chatRoomType, setChatRoomType] = useState(() => {
     return chatRooms.get(chatRoomId)?.chatRoomType;
+  });
+  const [chatRoomName, setChatRoomName] = useState(() => {
+    return chatRooms.get(chatRoomId)?.name;
   });
   const [recipientUsername, setRecipientUsername] = useState(() => {
     return chatRooms.get(chatRoomId)?.recipientUsername;
@@ -78,12 +80,11 @@ const ChatRoom = () => {
       navigate("/chat-rooms");
     } else {
       setChatRoomId(activeChatRoomId);
-      setChatRoomName(activeChatRoomName);
     }
   }, [activeChatRoomId]);
 
   useEffect(() => {
-    if (chatRoomId) {
+    if (chatRoomId && chatRoomId !== "-1") {
       setChatRoomMessages(messages[chatRoomId] || []);
       handleMarkAllMessagesRead();
     }
@@ -111,7 +112,7 @@ const ChatRoom = () => {
     fetchPolicy: "network-only",
   });
 
-  const handleSendMessage = (messageContent) => {
+  const handleSendMessage = async (messageContent) => {
     if (!chatRoomId) return;
     const newMessage = {
       id: `${Math.random()}`,
@@ -121,7 +122,21 @@ const ChatRoom = () => {
     };
 
     if (sendMessage) {
-      sendMessage(`/app/chat/sendMessage/${chatRoomId}`, newMessage);
+      // For first time individual chat rooms, creation happens when you first send the message
+      if (chatRoomId === "-1") {
+        const response = await handleCreateGroup(
+          null,
+          tempChatRoom.members,
+          tempChatRoom.chatRoomType,
+          newMessage
+        );
+        handleChatRoomClick(response.chatRoomId);
+        return {
+          chatRoomId: response.chatRoomId,
+        };
+      } else {
+        sendMessage(`/app/chat/sendMessage/${chatRoomId}`, newMessage);
+      }
       setMessage("");
       markChatRoomRead(chatRoomId);
     }

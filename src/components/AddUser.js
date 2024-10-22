@@ -10,7 +10,7 @@ import { useUser } from "../context/UserContext";
 import { useChatRoom } from "../context/ChatRoomContext";
 import useCreateChat from "../hooks/useCreateChat";
 
-const AddUser = ({ onClose }) => {
+const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
   const [users, setUsers] = useState([]);
   const { usernameToChatRoomMap } = useChatRoom();
   const { getUsers } = useCreateChat();
@@ -21,10 +21,9 @@ const AddUser = ({ onClose }) => {
 
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [groupName, setGroupName] = useState("");
-  const { handleCreateGroup } = useCreateChat();
   const [chatRoomType, setChatRoomType] = useState("INDIVIDUAL");
   const [isNewGroup, setIsNewGroup] = useState(false);
-  const { username } = useUser();
+  const { userId } = useUser();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -49,44 +48,38 @@ const AddUser = ({ onClose }) => {
     setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
   };
 
-  const createChatRoom = async (name, userIds, type) => {
-    try {
-      const response = await handleCreateGroup(name, userIds, type);
-      return { id: response.id, name: response.name };
-    } catch (err) {
-      console.error("Error creating chat room:", err);
-      throw err;
-    }
-  };
-
   const openChatRoom = async (user) => {
-    let chatRoomId, chatRoomName;
-
+    let chatRoomId;
     if (chatRoomType === "INDIVIDUAL") {
       const existingChatRoomId = usernameToChatRoomMap[user.id];
       if (existingChatRoomId) {
-        onClose(existingChatRoomId, user.username);
+        onClose(existingChatRoomId);
         return;
       }
 
-      const result = await createChatRoom(null, [user.id], chatRoomType);
-      chatRoomId = result.id;
-      chatRoomName =
-        result.recipientUsername === username
-          ? result.creatorUsername
-          : result.recipientUsername;
+      // const result = await createChatRoom(null, [user.id], chatRoomType);
+      // chatRoomId = result.id;
+      chatRoomId = "-1";
+      // Set Temp ChatRoom
+      const tempChatRoom = {
+        name: user.username,
+        chatRoomId: "-1",
+        chatRoomType,
+        members: [user.id, userId],
+        createdById: userId,
+      };
+      setTempChatRoom(tempChatRoom);
     } else {
       const selectedUserIds = selectedUsers.map((user) => user.id);
-      const result = await createChatRoom(
+      const result = await handleCreateGroup(
         groupName,
         selectedUserIds,
         chatRoomType
       );
-      chatRoomId = result.id;
-      chatRoomName = result.name;
+      chatRoomId = result.chatRoomId;
     }
 
-    onClose(chatRoomId, chatRoomName);
+    onClose(chatRoomId);
   };
 
   useEffect(() => {
@@ -115,7 +108,7 @@ const AddUser = ({ onClose }) => {
             className="back-btn"
             onClick={() => {
               if (isNewGroup) setIsNewGroup(false);
-              else onClose(null, null);
+              else onClose(null);
               setChatRoomType("INDIVIDUAL");
             }}
           />

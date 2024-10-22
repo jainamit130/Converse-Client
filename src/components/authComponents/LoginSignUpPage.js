@@ -10,13 +10,15 @@ const LoginSignUpPage = () => {
   const {
     updateUserId = () => {},
     setActiveChatRoomId = () => {},
-    setActiveChatRoomName = () => {},
+    resetUser,
   } = useUser() || {};
+
+  const { resetChatRoomContext } = useChatRoom();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const { saveLastSeen } = useRedis();
+  const { saveUserToRedis } = useRedis();
   const [isLoginPage, setIsLoginPage] = useState(true);
   const navigate = useNavigate();
 
@@ -55,6 +57,8 @@ const LoginSignUpPage = () => {
       } else {
         const data = await response.json();
         const { userId, username, authenticationToken, refreshToken } = data;
+
+        resetChatRoomContext();
         if (JSON.stringify(userId) !== localStorage.getItem("userId")) {
           localStorage.setItem("userId", userId);
           localStorage.setItem("username", username);
@@ -62,11 +66,9 @@ const LoginSignUpPage = () => {
           localStorage.setItem("refreshToken", refreshToken);
           localStorage.setItem("isLogin", true);
           setActiveChatRoomId(null);
-          setActiveChatRoomName(null);
           updateUserId(userId);
-          const timestamp = new Date().toISOString();
-          saveLastSeen(userId, timestamp);
         }
+        saveUserToRedis(userId);
         navigate("/chat-rooms");
       }
     } catch (error) {

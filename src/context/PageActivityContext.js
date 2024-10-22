@@ -10,7 +10,7 @@ export const PageActivityProvider = ({ children }) => {
   const { isInactive, setIsInactive, resetInactivity } =
     usePageInactivity(60000);
   const location = useLocation();
-  const { saveLastSeen, updateLastSeen } = useRedis();
+  const { saveUserToRedis, removeUserFromRedis } = useRedis();
   const { userId, activeChatRoomId } = useUser();
 
   const resetActivity = () => {
@@ -20,10 +20,10 @@ export const PageActivityProvider = ({ children }) => {
 
   useEffect(() => {
     if (location.pathname !== "/chat-rooms") {
-      updateLastSeen(userId, activeChatRoomId);
+      removeUserFromRedis(userId, activeChatRoomId);
       setIsInactive(true);
     } else {
-      saveLastSeen(userId, activeChatRoomId);
+      saveUserToRedis(userId, activeChatRoomId);
       setIsInactive(false);
     }
   }, [location, setIsInactive]);

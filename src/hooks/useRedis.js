@@ -6,16 +6,16 @@ const useRedis = () => {
   const [error, setError] = useState(null);
   const BASE_URL = config.BASE_URL;
 
-  const saveLastSeen = async (key, value, optional) => {
+  const saveUserToRedis = async (key, optional) => {
     if (key === null) {
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      let url = `${BASE_URL}/user/save/lastSeen/${key}?timestamp=${value}`;
+      let url = `${BASE_URL}/user/save/lastSeen/${key}`;
       if (optional) {
-        url += `&prevChatRoomId=${optional}`;
+        url += `?prevChatRoomId=${optional}`;
       }
       const response = await fetch(url, {
         method: "POST",
@@ -30,24 +30,24 @@ const useRedis = () => {
     }
   };
 
-  const getLastSeen = async (key) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${BASE_URL}/user/get/lastSeen/${key}`, {
-        method: "GET",
-      });
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      setError(err);
-      console.error("Error fetching data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const getLastSeen = async (key) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   try {
+  //     const response = await fetch(`${BASE_URL}/user/get/lastSeen/${key}`, {
+  //       method: "GET",
+  //     });
+  //     const data = await response.json();
+  //     return data;
+  //   } catch (err) {
+  //     setError(err);
+  //     console.error("Error fetching data:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const updateLastSeen = async (key, optional) => {
+  const removeUserFromRedis = async (key, optional) => {
     setLoading(true);
     setError(null);
     try {
@@ -113,9 +113,9 @@ const useRedis = () => {
   };
 
   return {
-    saveLastSeen,
-    getLastSeen,
-    updateLastSeen,
+    saveUserToRedis,
+    // getLastSeen,
+    removeUserFromRedis,
     markChatRoomActive,
     markChatRoomInactive,
     loading,
