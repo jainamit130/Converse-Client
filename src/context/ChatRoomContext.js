@@ -80,9 +80,6 @@ export const ChatRoomProvider = ({ children }) => {
     }
 
     const activeChatRoomId = localStorage.getItem("activeChatRoom");
-    if (activeChatRoomId === "-1") {
-      return;
-    }
 
     if (!isInactive) {
       saveUserToRedis(userId, activeChatRoomId);

@@ -49,7 +49,7 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
   };
 
   const openChatRoom = async (user) => {
-    let chatRoomId;
+    let chatRoomId = null;
     if (chatRoomType === "INDIVIDUAL") {
       const existingChatRoomId = usernameToChatRoomMap[user.id];
       if (existingChatRoomId) {
@@ -59,16 +59,15 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
 
       // const result = await createChatRoom(null, [user.id], chatRoomType);
       // chatRoomId = result.id;
-      chatRoomId = "-1";
       // Set Temp ChatRoom
       const tempChatRoom = {
         name: user.username,
-        chatRoomId: "-1",
         chatRoomType,
         members: [user.id, userId],
         createdById: userId,
       };
       setTempChatRoom(tempChatRoom);
+      onClose(chatRoomId, true);
     } else {
       const selectedUserIds = selectedUsers.map((user) => user.id);
       const result = await handleCreateGroup(
@@ -77,9 +76,8 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
         chatRoomType
       );
       chatRoomId = result.chatRoomId;
+      onClose(chatRoomId);
     }
-
-    onClose(chatRoomId);
   };
 
   useEffect(() => {

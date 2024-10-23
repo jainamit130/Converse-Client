@@ -14,6 +14,7 @@ const LoginSignUpPage = () => {
   } = useUser() || {};
 
   const { resetChatRoomContext } = useChatRoom();
+  const { resetWebSocketContext } = useWebSocket();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -58,6 +59,7 @@ const LoginSignUpPage = () => {
         const data = await response.json();
         const { userId, username, authenticationToken, refreshToken } = data;
 
+        resetWebSocketContext();
         resetChatRoomContext();
         if (JSON.stringify(userId) !== localStorage.getItem("userId")) {
           localStorage.setItem("userId", userId);
@@ -70,6 +72,7 @@ const LoginSignUpPage = () => {
         }
         saveUserToRedis(userId);
         navigate("/chat-rooms");
+        window.location.reload();
       }
     } catch (error) {
       console.error("There was an error!", error);

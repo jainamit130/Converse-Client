@@ -24,6 +24,7 @@ export const WebSocketProvider = ({ children }) => {
     chatRooms,
     setChatRooms,
   } = useChatRoom();
+  const [newIndividualChat, setNewIndividualChat] = useState(false);
   const { userId, activeChatRoomId } = useUser();
   const { isInactive } = usePageActivity();
   const [connected, setConnected] = useState(false);
@@ -159,7 +160,12 @@ export const WebSocketProvider = ({ children }) => {
   const subscribeToUser = (userId) => {
     stompClient.subscribe(`/topic/user/${userId}`, (message) => {
       const chatRoom = JSON.parse(message.body);
-      mergeChatRooms(chatRoom);
+      const updatedChatRoom =
+        chatRoom.latestMessage?.senderId === userId &&
+        chatRoom.unreadMessageCount === 1
+          ? { ...chatRoom, unreadMessageCount: 0 }
+          : chatRoom;
+      mergeChatRooms(updatedChatRoom);
     });
   };
 
@@ -302,12 +308,6 @@ export const WebSocketProvider = ({ children }) => {
     }
   };
 
-  // useEffect(() => {
-  //   return () => {
-  //     resetWebSocketContext();
-  //   };
-  // }, []);
-
   return (
     <WebSocketContext.Provider
       value={{
@@ -318,7 +318,7 @@ export const WebSocketProvider = ({ children }) => {
         handleStopTyping,
         handleTyping,
         typingTimeoutRef,
-        // resetWebSocketContext,
+        resetWebSocketContext,
       }}
     >
       {children}

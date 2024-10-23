@@ -23,12 +23,12 @@ const ChatRooms = () => {
   const [showAddUserPanel, setShowAddUserPanel] = useState(false);
   const [tempChatRoom, setTempChatRoom] = useState({});
 
-  const handleCloseAddUser = (chatRoomId) => {
-    if (chatRoomId === "-1") {
+  const handleCloseAddUser = (chatRoomId, isNewIndividualChat) => {
+    if (isNewIndividualChat) {
       setShowTempChatRoom(true);
     }
     setShowAddUserPanel(false);
-    if (chatRoomId !== null) handleChatRoomClick(chatRoomId);
+    handleChatRoomClick(chatRoomId);
   };
 
   const createChatRoom = async (name, userIds, type, message) => {
@@ -50,7 +50,7 @@ const ChatRooms = () => {
   }, [data, mergeChatRooms]);
 
   const handleChatRoomClick = (chatRoomId) => {
-    if (chatRoomId !== "-1") {
+    if (chatRoomId !== null) {
       setShowTempChatRoom(false);
     }
     setActiveChatRoomId(chatRoomId);
@@ -110,7 +110,7 @@ const ChatRooms = () => {
       </div>
 
       <div className="chat-section">
-        {!activeChatRoomId ? (
+        {!activeChatRoomId && !showTempChatRoom ? (
           <div className="chat-header">
             <div className="converse">
               <div style={{ textAlign: "right" }}>

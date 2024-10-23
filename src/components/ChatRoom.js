@@ -44,12 +44,17 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
   );
+
   const [chatRoomType, setChatRoomType] = useState(() => {
-    return chatRooms.get(chatRoomId)?.chatRoomType;
+    return chatRoomId
+      ? chatRooms.get(chatRoomId)?.chatRoomType
+      : tempChatRoom.chatRoomType;
   });
+
   const [chatRoomName, setChatRoomName] = useState(() => {
-    return chatRooms.get(chatRoomId)?.name;
+    return chatRoomId ? chatRooms.get(chatRoomId)?.name : tempChatRoom.name;
   });
+
   const [recipientUsername, setRecipientUsername] = useState(() => {
     return chatRooms.get(chatRoomId)?.recipientUsername;
   });
@@ -84,7 +89,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   }, [activeChatRoomId]);
 
   useEffect(() => {
-    if (chatRoomId && chatRoomId !== "-1") {
+    if (chatRoomId) {
       setChatRoomMessages(messages[chatRoomId] || []);
       handleMarkAllMessagesRead();
     }
@@ -113,7 +118,6 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   });
 
   const handleSendMessage = async (messageContent) => {
-    if (!chatRoomId) return;
     const newMessage = {
       id: `${Math.random()}`,
       content: messageContent,
@@ -123,7 +127,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
 
     if (sendMessage) {
       // For first time individual chat rooms, creation happens when you first send the message
-      if (chatRoomId === "-1") {
+      if (chatRoomId === null) {
         const response = await handleCreateGroup(
           null,
           tempChatRoom.members,
@@ -169,7 +173,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
       <ChatRoomHeader
         key={chatRoomId}
         chatRoomName={
-          chatRoomType === "INDIVIDUAL"
+          chatRoomType === "INDIVIDUAL" && chatRoomId !== null
             ? recipientUsername === username
               ? creatorUsername
               : recipientUsername
