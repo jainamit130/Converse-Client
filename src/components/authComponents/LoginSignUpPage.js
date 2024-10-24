@@ -30,9 +30,13 @@ const LoginSignUpPage = () => {
   const handle = async (e) => {
     e.preventDefault();
 
+    // const url = isLoginPage
+    //   ? "http://localhost:8081/converse/auth/login"
+    //   : "http://localhost:8081/converse/auth/signup";
+
     const url = isLoginPage
-      ? "http://localhost:8081/converse/auth/login"
-      : "http://localhost:8081/converse/auth/signup";
+      ? "https://converse-803802355670.asia-south1.run.app/converse/auth/login"
+      : "https://converse-803802355670.asia-south1.run.app/converse/auth/signup";
 
     const payload = {
       username: username,

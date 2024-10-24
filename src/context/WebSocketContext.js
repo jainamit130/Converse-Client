@@ -11,6 +11,7 @@ import { useChatRoom } from "./ChatRoomContext";
 import { useUser } from "./UserContext";
 import { usePageActivity } from "./PageActivityContext";
 import { sortChatRooms } from "../util/chatUtil";
+import config from "../config/environment";
 
 const WebSocketContext = createContext(null);
 
@@ -75,7 +76,7 @@ export const WebSocketProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("authenticationToken");
-    const socket = new SockJS(`http://localhost:8080/ws?token=${token}`);
+    const socket = new SockJS(`${config.BASE_URL}/ws?token=${token}`);
     const client = Stomp.over(socket);
 
     client.connect({}, () => {

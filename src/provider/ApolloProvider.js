@@ -4,9 +4,10 @@ import {
   InMemoryCache,
   ApolloProvider as Provider,
 } from "@apollo/client";
+import config from "../config/environment";
 
 const client = new ApolloClient({
-  uri: "http://localhost:8080/graphql",
+  uri: config.BASE_URL + "/graphql",
   cache: new InMemoryCache(),
 });
 
