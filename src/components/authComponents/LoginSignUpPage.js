@@ -5,20 +5,25 @@ import useRedis from "../../hooks/useRedis";
 import { useChatRoom } from "../../context/ChatRoomContext";
 import { usePageActivity } from "../../context/PageActivityContext";
 import { useWebSocket } from "../../context/WebSocketContext";
+import config from "../../config/environment";
 
 const LoginSignUpPage = () => {
   const {
     updateUserId = () => {},
     setActiveChatRoomId = () => {},
-    setActiveChatRoomName = () => {},
+    resetUser,
   } = useUser() || {};
+
+  const { resetChatRoomContext } = useChatRoom();
+  const { resetWebSocketContext } = useWebSocket();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const { saveLastSeen } = useRedis();
+  const { saveUserToRedis } = useRedis();
   const [isLoginPage, setIsLoginPage] = useState(true);
   const navigate = useNavigate();
+  const BASE_URL = config.USER_BASE_URL + "/converse/auth";
 
   const togglePage = () => {
     setIsLoginPage(!isLoginPage);
@@ -27,9 +32,7 @@ const LoginSignUpPage = () => {
   const handle = async (e) => {
     e.preventDefault();
 
-    const url = isLoginPage
-      ? "http://localhost:8081/converse/auth/login"
-      : "http://localhost:8081/converse/auth/signup";
+    const url = isLoginPage ? BASE_URL + "/login" : BASE_URL + "/signup";
 
     const payload = {
       username: username,
@@ -55,6 +58,9 @@ const LoginSignUpPage = () => {
       } else {
         const data = await response.json();
         const { userId, username, authenticationToken, refreshToken } = data;
+
+        resetWebSocketContext();
+        resetChatRoomContext();
         if (JSON.stringify(userId) !== localStorage.getItem("userId")) {
           localStorage.setItem("userId", userId);
           localStorage.setItem("username", username);
@@ -62,12 +68,11 @@ const LoginSignUpPage = () => {
           localStorage.setItem("refreshToken", refreshToken);
           localStorage.setItem("isLogin", true);
           setActiveChatRoomId(null);
-          setActiveChatRoomName(null);
           updateUserId(userId);
-          const timestamp = new Date().toISOString();
-          saveLastSeen(userId, timestamp);
         }
+        saveUserToRedis(userId);
         navigate("/chat-rooms");
+        window.location.reload();
       }
     } catch (error) {
       console.error("There was an error!", error);

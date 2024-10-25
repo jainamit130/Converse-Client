@@ -7,7 +7,7 @@ const useCreateChat = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { token, userId } = useUser();
-  const BASE_URL = config.BASE_URL;
+  const BASE_URL = config.CHAT_BASE_URL;
 
   const getUsers = async () => {
     setLoading(true);
@@ -34,7 +34,8 @@ const useCreateChat = () => {
   const handleCreateGroup = async (
     groupName,
     selectedUserIds,
-    chatRoomType
+    chatRoomType,
+    latestMessage
   ) => {
     setLoading(true);
     try {
@@ -43,6 +44,7 @@ const useCreateChat = () => {
         members: selectedUserIds,
         chatRoomType: chatRoomType,
         createdById: userId,
+        latestMessage: latestMessage,
       });
       return response.data;
     } catch (err) {

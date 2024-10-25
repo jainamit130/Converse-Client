@@ -23,8 +23,8 @@ export const ChatRoomProvider = ({ children }) => {
   const [messages, setMessages] = useState({});
   const [usernameToChatRoomMap, setUsernameToChatRoomMap] = useState(new Map());
   const {
-    updateLastSeen,
-    saveLastSeen,
+    removeUserFromRedis,
+    saveUserToRedis,
     markChatRoomActive,
     markChatRoomInactive,
   } = useRedis();
@@ -38,12 +38,12 @@ export const ChatRoomProvider = ({ children }) => {
   const prevChatRoomIdRef = useRef(null);
   const deliveredRef = useRef(false);
 
-  // const resetChatRoomContext = useCallback(() => {
-  //   setChatRooms(new Map());
-  //   setMessages({});
-  //   setUsernameToChatRoomMap(new Map());
-  //   setActiveChatRoomId(null);
-  // }, []);
+  const resetChatRoomContext = useCallback(() => {
+    setChatRooms(new Map());
+    setMessages({});
+    setUsernameToChatRoomMap(new Map());
+    setActiveChatRoomId(null);
+  }, []);
 
   const updateChatRoomWithOnlineUsers = (chatRoomId, onlineUsers) => {
     setChatRooms((prevChatRooms) => {
@@ -80,9 +80,9 @@ export const ChatRoomProvider = ({ children }) => {
     }
 
     const activeChatRoomId = localStorage.getItem("activeChatRoom");
-    const timestamp = new Date().toISOString();
+
     if (!isInactive) {
-      saveLastSeen(userId, timestamp, activeChatRoomId);
+      saveUserToRedis(userId, activeChatRoomId);
       if (!deliveredRef.current) {
         handleMarkAllMessagesDelivered();
         deliveredRef.current = true;
@@ -96,7 +96,7 @@ export const ChatRoomProvider = ({ children }) => {
         }
       }
     } else {
-      updateLastSeen(userId, activeChatRoomId);
+      removeUserFromRedis(userId, activeChatRoomId);
       setActiveChatRoomId(null);
       deliveredRef.current = false;
     }
@@ -243,7 +243,7 @@ export const ChatRoomProvider = ({ children }) => {
         addMessageToRoom,
         usernameToChatRoomMap,
         mergeChatRooms,
-        // resetChatRoomContext,
+        resetChatRoomContext,
       }}
     >
       {children}

@@ -4,8 +4,7 @@ import { useUser } from "../../context/UserContext";
 
 const LogoutPage = () => {
   const navigate = useNavigate();
-  const { updateUserId, setActiveChatRoomId, setActiveChatRoomName } =
-    useUser();
+  const { updateUserId, setActiveChatRoomId } = useUser();
 
   useEffect(() => {
     const handleLogout = async () => {
@@ -36,8 +35,6 @@ const LogoutPage = () => {
           localStorage.clear();
           updateUserId(null);
           setActiveChatRoomId(null);
-          setActiveChatRoomName(null);
-
           navigate("/login");
         } catch (error) {
           console.error("Logout failed", error);
@@ -46,7 +43,7 @@ const LogoutPage = () => {
     };
 
     handleLogout();
-  }, [navigate, updateUserId, setActiveChatRoomId, setActiveChatRoomName]);
+  }, [navigate, updateUserId, setActiveChatRoomId]);
 
   return <div>Logging out...</div>;
 };

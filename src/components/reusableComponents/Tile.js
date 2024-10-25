@@ -50,7 +50,6 @@ const Tile = ({
             style={{
               display: "flex",
               alignItems: "center",
-              color: "green",
             }}
           >
             {typingUsers && typingUsers.length > 0 ? (

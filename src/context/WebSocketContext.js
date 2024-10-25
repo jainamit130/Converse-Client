@@ -11,6 +11,7 @@ import { useChatRoom } from "./ChatRoomContext";
 import { useUser } from "./UserContext";
 import { usePageActivity } from "./PageActivityContext";
 import { sortChatRooms } from "../util/chatUtil";
+import config from "../config/environment";
 
 const WebSocketContext = createContext(null);
 
@@ -24,12 +25,33 @@ export const WebSocketProvider = ({ children }) => {
     chatRooms,
     setChatRooms,
   } = useChatRoom();
+
   const { userId, activeChatRoomId } = useUser();
   const { isInactive } = usePageActivity();
   const [connected, setConnected] = useState(false);
   const subscriptions = useRef({});
 
   const typingTimeoutRef = useRef(null);
+
+  const initializeWebSocket = () => {
+    const token = localStorage.getItem("authenticationToken");
+    const socket = new SockJS(`${config.CHAT_BASE_URL}/ws?token=${token}`);
+    const client = Stomp.over(socket);
+
+    client.connect({}, () => {
+      setStompClient(client);
+      setConnected(true);
+    });
+
+    return client;
+  };
+
+  useEffect(() => {
+    if (!isInactive && !connected) {
+      const client = initializeWebSocket();
+      setStompClient(client);
+    }
+  }, [isInactive]);
 
   const resetWebSocketContext = () => {
     subscriptions.current = {};
@@ -69,23 +91,6 @@ export const WebSocketProvider = ({ children }) => {
   useEffect(() => {
     return () => {
       clearTimeout(typingTimeoutRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem("authenticationToken");
-    const socket = new SockJS(`http://localhost:8080/ws?token=${token}`);
-    const client = Stomp.over(socket);
-
-    client.connect({}, () => {
-      setStompClient(client);
-      setConnected(true);
-    });
-
-    return () => {
-      if (client) {
-        client.disconnect();
-      }
     };
   }, []);
 
@@ -159,7 +164,12 @@ export const WebSocketProvider = ({ children }) => {
   const subscribeToUser = (userId) => {
     stompClient.subscribe(`/topic/user/${userId}`, (message) => {
       const chatRoom = JSON.parse(message.body);
-      mergeChatRooms(chatRoom);
+      const updatedChatRoom =
+        chatRoom.latestMessage?.senderId === userId &&
+        chatRoom.unreadMessageCount === 1
+          ? { ...chatRoom, unreadMessageCount: 0 }
+          : chatRoom;
+      mergeChatRooms(updatedChatRoom);
     });
   };
 
@@ -302,12 +312,6 @@ export const WebSocketProvider = ({ children }) => {
     }
   };
 
-  // useEffect(() => {
-  //   return () => {
-  //     resetWebSocketContext();
-  //   };
-  // }, []);
-
   return (
     <WebSocketContext.Provider
       value={{
@@ -318,7 +322,7 @@ export const WebSocketProvider = ({ children }) => {
         handleStopTyping,
         handleTyping,
         typingTimeoutRef,
-        // resetWebSocketContext,
+        resetWebSocketContext,
       }}
     >
       {children}

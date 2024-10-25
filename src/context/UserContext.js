@@ -20,11 +20,6 @@ export const UserProvider = ({ children }) => {
     return storedData ? storedData : null;
   });
 
-  const [activeChatRoomName, setActiveChatRoomName] = useState(() => {
-    const storedData = localStorage.getItem("activeChatRoomName");
-    return storedData ? storedData : null;
-  });
-
   const [isLogin, setIsLogin] = useState(() => {
     const savedLoginStatus = localStorage.getItem("isLogin");
     return savedLoginStatus === "true";
@@ -38,14 +33,6 @@ export const UserProvider = ({ children }) => {
     }
   }, [activeChatRoomId]);
 
-  useEffect(() => {
-    if (activeChatRoomName) {
-      localStorage.setItem("activeChatRoomName", activeChatRoomName);
-    } else {
-      localStorage.removeItem("activeChatRoomName");
-    }
-  }, [activeChatRoomName]);
-
   const updateUserId = (id) => {
     const userIdString = String(id);
     setIsLogin(true);
@@ -57,22 +44,14 @@ export const UserProvider = ({ children }) => {
     setToken(null);
     setUsername(null);
     setActiveChatRoomId(null);
-    setActiveChatRoomName(null);
     setIsLogin(false);
 
     localStorage.removeItem("userId");
     localStorage.removeItem("authenticationToken");
     localStorage.removeItem("username");
     localStorage.removeItem("activeChatRoom");
-    localStorage.removeItem("activeChatRoomName");
     localStorage.removeItem("isLogin");
   };
-
-  // useEffect(() => {
-  //   return () => {
-  //     resetUser();
-  //   };
-  // }, []);
 
   return (
     <UserContext.Provider
@@ -84,9 +63,7 @@ export const UserProvider = ({ children }) => {
         setIsLogin,
         activeChatRoomId,
         setActiveChatRoomId,
-        activeChatRoomName,
         token,
-        setActiveChatRoomName,
         resetUser,
       }}
     >

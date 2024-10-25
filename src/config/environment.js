@@ -1,9 +1,13 @@
 const ENVIRONMENT = {
   development: {
-    BASE_URL: "http://localhost:8080",
+    // USER_BASE_URL: "http://localhost:8081",
+    // CHAT_BASE_URL: "http://localhost:8080",
+    USER_BASE_URL: "https://converse-803802355670.asia-south1.run.app",
+    CHAT_BASE_URL: "https://converse-common-803802355670.asia-south1.run.app",
   },
   production: {
-    BASE_URL: "",
+    USER_BASE_URL: "https://converse-803802355670.asia-south1.run.app",
+    CHAT_BASE_URL: "https://converse-common-803802355670.asia-south1.run.app",
   },
 };
 
