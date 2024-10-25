@@ -25,13 +25,33 @@ export const WebSocketProvider = ({ children }) => {
     chatRooms,
     setChatRooms,
   } = useChatRoom();
-  const [newIndividualChat, setNewIndividualChat] = useState(false);
+
   const { userId, activeChatRoomId } = useUser();
   const { isInactive } = usePageActivity();
   const [connected, setConnected] = useState(false);
   const subscriptions = useRef({});
 
   const typingTimeoutRef = useRef(null);
+
+  const initializeWebSocket = () => {
+    const token = localStorage.getItem("authenticationToken");
+    const socket = new SockJS(`${config.CHAT_BASE_URL}/ws?token=${token}`);
+    const client = Stomp.over(socket);
+
+    client.connect({}, () => {
+      setStompClient(client);
+      setConnected(true);
+    });
+
+    return client;
+  };
+
+  useEffect(() => {
+    if (!isInactive && !connected) {
+      const client = initializeWebSocket();
+      setStompClient(client);
+    }
+  }, [isInactive]);
 
   const resetWebSocketContext = () => {
     subscriptions.current = {};
@@ -71,23 +91,6 @@ export const WebSocketProvider = ({ children }) => {
   useEffect(() => {
     return () => {
       clearTimeout(typingTimeoutRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem("authenticationToken");
-    const socket = new SockJS(`${config.BASE_URL}/ws?token=${token}`);
-    const client = Stomp.over(socket);
-
-    client.connect({}, () => {
-      setStompClient(client);
-      setConnected(true);
-    });
-
-    return () => {
-      if (client) {
-        client.disconnect();
-      }
     };
   }, []);
 

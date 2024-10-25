@@ -5,6 +5,7 @@ import useRedis from "../../hooks/useRedis";
 import { useChatRoom } from "../../context/ChatRoomContext";
 import { usePageActivity } from "../../context/PageActivityContext";
 import { useWebSocket } from "../../context/WebSocketContext";
+import config from "../../config/environment";
 
 const LoginSignUpPage = () => {
   const {
@@ -22,6 +23,7 @@ const LoginSignUpPage = () => {
   const { saveUserToRedis } = useRedis();
   const [isLoginPage, setIsLoginPage] = useState(true);
   const navigate = useNavigate();
+  const BASE_URL = config.USER_BASE_URL + "/converse/auth";
 
   const togglePage = () => {
     setIsLoginPage(!isLoginPage);
@@ -30,13 +32,7 @@ const LoginSignUpPage = () => {
   const handle = async (e) => {
     e.preventDefault();
 
-    // const url = isLoginPage
-    //   ? "http://localhost:8081/converse/auth/login"
-    //   : "http://localhost:8081/converse/auth/signup";
-
-    const url = isLoginPage
-      ? "https://converse-803802355670.asia-south1.run.app/converse/auth/login"
-      : "https://converse-803802355670.asia-south1.run.app/converse/auth/signup";
+    const url = isLoginPage ? BASE_URL + "/login" : BASE_URL + "/signup";
 
     const payload = {
       username: username,

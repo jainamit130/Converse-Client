@@ -7,7 +7,7 @@ const useCreateChat = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { token, userId } = useUser();
-  const BASE_URL = config.BASE_URL;
+  const BASE_URL = config.CHAT_BASE_URL;
 
   const getUsers = async () => {
     setLoading(true);

@@ -7,7 +7,7 @@ import {
 import config from "../config/environment";
 
 const client = new ApolloClient({
-  uri: config.BASE_URL + "/graphql",
+  uri: config.CHAT_BASE_URL + "/graphql",
   cache: new InMemoryCache(),
 });
 

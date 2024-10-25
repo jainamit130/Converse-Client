@@ -4,7 +4,7 @@ import config from "../config/environment";
 export const useMessageInfo = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const BASE_URL = config.BASE_URL;
+  const BASE_URL = config.CHAT_BASE_URL;
 
   const getMessageInfo = async (messageId) => {
     setLoading(true);

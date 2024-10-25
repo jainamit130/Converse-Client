@@ -5,7 +5,7 @@ const useGetOnlineUsers = (chatRoomId) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const BASE_URL = config.BASE_URL;
+  const BASE_URL = config.CHAT_BASE_URL;
 
   useEffect(() => {
     const fetchOnlineUsers = async () => {

@@ -4,7 +4,7 @@ import config from "../config/environment";
 const useRedis = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const BASE_URL = config.BASE_URL;
+  const BASE_URL = config.CHAT_BASE_URL;
 
   const saveUserToRedis = async (key, optional) => {
     if (key === null) {

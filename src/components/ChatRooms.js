@@ -9,6 +9,7 @@ import "./ChatRooms.css";
 import Tile from "./reusableComponents/Tile";
 import AddUser from "./AddUser";
 import GroupIcon from "../assets/GroupIcon.png";
+import HomeImage from "../assets/converseHome.png";
 import ProfileIcon from "../assets/profileIcon.webp";
 import useCreateChat from "../hooks/useCreateChat";
 
@@ -111,31 +112,7 @@ const ChatRooms = () => {
 
       <div className="chat-section">
         {!activeChatRoomId && !showTempChatRoom ? (
-          <div className="chat-header">
-            <div className="converse">
-              <div style={{ textAlign: "right" }}>
-                <h1
-                  style={{
-                    marginBottom: "0px",
-                    fontSize: "80px",
-                    fontStyle: "italic",
-                    fontFamily: "cursive",
-                  }}
-                >
-                  Converse
-                </h1>
-                <p
-                  style={{
-                    marginTop: "0px",
-                    fontSize: "13px",
-                  }}
-                >
-                  Made by Amit
-                </p>
-              </div>
-              <h3>Open any chat to see messages here</h3>
-            </div>
-          </div>
+          <img src={HomeImage} className="homeImage" />
         ) : (
           <ChatRoom
             key={activeChatRoomId}

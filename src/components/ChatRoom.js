@@ -12,7 +12,6 @@ import MessageInfoPanel from "./MessageInfoPanel";
 import { useNavigate } from "react-router-dom";
 import ChatRoomHeader from "./ChatRoomHeader.js";
 import MessageStatusIcon from "./MessageStatusIcon.js";
-import useCreateChat from "../hooks/useCreateChat.js";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   return messages.reduce((acc, message, index) => {

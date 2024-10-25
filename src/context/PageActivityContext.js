@@ -28,11 +28,12 @@ export const PageActivityProvider = ({ children }) => {
     }
   }, [location, setIsInactive]);
 
-  // useEffect(() => {
-  //   return () => {
-  //     resetActivity();
-  //   };
-  // }, []);
+  useEffect(() => {
+    return () => {
+      if (userId !== null) removeUserFromRedis(userId, activeChatRoomId);
+      setIsInactive(true);
+    };
+  }, []);
 
   return (
     <PageActivityContext.Provider
