@@ -61,7 +61,8 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     return chatRooms.get(chatRoomId)?.creatorUsername;
   });
   const [typingUsers, setTypingUsers] = useState([]);
-  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [onlineUsersCount, setOnlineUsersCount] = useState();
+  const [lastSeen, setLastSeen] = useState();
 
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(chatRoomId, userId);
   const chatMessagesRef = useRef(null);
@@ -99,9 +100,8 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
       const chatRoom = chatRooms.get(chatRoomId);
       if (chatRoom) {
         setTypingUsers(chatRoom.typingUsers || []);
-        const filteredOnlineUsers = chatRoom.onlineUsers || new Set();
-        filteredOnlineUsers.delete(username);
-        setOnlineUsers(filteredOnlineUsers);
+        setOnlineUsersCount(chatRoom.onlineUsersCount || 0);
+        setLastSeen(chatRoom.lastSeenTimestamp || null);
       }
     }
   }, [chatRooms, chatRoomId, userId]);
@@ -179,7 +179,8 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
             : chatRoomName
         }
         typingUsers={typingUsers}
-        onlineUsers={onlineUsers}
+        onlineUsersCount={onlineUsersCount}
+        lastSeen={lastSeen}
         chatRoomType={chatRoomType}
       />
 

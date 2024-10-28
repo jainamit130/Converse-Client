@@ -130,16 +130,17 @@ export const WebSocketProvider = ({ children }) => {
           const chatRoom = updatedChatRooms.get(chatRoomId);
 
           if (chatRoom) {
-            const updatedOnlineUsers = chatRoom.onlineUsers || new Set();
+            let updatedOnlineUsersCount = chatRoom.onlineUsersCount;
 
             if (onlineUsers.status === "ONLINE") {
-              updatedOnlineUsers.add(onlineUsers.username);
+              updatedOnlineUsersCount = updatedOnlineUsersCount + 1;
             } else if (onlineUsers.status === "OFFLINE") {
-              updatedOnlineUsers.delete(onlineUsers.username);
+              updatedOnlineUsersCount = updatedOnlineUsersCount - 1;
             }
             updatedChatRooms.set(chatRoomId, {
               ...chatRoom,
-              onlineUsers: updatedOnlineUsers,
+              onlineUsersCount: updatedOnlineUsersCount,
+              lastSeenTimestamp: null,
             });
           }
 

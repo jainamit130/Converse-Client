@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import config from "../../config/environment";
 
 const RefreshToken = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const RefreshToken = () => {
 
         try {
           const response = await fetch(
-            "http://localhost:8081/converse/auth/refreshToken",
+            config.USER_BASE_URL + "/converse/auth/refreshToken",
             {
               method: "POST",
               headers: {

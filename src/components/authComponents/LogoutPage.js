@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../context/UserContext";
+import config from "../../config/environment";
 
 const LogoutPage = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const LogoutPage = () => {
 
         try {
           const response = await fetch(
-            "http://localhost:8081/converse/auth/logout",
+            config.USER_BASE_URL + "/converse/auth/logout",
             {
               method: "POST",
               headers: {

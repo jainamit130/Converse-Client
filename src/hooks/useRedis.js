@@ -82,8 +82,8 @@ const useRedis = () => {
       });
 
       const data = await response.json();
-      const onlineUsers = new Set(data);
-      return onlineUsers;
+      const { onlineMembersCount, lastSeenTimestamp } = data;
+      return { onlineMembersCount, lastSeenTimestamp };
     } catch (err) {
       setError(err);
       console.error("Error saving data:", err);

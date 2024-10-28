@@ -1,12 +1,16 @@
 import TypingIndicator from "./TypingIndicator";
 import profileIcon from "../assets/profileIcon.webp";
+import { formatLastSeen } from "../util/dateUtil";
 
 const ChatRoomHeader = ({
   chatRoomName,
   typingUsers,
-  onlineUsers,
+  onlineUsersCount,
+  lastSeen,
   chatRoomType,
 }) => {
+  const lastSeenFormat = formatLastSeen(lastSeen);
+
   return (
     <div className="chat-details">
       <img src={profileIcon} className="chatRoomIcon" />
@@ -17,15 +21,16 @@ const ChatRoomHeader = ({
         </div>
         {!typingUsers.length && (
           <div className="online-status">
-            {chatRoomType === "SELF" ? (
-              <span>online</span>
-            ) : chatRoomType === "INDIVIDUAL" ? (
-              onlineUsers.size === 1 ? (
+            {chatRoomType === "SELF" && <span>online</span>}
+            {chatRoomType === "INDIVIDUAL" ? (
+              onlineUsersCount === 1 ? (
                 <span>online</span>
+              ) : lastSeen ? (
+                <span>{lastSeenFormat}</span>
               ) : null
             ) : chatRoomType === "GROUP" ? (
-              onlineUsers.size > 0 ? (
-                <span>{onlineUsers.size} online</span>
+              onlineUsersCount > 0 ? (
+                <span>{onlineUsersCount + " online"}</span>
               ) : null
             ) : null}
           </div>
