@@ -158,6 +158,7 @@
 }
 
 .latestMessage {
+  display: flex;
   font-size: 15px;
   color: #4b4b4b;
 }

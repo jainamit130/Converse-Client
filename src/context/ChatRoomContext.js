@@ -45,11 +45,7 @@ export const ChatRoomProvider = ({ children }) => {
     setActiveChatRoomId(null);
   }, []);
 
-  const updateChatRoomWithOnlineUsers = (
-    chatRoomId,
-    onlineUsersCount,
-    lastSeenTimestamp
-  ) => {
+  const updateChatRoomWithOnlineUsers = (chatRoomId, onlineUsers, lastSeen) => {
     setChatRooms((prevChatRooms) => {
       const updatedChatRooms = new Map(prevChatRooms);
       const prevChatRoomId = prevChatRoomIdRef.current;
@@ -57,9 +53,12 @@ export const ChatRoomProvider = ({ children }) => {
       if (prevChatRoomId) {
         const prevRoom = updatedChatRooms.get(prevChatRoomId);
         if (prevRoom) {
+          const updatedOnlineUsers = new Set();
+          updatedOnlineUsers.add(username);
           updatedChatRooms.set(prevChatRoomId, {
             ...prevRoom,
-            lastSeenTimestamp: null,
+            onlineUsers: updatedOnlineUsers,
+            ...(prevRoom.chatRoomType === "INDIVIDUAL" && { lastSeen }),
           });
         }
       }
@@ -68,8 +67,8 @@ export const ChatRoomProvider = ({ children }) => {
       if (updatedRoom) {
         updatedChatRooms.set(chatRoomId, {
           ...updatedRoom,
-          onlineUsersCount: onlineUsersCount,
-          lastSeenTimestamp: lastSeenTimestamp,
+          onlineUsers: onlineUsers,
+          ...(updatedRoom.chatRoomType === "INDIVIDUAL" && { lastSeen }),
         });
       }
 
@@ -92,7 +91,7 @@ export const ChatRoomProvider = ({ children }) => {
       }
 
       if (activeChatRoomId !== null) {
-        // markChatRoomActive(activeChatRoomId, userId);
+        markChatRoomActive(activeChatRoomId, userId);
         const chatRoom = chatRooms.get(activeChatRoomId);
         if (chatRoom?.unreadMessageCount > 0) {
           handleMarkAllMessagesRead();
@@ -137,17 +136,12 @@ export const ChatRoomProvider = ({ children }) => {
       }
 
       (async () => {
-        const { onlineMembersCount, lastSeenTimestamp } =
-          await markChatRoomActive(
-            activeChatRoomId,
-            userId,
-            prevChatRoomIdRef.current
-          );
-        updateChatRoomWithOnlineUsers(
+        const { onlineUsers, lastSeen } = await markChatRoomActive(
           activeChatRoomId,
-          onlineMembersCount,
-          lastSeenTimestamp
+          userId,
+          prevChatRoomIdRef.current
         );
+        updateChatRoomWithOnlineUsers(activeChatRoomId, onlineUsers, lastSeen);
       })();
     }
 
@@ -161,12 +155,14 @@ export const ChatRoomProvider = ({ children }) => {
       chatRoomsArray = newChatRooms.map((room) => ({
         ...room,
         typingUsers: [],
+        lastSeen: null,
       }));
     } else {
       chatRoomsArray = [
         {
           ...newChatRooms,
           typingUsers: [],
+          lastSeen: null,
         },
       ];
     }

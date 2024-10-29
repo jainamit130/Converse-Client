@@ -5,11 +5,11 @@ import { formatLastSeen } from "../util/dateUtil";
 const ChatRoomHeader = ({
   chatRoomName,
   typingUsers,
-  onlineUsersCount,
-  lastSeen,
+  onlineUsers,
   chatRoomType,
+  lastSeen,
 }) => {
-  const lastSeenFormat = formatLastSeen(lastSeen);
+  const lastSeenFormat = lastSeen ? formatLastSeen(lastSeen) : null;
 
   return (
     <div className="chat-details">
@@ -21,16 +21,17 @@ const ChatRoomHeader = ({
         </div>
         {!typingUsers.length && (
           <div className="online-status">
-            {chatRoomType === "SELF" && <span>online</span>}
-            {chatRoomType === "INDIVIDUAL" ? (
-              onlineUsersCount === 1 ? (
+            {chatRoomType === "SELF" ? (
+              <span>online</span>
+            ) : chatRoomType === "INDIVIDUAL" ? (
+              onlineUsers.size === 1 ? (
                 <span>online</span>
-              ) : lastSeen ? (
-                <span>{lastSeenFormat}</span>
-              ) : null
+              ) : (
+                lastSeenFormat
+              )
             ) : chatRoomType === "GROUP" ? (
-              onlineUsersCount > 0 ? (
-                <span>{onlineUsersCount + " online"}</span>
+              onlineUsers.size > 0 ? (
+                <span>{onlineUsers.size} online</span>
               ) : null
             ) : null}
           </div>

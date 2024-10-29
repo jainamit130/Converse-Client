@@ -61,8 +61,8 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     return chatRooms.get(chatRoomId)?.creatorUsername;
   });
   const [typingUsers, setTypingUsers] = useState([]);
-  const [onlineUsersCount, setOnlineUsersCount] = useState();
-  const [lastSeen, setLastSeen] = useState();
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [lastSeen, setLastSeen] = useState(null);
 
   const handleMarkAllMessagesRead = useMarkAllMessagesRead(chatRoomId, userId);
   const chatMessagesRef = useRef(null);
@@ -100,8 +100,10 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
       const chatRoom = chatRooms.get(chatRoomId);
       if (chatRoom) {
         setTypingUsers(chatRoom.typingUsers || []);
-        setOnlineUsersCount(chatRoom.onlineUsersCount || 0);
-        setLastSeen(chatRoom.lastSeenTimestamp || null);
+        setLastSeen(chatRoom.lastSeen || null);
+        const filteredOnlineUsers = chatRoom.onlineUsers || new Set();
+        filteredOnlineUsers.delete(username);
+        setOnlineUsers(filteredOnlineUsers);
       }
     }
   }, [chatRooms, chatRoomId, userId]);
@@ -176,10 +178,12 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
             ? recipientUsername === username
               ? creatorUsername
               : recipientUsername
+            : chatRoomType === "SELF"
+            ? `${chatRoomName} (You)`
             : chatRoomName
         }
         typingUsers={typingUsers}
-        onlineUsersCount={onlineUsersCount}
+        onlineUsers={onlineUsers}
         lastSeen={lastSeen}
         chatRoomType={chatRoomType}
       />

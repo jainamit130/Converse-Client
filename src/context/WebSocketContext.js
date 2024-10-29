@@ -130,17 +130,16 @@ export const WebSocketProvider = ({ children }) => {
           const chatRoom = updatedChatRooms.get(chatRoomId);
 
           if (chatRoom) {
-            let updatedOnlineUsersCount = chatRoom.onlineUsersCount;
-
+            const updatedOnlineUsers = chatRoom.onlineUsers || new Set();
             if (onlineUsers.status === "ONLINE") {
-              updatedOnlineUsersCount = updatedOnlineUsersCount + 1;
+              updatedOnlineUsers.add(onlineUsers.username);
             } else if (onlineUsers.status === "OFFLINE") {
-              updatedOnlineUsersCount = updatedOnlineUsersCount - 1;
+              updatedOnlineUsers.delete(onlineUsers.username);
             }
             updatedChatRooms.set(chatRoomId, {
               ...chatRoom,
-              onlineUsersCount: updatedOnlineUsersCount,
-              lastSeenTimestamp: null,
+              onlineUsers: updatedOnlineUsers,
+              ...(chatRoom.chatRoomType === "INDIVIDUAL" && { lastSeen: null }),
             });
           }
 
@@ -256,14 +255,12 @@ export const WebSocketProvider = ({ children }) => {
         (message) => {
           const statusUpdate = JSON.parse(message.body);
           console.log(statusUpdate);
-
+          const messageIdsToUpdate = new Set(statusUpdate.messageIds);
           setMessages((prevMessages) => {
             const updatedMessages = { ...prevMessages };
 
             const chatRoomMessages =
               updatedMessages[statusUpdate.chatRoomId] || [];
-
-            const messageIdsToUpdate = new Set(statusUpdate.messageIds);
 
             const updatedChatRoomMessages = chatRoomMessages.map((msg) => {
               if (messageIdsToUpdate.size === 0) {
@@ -284,6 +281,27 @@ export const WebSocketProvider = ({ children }) => {
             updatedMessages[statusUpdate.chatRoomId] = updatedChatRoomMessages;
 
             return updatedMessages;
+          });
+
+          setChatRooms((prevChatRooms) => {
+            const updatedChatRooms = new Map(prevChatRooms);
+            const chatRoom = updatedChatRooms.get(statusUpdate.chatRoomId);
+
+            if (
+              chatRoom &&
+              chatRoom.latestMessage &&
+              messageIdsToUpdate.has(chatRoom.latestMessage.id)
+            ) {
+              updatedChatRooms.set(statusUpdate.chatRoomId, {
+                ...chatRoom,
+                latestMessage: {
+                  ...chatRoom.latestMessage,
+                  status: statusUpdate.isDelivered ? "DELIVERED" : "READ",
+                },
+              });
+            }
+
+            return updatedChatRooms;
           });
         }
       );

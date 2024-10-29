@@ -12,6 +12,7 @@ import GroupIcon from "../assets/GroupIcon.png";
 import HomeImage from "../assets/converseHome.png";
 import ProfileIcon from "../assets/profileIcon.webp";
 import useCreateChat from "../hooks/useCreateChat";
+import MessageStatusIcon from "./MessageStatusIcon";
 
 const ChatRooms = () => {
   const { userId, username, activeChatRoomId, setActiveChatRoomId } = useUser();
@@ -87,6 +88,12 @@ const ChatRooms = () => {
             latestMessageTimestamp={room.latestMessage?.timestamp}
             smallerInfo={
               <div className="latestMessage">
+                <MessageStatusIcon
+                  key={room.latestMessage?.id}
+                  isSender={room.latestMessage?.senderId === userId}
+                  status={room.latestMessage?.status}
+                  formattedTime={null}
+                />
                 {room.latestMessage?.user.username &&
                   `${room.latestMessage?.user.username}: `}
                 {room.latestMessage?.content || "No messages yet"}

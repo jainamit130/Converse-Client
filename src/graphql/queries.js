@@ -15,6 +15,7 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
         senderId
         timestamp
         content
+        status
         user {
           id
           username

@@ -20,7 +20,7 @@ const MessageStatusIcon = ({ status, formattedTime, isSender }) => {
   // Render message with status icon
   return (
     <div className="messageTimeStatus">
-      <div className="message-time">{formattedTime}</div>
+      {formattedTime && <div className="message-time">{formattedTime}</div>}
       {isSender && (
         <img
           src={getStatusIcon()}

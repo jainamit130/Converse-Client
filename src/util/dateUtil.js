@@ -42,10 +42,19 @@ export const formatMessageTimestamp = (timestamp) => {
   return `${formatFullDate(date)}, ${formatTime(date)}`;
 };
 
+function isYesterday(date) {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return (
+    date.getFullYear() === yesterday.getFullYear() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getDate() === yesterday.getDate()
+  );
+}
+
 export const formatLastSeen = (timestamp) => {
   const date = parseDate(timestamp * 1000);
   const now = new Date();
-
   const timeDifference = now - date;
   const minutesAgo = Math.floor(timeDifference / (1000 * 60));
 
@@ -56,15 +65,16 @@ export const formatLastSeen = (timestamp) => {
   if (minutesAgo < 60) {
     return `Last seen ${minutesAgo} minute${minutesAgo !== 1 ? "s" : ""} ago`;
   }
-
   if (isToday(date)) {
     return `Last seen today at ${formatTime(date)}`;
   }
 
-  const daysAgo = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-  if (daysAgo === 1) {
+  if (isYesterday(date)) {
     return `Last seen yesterday at ${formatTime(date)}`;
-  } else if (daysAgo < 7) {
+  }
+
+  const daysAgo = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+  if (daysAgo < 7) {
     return `Last seen on ${getDayOfWeek(date)} at ${formatTime(date)}`;
   }
 
