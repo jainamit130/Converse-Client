@@ -113,7 +113,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   const fromCount = messages[chatRoomId]?.length || 0;
 
   const { loading, error, data } = useQuery(GET_MESSAGES_OF_CHAT_ROOM, {
-    variables: { chatRoomId, fromCount },
+    variables: { chatRoomId, userId, fromCount },
     skip: !chatRoomId || !connected || messagesLoaded,
     fetchPolicy: "network-only",
   });
