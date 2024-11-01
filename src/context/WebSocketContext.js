@@ -19,6 +19,7 @@ export const WebSocketProvider = ({ children }) => {
   const [stompClient, setStompClient] = useState(null);
   const {
     addMessageToRoom,
+    updateDeletedMessage,
     mergeChatRooms,
     messages,
     setMessages,
@@ -191,32 +192,39 @@ export const WebSocketProvider = ({ children }) => {
         `/topic/chat/${chatRoomId}`,
         (message) => {
           const parsedMessage = JSON.parse(message.body);
-          addMessageToRoom(chatRoomId, parsedMessage);
+          const chatMessage = parsedMessage.message;
+          const messageId = parsedMessage.messageId;
+          const messageType = parsedMessage.type;
+          if (messageType === "ADD") {
+            addMessageToRoom(chatRoomId, chatMessage);
 
-          setChatRooms((prevChatRooms) => {
-            const updatedRooms = new Map(prevChatRooms);
-            const existingRoom = updatedRooms.get(chatRoomId);
-            const activeChatRoom = localStorage.getItem("activeChatRoom");
+            setChatRooms((prevChatRooms) => {
+              const updatedRooms = new Map(prevChatRooms);
+              const existingRoom = updatedRooms.get(chatRoomId);
+              const activeChatRoom = localStorage.getItem("activeChatRoom");
 
-            if (existingRoom) {
-              const unreadMessageCount =
-                (activeChatRoom !== chatRoomId &&
-                  userId !== parsedMessage.senderId) ||
-                isInactive
-                  ? existingRoom.unreadMessageCount + 1
-                  : 0;
+              if (existingRoom) {
+                const unreadMessageCount =
+                  (activeChatRoom !== chatRoomId &&
+                    userId !== chatMessage.senderId) ||
+                  isInactive
+                    ? existingRoom.unreadMessageCount + 1
+                    : 0;
 
-              const updatedRoom = {
-                ...existingRoom,
-                latestMessage: parsedMessage,
-                unreadMessageCount: unreadMessageCount,
-              };
+                const updatedRoom = {
+                  ...existingRoom,
+                  latestMessage: chatMessage,
+                  unreadMessageCount: unreadMessageCount,
+                };
 
-              updatedRooms.set(chatRoomId, updatedRoom);
-            }
-            const sortedRooms = sortChatRooms(updatedRooms);
-            return sortedRooms;
-          });
+                updatedRooms.set(chatRoomId, updatedRoom);
+              }
+              const sortedRooms = sortChatRooms(updatedRooms);
+              return sortedRooms;
+            });
+          } else if (messageType === "DELETE") {
+            updateDeletedMessage(chatRoomId, messageId);
+          }
         }
       );
 
@@ -254,7 +262,6 @@ export const WebSocketProvider = ({ children }) => {
         `/topic/message/${userId}`,
         (message) => {
           const statusUpdate = JSON.parse(message.body);
-          console.log(statusUpdate);
           const messageIdsToUpdate = new Set(statusUpdate.messageIds);
           setMessages((prevMessages) => {
             const updatedMessages = { ...prevMessages };

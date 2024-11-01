@@ -194,11 +194,34 @@ export const ChatRoomProvider = ({ children }) => {
 
       setUsernameToChatRoomMap(updatedUsernameMap);
 
-      // Sort the rooms and return the sorted list
       const sortedRooms = sortChatRooms(updatedRooms);
       return sortedRooms;
     });
   }, []);
+
+  const updateDeletedMessage = (chatRoomId, messageId) => {
+    setMessages((prevMessages) => {
+      const currentMessages = prevMessages[chatRoomId] || [];
+      const updatedMessages = currentMessages.map((message) => {
+        if (message.id === messageId) {
+          const newContent =
+            message.senderId === userId
+              ? "You deleted this message"
+              : "This message has been deleted";
+          return {
+            ...message,
+            content: newContent,
+          };
+        }
+        return message;
+      });
+
+      return {
+        ...prevMessages,
+        [chatRoomId]: updatedMessages,
+      };
+    });
+  };
 
   const addMessageToRoom = useCallback(
     (chatRoomId, messageOrMessages, base = false) => {
@@ -245,6 +268,7 @@ export const ChatRoomProvider = ({ children }) => {
         messages,
         setMessages,
         addMessageToRoom,
+        updateDeletedMessage,
         usernameToChatRoomMap,
         mergeChatRooms,
         resetChatRoomContext,

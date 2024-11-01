@@ -1,17 +1,25 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_MESSAGES_OF_CHAT_ROOM } from "../graphql/queries";
 import { useWebSocket } from "../context/WebSocketContext";
 import { useUser } from "../context/UserContext";
 import { useChatRoom } from "../context/ChatRoomContext";
-import { parseDate, formatMessageDate, formatTime } from "../util/dateUtil.js";
+import {
+  parseDate,
+  formatMessageDate,
+  formatTime,
+  isMessageOlderThan15Minutes,
+} from "../util/dateUtil.js";
 import "./ChatRoom.css";
 import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
 import MessageInfoPanel from "./MessageInfoPanel";
 import { useNavigate } from "react-router-dom";
 import ChatRoomHeader from "./ChatRoomHeader.js";
+import messageOptionsIcon from "../assets/messageOptions.png";
 import MessageStatusIcon from "./MessageStatusIcon.js";
+import OptionsDropdown from "./reusableComponents/OptionsDropdown.js";
+import useDelete from "../hooks/useDelete.js";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   return messages.reduce((acc, message, index) => {
@@ -43,6 +51,36 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
   );
+  const { handleDeleteMessageForEveryone, handleDeleteMessageForMe } =
+    useDelete();
+  const [isOpen, setIsOpen] = useState(null);
+  const [options, setOptions] = useState(["Delete for me", "Message info"]);
+
+  const toggleDropdown = (message) => {
+    if (isOpen) {
+      setIsOpen(null);
+    } else {
+      if (message.senderId === userId) {
+        if (!isMessageOlderThan15Minutes(message)) {
+          setOptions(["Delete for everyone", "Delete for me", "Message info"]);
+        } else {
+          setOptions(["Delete for me", "Message info"]);
+        }
+      }
+      setIsOpen(message.id);
+    }
+  };
+
+  const handleSelectOption = async (option, message) => {
+    if (option === "Message info") {
+      openMessageInfoPanel(message);
+    } else if (option === "Delete for everyone") {
+      const isSuccess = await handleDeleteMessageForEveryone(message.id);
+    } else if (option === "Delete for me") {
+      const isSuccess = await handleDeleteMessageForMe(message.id);
+    }
+    setIsOpen(null);
+  };
 
   const [chatRoomType, setChatRoomType] = useState(() => {
     return chatRoomId
@@ -219,9 +257,24 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
                       ? "message-right"
                       : "message-left"
                   }`}
-                  onClick={() => openMessageInfoPanel(message)}
                 >
-                  <div className="messageContent">{message.content}</div>
+                  <div>
+                    <div className="messageContent">{message.content}</div>
+                    <img
+                      src={messageOptionsIcon}
+                      className="messageOptionsIcon"
+                      onClick={() => toggleDropdown(message)}
+                    />
+                    {isOpen === message.id && (
+                      <OptionsDropdown
+                        options={options}
+                        onSelect={handleSelectOption}
+                        isOpen={isOpen}
+                        toggleDropdown={toggleDropdown}
+                        parameter={message}
+                      />
+                    )}
+                  </div>
                   {
                     <MessageStatusIcon
                       key={message.id}
