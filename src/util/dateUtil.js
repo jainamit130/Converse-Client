@@ -52,6 +52,17 @@ function isYesterday(date) {
   );
 }
 
+export const isMessageOlderThan15Minutes = (message) => {
+  const currentTime = Date.now();
+  const messageTime = new Date(message.timestamp).getTime();
+  const timeDifference = currentTime - messageTime;
+
+  if (timeDifference > 15 * 60 * 1000) {
+    return true;
+  }
+  return false;
+};
+
 export const formatLastSeen = (timestamp) => {
   const date = parseDate(timestamp * 1000);
   const now = new Date();

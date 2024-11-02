@@ -15,6 +15,7 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
         senderId
         timestamp
         content
+        deletedForEveryone
         status
         user {
           id
@@ -26,13 +27,22 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
 `;
 
 export const GET_MESSAGES_OF_CHAT_ROOM = gql`
-  query getMessagesOfChatRoom($chatRoomId: String!, $fromCount: Int) {
-    getMessagesOfChatRoom(chatRoomId: $chatRoomId, fromCount: $fromCount) {
+  query getMessagesOfChatRoom(
+    $chatRoomId: String!
+    $userId: String!
+    $fromCount: Int
+  ) {
+    getMessagesOfChatRoom(
+      chatRoomId: $chatRoomId
+      userId: $userId
+      fromCount: $fromCount
+    ) {
       id
       senderId
       timestamp
       content
       status
+      deletedForEveryone
       user {
         id
         username

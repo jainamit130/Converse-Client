@@ -4,14 +4,23 @@ import { GET_MESSAGES_OF_CHAT_ROOM } from "../graphql/queries";
 import { useWebSocket } from "../context/WebSocketContext";
 import { useUser } from "../context/UserContext";
 import { useChatRoom } from "../context/ChatRoomContext";
-import { parseDate, formatMessageDate, formatTime } from "../util/dateUtil.js";
+import {
+  parseDate,
+  formatMessageDate,
+  formatTime,
+  isMessageOlderThan15Minutes,
+} from "../util/dateUtil.js";
 import "./ChatRoom.css";
 import ScrollToBottom from "../util/ScrollToBottom.js";
 import { useMarkAllMessagesRead } from "../hooks/useMarkAllMessages.js";
 import MessageInfoPanel from "./MessageInfoPanel";
 import { useNavigate } from "react-router-dom";
 import ChatRoomHeader from "./ChatRoomHeader.js";
+import messageOptionsIcon from "../assets/messageOptions.png";
 import MessageStatusIcon from "./MessageStatusIcon.js";
+import OptionsDropdown from "./reusableComponents/OptionsDropdown.js";
+import useDelete from "../hooks/useDelete.js";
+import DeletedMessageStyle from "./reusableComponents/DeletedMessageStyle.js";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   return messages.reduce((acc, message, index) => {
@@ -21,7 +30,6 @@ const groupMessagesByDate = (messages, unreadMessageCount) => {
       acc[messageDate] = [];
     }
 
-    // Insert the marker before the first of the last few unread messages
     const markerIndex = messages.length - unreadMessageCount;
     if (index === markerIndex) {
       acc[messageDate].push({ unreadMarker: true });
@@ -38,11 +46,51 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   const { sendMessage, connected, handleStopTyping, handleTyping } =
     useWebSocket();
   const [message, setMessage] = useState("");
-  const { messages, addMessageToRoom, chatRooms, markChatRoomRead } =
-    useChatRoom();
+  const {
+    messages,
+    addMessageToRoom,
+    chatRooms,
+    markChatRoomRead,
+    updateDeletedMessage,
+  } = useChatRoom();
   const [chatRoomMessages, setChatRoomMessages] = useState(
     messages[chatRoomId] || []
   );
+  const { handleDeleteMessageForEveryone, handleDeleteMessageForMe } =
+    useDelete();
+  const [isOpen, setIsOpen] = useState(null);
+  const [options, setOptions] = useState(["Delete for me", "Message info"]);
+
+  const toggleDropdown = (message) => {
+    if (isOpen) {
+      setIsOpen(null);
+    } else {
+      if (
+        message.senderId === userId &&
+        !message.deletedForEveryone &&
+        !isMessageOlderThan15Minutes(message)
+      ) {
+        setOptions(["Delete for everyone", "Delete for me", "Message info"]);
+      } else {
+        setOptions(["Delete for me", "Message info"]);
+      }
+      setIsOpen(message.id);
+    }
+  };
+
+  const handleSelectOption = async (option, message) => {
+    if (option === "Message info") {
+      openMessageInfoPanel(message);
+    } else if (option === "Delete for everyone") {
+      const isSuccess = await handleDeleteMessageForEveryone(message.id);
+    } else if (option === "Delete for me") {
+      const isSuccess = await handleDeleteMessageForMe(message.id);
+      if (isSuccess) {
+        updateDeletedMessage(chatRoomId, message.id, true);
+      }
+    }
+    setIsOpen(null);
+  };
 
   const [chatRoomType, setChatRoomType] = useState(() => {
     return chatRoomId
@@ -113,7 +161,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   const fromCount = messages[chatRoomId]?.length || 0;
 
   const { loading, error, data } = useQuery(GET_MESSAGES_OF_CHAT_ROOM, {
-    variables: { chatRoomId, fromCount },
+    variables: { chatRoomId, userId, fromCount },
     skip: !chatRoomId || !connected || messagesLoaded,
     fetchPolicy: "network-only",
   });
@@ -219,12 +267,42 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
                       ? "message-right"
                       : "message-left"
                   }`}
-                  onClick={() => openMessageInfoPanel(message)}
                 >
-                  <div className="messageContent">{message.content}</div>
+                  <div>
+                    {!message?.deletedForEveryone ? (
+                      <div className="messageContent">{message.content}</div>
+                    ) : (
+                      <DeletedMessageStyle
+                        senderId={message.senderId}
+                        userId={userId}
+                      />
+                    )}
+
+                    <img
+                      src={messageOptionsIcon}
+                      className="messageOptionsIcon"
+                      style={{
+                        backgroundColor:
+                          message.senderId !== userId
+                            ? "white"
+                            : "rgb(210, 255, 160)",
+                      }}
+                      onClick={() => toggleDropdown(message)}
+                    />
+                    {isOpen === message.id && (
+                      <OptionsDropdown
+                        options={options}
+                        onSelect={handleSelectOption}
+                        isOpen={isOpen}
+                        toggleDropdown={toggleDropdown}
+                        parameter={message}
+                      />
+                    )}
+                  </div>
                   {
                     <MessageStatusIcon
                       key={message.id}
+                      deletedForEveryone={message.deletedForEveryone}
                       isSender={message.senderId === userId}
                       status={message.status}
                       formattedTime={formattedTime}
