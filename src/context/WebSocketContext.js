@@ -223,7 +223,7 @@ export const WebSocketProvider = ({ children }) => {
               return sortedRooms;
             });
           } else if (messageType === "DELETE") {
-            updateDeletedMessage(chatRoomId, messageId);
+            updateDeletedMessage(chatRoomId, messageId, false);
           }
         }
       );
@@ -263,6 +263,28 @@ export const WebSocketProvider = ({ children }) => {
         (message) => {
           const statusUpdate = JSON.parse(message.body);
           const messageIdsToUpdate = new Set(statusUpdate.messageIds);
+
+          setChatRooms((prevChatRooms) => {
+            const updatedChatRooms = new Map(prevChatRooms);
+            const chatRoom = updatedChatRooms.get(statusUpdate.chatRoomId);
+
+            if (
+              chatRoom &&
+              chatRoom.latestMessage &&
+              messageIdsToUpdate.has(chatRoom.latestMessage.id)
+            ) {
+              updatedChatRooms.set(statusUpdate.chatRoomId, {
+                ...chatRoom,
+                latestMessage: {
+                  ...chatRoom.latestMessage,
+                  status: statusUpdate.isDelivered ? "DELIVERED" : "READ",
+                },
+              });
+            }
+
+            return updatedChatRooms;
+          });
+
           setMessages((prevMessages) => {
             const updatedMessages = { ...prevMessages };
 
@@ -288,27 +310,6 @@ export const WebSocketProvider = ({ children }) => {
             updatedMessages[statusUpdate.chatRoomId] = updatedChatRoomMessages;
 
             return updatedMessages;
-          });
-
-          setChatRooms((prevChatRooms) => {
-            const updatedChatRooms = new Map(prevChatRooms);
-            const chatRoom = updatedChatRooms.get(statusUpdate.chatRoomId);
-
-            if (
-              chatRoom &&
-              chatRoom.latestMessage &&
-              messageIdsToUpdate.has(chatRoom.latestMessage.id)
-            ) {
-              updatedChatRooms.set(statusUpdate.chatRoomId, {
-                ...chatRoom,
-                latestMessage: {
-                  ...chatRoom.latestMessage,
-                  status: statusUpdate.isDelivered ? "DELIVERED" : "READ",
-                },
-              });
-            }
-
-            return updatedChatRooms;
           });
         }
       );

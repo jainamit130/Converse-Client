@@ -3,7 +3,12 @@ import readStatusIcon from "../assets/readStatus.png";
 import pendingStatusIcon from "../assets/pendingStatus.png";
 import sendingStatusIcon from "../assets/SendingStatus.png";
 
-const MessageStatusIcon = ({ status, formattedTime, isSender }) => {
+const MessageStatusIcon = ({
+  status,
+  formattedTime,
+  isSender,
+  deletedForEveryone,
+}) => {
   const getStatusIcon = () => {
     switch (status) {
       case "DELIVERED":
@@ -17,11 +22,10 @@ const MessageStatusIcon = ({ status, formattedTime, isSender }) => {
     }
   };
 
-  // Render message with status icon
   return (
     <div className="messageTimeStatus">
       {formattedTime && <div className="message-time">{formattedTime}</div>}
-      {isSender && (
+      {!deletedForEveryone && isSender && (
         <img
           src={getStatusIcon()}
           className="messagetStatus"

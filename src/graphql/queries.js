@@ -15,6 +15,7 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
         senderId
         timestamp
         content
+        deletedForEveryone
         status
         user {
           id
@@ -41,6 +42,7 @@ export const GET_MESSAGES_OF_CHAT_ROOM = gql`
       timestamp
       content
       status
+      deletedForEveryone
       user {
         id
         username

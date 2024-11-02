@@ -13,6 +13,7 @@ import HomeImage from "../assets/converseHome.png";
 import ProfileIcon from "../assets/profileIcon.webp";
 import useCreateChat from "../hooks/useCreateChat";
 import MessageStatusIcon from "./MessageStatusIcon";
+import DeletedMessageStyle from "./reusableComponents/DeletedMessageStyle";
 
 const ChatRooms = () => {
   const { userId, username, activeChatRoomId, setActiveChatRoomId } = useUser();
@@ -90,13 +91,26 @@ const ChatRooms = () => {
               <div className="latestMessage">
                 <MessageStatusIcon
                   key={room.latestMessage?.id}
+                  deletedForEveryone={room.latestMessage?.deletedForEveryone}
                   isSender={room.latestMessage?.senderId === userId}
                   status={room.latestMessage?.status}
                   formattedTime={null}
                 />
-                {room.latestMessage?.user.username &&
-                  `${room.latestMessage?.user.username}: `}
-                {room.latestMessage?.content || "No messages yet"}
+                {room?.latestMessage?.deletedForEveryone ? (
+                  <DeletedMessageStyle
+                    content={room?.latestMessage?.content}
+                    userId={userId}
+                    senderId={room?.latestMessage?.senderId}
+                  />
+                ) : (
+                  <>
+                    {room.chatRoomType === "GROUP" &&
+                      room.latestMessage?.user?.username && (
+                        <span>{`${room.latestMessage.user.username}: `}</span>
+                      )}
+                    {room.latestMessage?.content || "No messages yet"}
+                  </>
+                )}
               </div>
             }
             icon={GroupIcon}

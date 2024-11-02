@@ -14,8 +14,11 @@ const useDelete = () => {
     try {
       const response = await axios.post(
         `${BASE_URL}/chat/message/deleteForMe/${messageId}`,
+        userId,
         {
-          userId,
+          headers: {
+            "Content-Type": "text/plain",
+          },
         }
       );
       return response.data;
@@ -32,8 +35,11 @@ const useDelete = () => {
     try {
       const response = await axios.post(
         `${BASE_URL}/chat/message/deleteForEveryone/${messageId}`,
+        userId,
         {
-          userId,
+          headers: {
+            "Content-Type": "text/plain",
+          },
         }
       );
       return response.data;

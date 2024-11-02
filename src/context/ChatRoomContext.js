@@ -104,7 +104,6 @@ export const ChatRoomProvider = ({ children }) => {
     }
   }, [isInactive, isLogin]);
 
-  // Effect for marking a chat room read when switching between rooms
   useEffect(() => {
     if (prevChatRoomIdRef.current === null) {
       return;
@@ -112,7 +111,6 @@ export const ChatRoomProvider = ({ children }) => {
     markChatRoomRead(prevChatRoomIdRef.current);
   }, [activeChatRoomId]);
 
-  // Mark a chat room as read
   const markChatRoomRead = (chatRoomId) => {
     const chatRoom = chatRooms.get(chatRoomId);
     setChatRooms((prevChatRooms) => {
@@ -125,7 +123,6 @@ export const ChatRoomProvider = ({ children }) => {
     });
   };
 
-  // useEffect for marking active chat rooms and updating online users
   useEffect(() => {
     if (activeChatRoomId !== null) {
       if (
@@ -199,27 +196,75 @@ export const ChatRoomProvider = ({ children }) => {
     });
   }, []);
 
-  const updateDeletedMessage = (chatRoomId, messageId) => {
+  const updateDeletedMessage = (chatRoomId, messageId, isDeleted) => {
     setMessages((prevMessages) => {
       const currentMessages = prevMessages[chatRoomId] || [];
-      const updatedMessages = currentMessages.map((message) => {
-        if (message.id === messageId) {
-          const newContent =
-            message.senderId === userId
-              ? "You deleted this message"
-              : "This message has been deleted";
-          return {
-            ...message,
-            content: newContent,
-          };
-        }
-        return message;
-      });
 
-      return {
-        ...prevMessages,
-        [chatRoomId]: updatedMessages,
-      };
+      if (isDeleted) {
+        const updatedMessages = currentMessages.filter(
+          (message) => message.id !== messageId
+        );
+
+        setChatRooms((prevChatRooms) => {
+          const updatedChatRooms = new Map(prevChatRooms);
+          const chatRoom = updatedChatRooms.get(chatRoomId);
+          if (chatRoom && chatRoom?.latestMessage.id === messageId) {
+            const nextLatestMessage = updatedMessages.length
+              ? updatedMessages[updatedMessages.length - 1]
+              : null;
+            updatedChatRooms.set(chatRoomId, {
+              ...chatRoom,
+              latestMessage: nextLatestMessage,
+            });
+          }
+          return updatedChatRooms;
+        });
+
+        return {
+          ...prevMessages,
+          [chatRoomId]: updatedMessages,
+        };
+      } else {
+        const updatedMessages = currentMessages.map((message) => {
+          if (message.id === messageId) {
+            const newContent =
+              message.senderId === userId
+                ? "You deleted this message."
+                : "This message has been deleted.";
+
+            setChatRooms((prevChatRooms) => {
+              const updatedChatRooms = new Map(prevChatRooms);
+              const chatRoom = updatedChatRooms.get(chatRoomId);
+              if (chatRoom && chatRoom.latestMessage?.id === messageId) {
+                updatedChatRooms.set(chatRoomId, {
+                  ...chatRoom,
+                  latestMessage: {
+                    ...chatRoom.latestMessage,
+                    content:
+                      userId === chatRoom.latestMessage.senderId
+                        ? "You deleted this message."
+                        : "This message has been deleted.",
+                    deletedForEveryone: true,
+                  },
+                });
+              }
+              return updatedChatRooms;
+            });
+
+            return {
+              ...message,
+              content: newContent,
+              deletedForEveryone: true,
+            };
+          }
+          return message;
+        });
+
+        return {
+          ...prevMessages,
+          [chatRoomId]: updatedMessages,
+        };
+      }
     });
   };
 
