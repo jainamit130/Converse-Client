@@ -88,6 +88,18 @@
     opacity: 0.8;
   }
 
+  .groupOptionsIcon{
+    height: 70px;
+    width: 35px;
+  }
+
+  .groupOptions{
+    position: absolute;
+    right:20px;
+    align-items: center;
+    justify-content: right;
+  }
+
   .chat-details{
     align-items: center;
     display: flex;

@@ -196,6 +196,28 @@ export const ChatRoomProvider = ({ children }) => {
     });
   }, []);
 
+  const clearChat = (chatRoomId) => {
+    setMessages((prevMessages) => {
+      const updatedMessages = { ...prevMessages, [chatRoomId]: [] };
+
+      setChatRooms((prevChatRooms) => {
+        const updatedChatRooms = new Map(prevChatRooms);
+        const chatRoom = updatedChatRooms.get(chatRoomId);
+
+        if (chatRoom) {
+          updatedChatRooms.set(chatRoomId, {
+            ...chatRoom,
+            latestMessage: null,
+          });
+        }
+
+        return updatedChatRooms;
+      });
+
+      return updatedMessages;
+    });
+  };
+
   const updateDeletedMessage = (chatRoomId, messageId, isDeleted) => {
     setMessages((prevMessages) => {
       const currentMessages = prevMessages[chatRoomId] || [];
@@ -314,6 +336,7 @@ export const ChatRoomProvider = ({ children }) => {
         setMessages,
         addMessageToRoom,
         updateDeletedMessage,
+        clearChat,
         usernameToChatRoomMap,
         mergeChatRooms,
         resetChatRoomContext,

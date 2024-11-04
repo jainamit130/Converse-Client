@@ -221,6 +221,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     >
       <ChatRoomHeader
         key={chatRoomId}
+        chatRoomId={chatRoomId}
         chatRoomName={
           chatRoomType === "INDIVIDUAL" && chatRoomId !== null
             ? recipientUsername === username
@@ -296,6 +297,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
                         isOpen={isOpen}
                         toggleDropdown={toggleDropdown}
                         parameter={message}
+                        parentButtonRef={"messageOptionsIcon"}
                       />
                     )}
                   </div>
