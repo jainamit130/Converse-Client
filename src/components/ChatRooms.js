@@ -47,6 +47,10 @@ const ChatRooms = () => {
   };
 
   useEffect(() => {
+    console.log("Updated chatRooms:", chatRooms);
+  }, [chatRooms]);
+
+  useEffect(() => {
     if (data) {
       mergeChatRooms(data.getChatRoomsOfUser);
     }

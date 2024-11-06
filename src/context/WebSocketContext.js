@@ -20,6 +20,7 @@ export const WebSocketProvider = ({ children }) => {
   const {
     addMessageToRoom,
     updateDeletedMessage,
+    exitGroup,
     mergeChatRooms,
     messages,
     setMessages,
@@ -193,9 +194,10 @@ export const WebSocketProvider = ({ children }) => {
         (message) => {
           const parsedMessage = JSON.parse(message.body);
           const chatMessage = parsedMessage.message;
-          const messageId = parsedMessage.messageId;
+          const elementId = parsedMessage.id;
           const messageType = parsedMessage.type;
-          if (messageType === "ADD") {
+
+          if (messageType === "MESSAGE") {
             addMessageToRoom(chatRoomId, chatMessage);
 
             setChatRooms((prevChatRooms) => {
@@ -223,7 +225,8 @@ export const WebSocketProvider = ({ children }) => {
               return sortedRooms;
             });
           } else if (messageType === "DELETE") {
-            updateDeletedMessage(chatRoomId, messageId, false);
+            updateDeletedMessage(chatRoomId, elementId, false);
+          } else if (messageType === "EXIT") {
           }
         }
       );

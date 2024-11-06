@@ -143,9 +143,14 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     }
   }, [messages[chatRoomId], chatRoomId]);
 
+  const [chatRoom, setChatRoom] = useState(chatRooms.get(chatRoomId));
+
+  useEffect(() => {
+    setChatRoom(chatRooms.get(chatRoomId));
+  }, [chatRooms, chatRoomId]);
+
   useEffect(() => {
     if (chatRoomId) {
-      const chatRoom = chatRooms.get(chatRoomId);
       if (chatRoom) {
         setTypingUsers(chatRoom.typingUsers || []);
         setLastSeen(chatRoom.lastSeen || null);
@@ -156,7 +161,6 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     }
   }, [chatRooms, chatRoomId, userId]);
 
-  const chatRoom = chatRooms.get(chatRoomId);
   const messagesLoaded = chatRoom?.messagesLoaded || false;
   const fromCount = messages[chatRoomId]?.length || 0;
 
@@ -221,7 +225,8 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     >
       <ChatRoomHeader
         key={chatRoomId}
-        chatRoomId={chatRoomId}
+        chatRoom={chatRoom}
+        isExited={chatRoom.isExited}
         chatRoomName={
           chatRoomType === "INDIVIDUAL" && chatRoomId !== null
             ? recipientUsername === username
@@ -234,7 +239,6 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
         typingUsers={typingUsers}
         onlineUsers={onlineUsers}
         lastSeen={lastSeen}
-        chatRoomType={chatRoomType}
       />
 
       <div className="chat-messages" ref={chatMessagesRef}>

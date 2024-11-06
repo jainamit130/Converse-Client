@@ -8,18 +8,32 @@ import useDelete from "../hooks/useDelete";
 import { useChatRoom } from "../context/ChatRoomContext";
 
 const ChatRoomHeader = ({
-  chatRoomId,
+  chatRoom,
+  isExited,
   chatRoomName,
   typingUsers,
   onlineUsers,
-  chatRoomType,
   lastSeen,
 }) => {
-  const { handleClearChat } = useDelete();
+  const { handleClearChat, handleDeleteChat, handleLeaveChat } = useDelete();
   const lastSeenFormat = lastSeen ? formatLastSeen(lastSeen) : null;
-  const { clearChat } = useChatRoom();
+  const { clearChat, deleteChat, exitGroup } = useChatRoom();
   const [isOpen, setIsOpen] = useState(null);
-  const [options, setOptions] = useState(["Clear Chat"]);
+  const [options, setOptions] = useState(() => {
+    let defaultOptions = ["Clear Chat"];
+
+    if (chatRoom.chatRoomType === "INDIVIDUAL") {
+      defaultOptions = [...defaultOptions, "Delete Chat"];
+    } else if (chatRoom.chatRoomType === "GROUP") {
+      if (chatRoom.isExited) {
+        defaultOptions = [...defaultOptions, "Delete Group"];
+      } else {
+        defaultOptions = [...defaultOptions, "Exit Group"];
+      }
+    }
+
+    return defaultOptions;
+  });
 
   const toggleDropdown = (chatRoomId) => {
     if (isOpen) {
@@ -29,13 +43,22 @@ const ChatRoomHeader = ({
     }
   };
 
-  const handleSelectOption = async (option, chatRoomId) => {
+  const handleSelectOption = async (option) => {
     if (option === "Clear Chat") {
-      const isSuccess = handleClearChat(chatRoomId);
+      const isSuccess = handleClearChat(chatRoom.id);
       if (isSuccess) {
-        clearChat(chatRoomId);
+        clearChat(chatRoom.id);
       }
-    } else if (option === "***") {
+    } else if (option === "Delete Chat" || option === "Delete Group") {
+      const isSuccess = handleDeleteChat(chatRoom.id);
+      if (isSuccess) {
+        deleteChat(chatRoom.id);
+      }
+    } else if (option === "Exit Group") {
+      const isSuccess = handleLeaveChat(chatRoom.id);
+      if (isSuccess) {
+        exitGroup(chatRoom.id);
+      }
     }
     setIsOpen(null);
   };
@@ -50,15 +73,15 @@ const ChatRoomHeader = ({
         </div>
         {!typingUsers.length && (
           <div className="online-status">
-            {chatRoomType === "SELF" ? (
+            {chatRoom.chatRoomType === "SELF" ? (
               <span>online</span>
-            ) : chatRoomType === "INDIVIDUAL" ? (
+            ) : chatRoom.chatRoomType === "INDIVIDUAL" ? (
               onlineUsers.size === 1 ? (
                 <span>online</span>
               ) : (
                 lastSeenFormat
               )
-            ) : chatRoomType === "GROUP" ? (
+            ) : chatRoom.chatRoomType === "GROUP" ? (
               onlineUsers.size > 0 ? (
                 <span>{onlineUsers.size} online</span>
               ) : null
@@ -70,15 +93,15 @@ const ChatRoomHeader = ({
         <img
           src={groupOptionsIcon}
           className="groupOptionsIcon"
-          onClick={() => toggleDropdown(chatRoomId)}
+          onClick={() => toggleDropdown(chatRoom.id)}
         />
-        {isOpen === chatRoomId && (
+        {isOpen === chatRoom.id && (
           <OptionsDropdown
             options={options}
             onSelect={handleSelectOption}
             isOpen={isOpen}
             toggleDropdown={toggleDropdown}
-            parameter={chatRoomId}
+            parameter={chatRoom.id}
             parentButtonRef={"groupOptionsIcon"}
           />
         )}

@@ -108,7 +108,7 @@ export const ChatRoomProvider = ({ children }) => {
     if (prevChatRoomIdRef.current === null) {
       return;
     }
-    markChatRoomRead(prevChatRoomIdRef.current);
+    if (activeChatRoomId !== null) markChatRoomRead(prevChatRoomIdRef.current);
   }, [activeChatRoomId]);
 
   const markChatRoomRead = (chatRoomId) => {
@@ -195,6 +195,47 @@ export const ChatRoomProvider = ({ children }) => {
       return sortedRooms;
     });
   }, []);
+
+  const exitGroup = (chatRoomId) => {
+    setChatRooms((prevChatRooms) => {
+      const updatedChatRooms = new Map(prevChatRooms);
+      const chatRoom = updatedChatRooms.get(chatRoomId);
+
+      if (chatRoom) {
+        const updatedOnlineUsers = chatRoom.onlineUsers || new Set();
+        updatedOnlineUsers.delete(username);
+        updatedChatRooms.set(chatRoomId, {
+          ...chatRoom,
+          isExited: true,
+          onlineUsers: updatedOnlineUsers,
+        });
+      }
+
+      return updatedChatRooms;
+    });
+  };
+
+  const deleteChat = (chatRoomId) => {
+    setChatRooms((prevChatRooms) => {
+      const updatedChatRooms = new Map(prevChatRooms);
+      const chatRoom = updatedChatRooms.get(chatRoomId);
+      if (chatRoom && chatRoom.chatRoomType === "INDIVIDUAL") {
+        const usernameToRemove =
+          chatRoom.creatorUsername === username
+            ? chatRoom.recipientUsername
+            : chatRoom.creatorUsername;
+
+        const updatedUsernameToChatRoomMap = new Map(usernameToChatRoomMap);
+        updatedUsernameToChatRoomMap.delete(usernameToRemove);
+        setUsernameToChatRoomMap(updatedUsernameToChatRoomMap);
+      }
+      updatedChatRooms.delete(chatRoomId);
+      if (chatRoomId === activeChatRoomId) {
+        setActiveChatRoomId(null);
+      }
+      return updatedChatRooms;
+    });
+  };
 
   const clearChat = (chatRoomId) => {
     setMessages((prevMessages) => {
@@ -337,6 +378,9 @@ export const ChatRoomProvider = ({ children }) => {
         addMessageToRoom,
         updateDeletedMessage,
         clearChat,
+        deleteChat,
+        exitGroup,
+        // handleExitMember,
         usernameToChatRoomMap,
         mergeChatRooms,
         resetChatRoomContext,
