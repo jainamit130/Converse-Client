@@ -227,6 +227,22 @@ export const WebSocketProvider = ({ children }) => {
           } else if (messageType === "DELETE") {
             updateDeletedMessage(chatRoomId, elementId, false);
           } else if (messageType === "EXIT") {
+            if (userId === elementId) {
+              if (subscriptionData.unsubscribeChat) {
+                subscriptionData.unsubscribeChat();
+                subscriptionData.unsubscribeChat = null;
+              }
+              if (subscriptionData.unsubscribeTyping) {
+                subscriptionData.unsubscribeTyping();
+                subscriptionData.unsubscribeTyping = null;
+              }
+              if (subscriptionData.unsubscribeMessageStatus) {
+                subscriptionData.unsubscribeMessageStatus();
+                subscriptionData.unsubscribeMessageStatus = null;
+              }
+
+              delete subscriptions.current[chatRoomId];
+            }
           }
         }
       );
