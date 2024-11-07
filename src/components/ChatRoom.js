@@ -225,8 +225,8 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     >
       <ChatRoomHeader
         key={chatRoomId}
-        chatRoom={chatRoom}
-        isExited={chatRoom.isExited}
+        chatRoom={chatRoomId ? chatRoom : tempChatRoom}
+        isExited={chatRoomId ? chatRoom?.isExited : false}
         chatRoomName={
           chatRoomType === "INDIVIDUAL" && chatRoomId !== null
             ? recipientUsername === username

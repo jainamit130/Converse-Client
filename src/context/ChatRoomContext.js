@@ -216,6 +216,10 @@ export const ChatRoomProvider = ({ children }) => {
   };
 
   const deleteChat = (chatRoomId) => {
+    if (chatRoomId === null) {
+      setActiveChatRoomId(null);
+      return;
+    }
     setChatRooms((prevChatRooms) => {
       const updatedChatRooms = new Map(prevChatRooms);
       const chatRoom = updatedChatRooms.get(chatRoomId);
@@ -225,7 +229,9 @@ export const ChatRoomProvider = ({ children }) => {
             ? chatRoom.recipientUsername
             : chatRoom.creatorUsername;
 
-        const updatedUsernameToChatRoomMap = new Map(usernameToChatRoomMap);
+        const updatedUsernameToChatRoomMap = new Map(
+          Object.entries(usernameToChatRoomMap)
+        );
         updatedUsernameToChatRoomMap.delete(usernameToRemove);
         setUsernameToChatRoomMap(updatedUsernameToChatRoomMap);
       }
@@ -238,6 +244,9 @@ export const ChatRoomProvider = ({ children }) => {
   };
 
   const clearChat = (chatRoomId) => {
+    if (chatRoomId === null) {
+      return;
+    }
     setMessages((prevMessages) => {
       const updatedMessages = { ...prevMessages, [chatRoomId]: [] };
 

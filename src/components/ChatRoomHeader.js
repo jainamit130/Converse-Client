@@ -9,7 +9,6 @@ import { useChatRoom } from "../context/ChatRoomContext";
 
 const ChatRoomHeader = ({
   chatRoom,
-  isExited,
   chatRoomName,
   typingUsers,
   onlineUsers,
@@ -22,7 +21,7 @@ const ChatRoomHeader = ({
   const [options, setOptions] = useState(() => {
     let defaultOptions = ["Clear Chat"];
 
-    if (chatRoom.chatRoomType === "INDIVIDUAL") {
+    if (chatRoom === null || chatRoom.chatRoomType === "INDIVIDUAL") {
       defaultOptions = [...defaultOptions, "Delete Chat"];
     } else if (chatRoom.chatRoomType === "GROUP") {
       if (chatRoom.isExited) {
@@ -47,12 +46,12 @@ const ChatRoomHeader = ({
     if (option === "Clear Chat") {
       const isSuccess = handleClearChat(chatRoom.id);
       if (isSuccess) {
-        clearChat(chatRoom.id);
+        clearChat(chatRoom?.id);
       }
     } else if (option === "Delete Chat" || option === "Delete Group") {
       const isSuccess = handleDeleteChat(chatRoom.id);
       if (isSuccess) {
-        deleteChat(chatRoom.id);
+        deleteChat(chatRoom?.id);
       }
     } else if (option === "Exit Group") {
       const isSuccess = handleLeaveChat(chatRoom.id);
