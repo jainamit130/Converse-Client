@@ -352,6 +352,27 @@ export const WebSocketProvider = ({ children }) => {
     };
   };
 
+  const unsubscribeChatRoom = (chatRoomId) => {
+    const subscriptionData = subscriptions.current[chatRoomId];
+
+    if (subscriptionData) {
+      if (subscriptionData.unsubscribeChat) {
+        subscriptionData.unsubscribeChat();
+        subscriptionData.unsubscribeChat = null;
+      }
+      if (subscriptionData.unsubscribeTyping) {
+        subscriptionData.unsubscribeTyping();
+        subscriptionData.unsubscribeTyping = null;
+      }
+      if (subscriptionData.unsubscribeMessageStatus) {
+        subscriptionData.unsubscribeMessageStatus();
+        subscriptionData.unsubscribeMessageStatus = null;
+      }
+
+      delete subscriptions.current[chatRoomId];
+    }
+  };
+
   const sendMessage = (destination, body) => {
     if (stompClient && connected) {
       stompClient.send(destination, {}, JSON.stringify(body));
@@ -367,6 +388,7 @@ export const WebSocketProvider = ({ children }) => {
         connected,
         handleStopTyping,
         handleTyping,
+        unsubscribeChatRoom,
         typingTimeoutRef,
         resetWebSocketContext,
       }}

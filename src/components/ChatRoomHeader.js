@@ -6,6 +6,7 @@ import OptionsDropdown from "./reusableComponents/OptionsDropdown";
 import { useState } from "react";
 import useDelete from "../hooks/useDelete";
 import { useChatRoom } from "../context/ChatRoomContext";
+import { useWebSocket } from "../context/WebSocketContext";
 
 const ChatRoomHeader = ({
   chatRoom,
@@ -17,6 +18,7 @@ const ChatRoomHeader = ({
   const { handleClearChat, handleDeleteChat, handleLeaveChat } = useDelete();
   const lastSeenFormat = lastSeen ? formatLastSeen(lastSeen) : null;
   const { clearChat, deleteChat, exitGroup } = useChatRoom();
+  const { unsubscribeChatRoom } = useWebSocket();
   const [isOpen, setIsOpen] = useState(null);
   const [options, setOptions] = useState(() => {
     let defaultOptions = ["Clear Chat"];
@@ -51,6 +53,7 @@ const ChatRoomHeader = ({
     } else if (option === "Delete Chat" || option === "Delete Group") {
       const isSuccess = handleDeleteChat(chatRoom.id);
       if (isSuccess) {
+        if (chatRoom?.id) unsubscribeChatRoom(chatRoom?.id);
         deleteChat(chatRoom?.id);
       }
     } else if (option === "Exit Group") {

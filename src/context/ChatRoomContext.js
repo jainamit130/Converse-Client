@@ -216,10 +216,12 @@ export const ChatRoomProvider = ({ children }) => {
   };
 
   const deleteChat = (chatRoomId) => {
+    setActiveChatRoomId(null);
     if (chatRoomId === null) {
-      setActiveChatRoomId(null);
       return;
     }
+
+    clearChat(chatRoomId);
     setChatRooms((prevChatRooms) => {
       const updatedChatRooms = new Map(prevChatRooms);
       const chatRoom = updatedChatRooms.get(chatRoomId);
