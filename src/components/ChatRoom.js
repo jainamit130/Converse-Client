@@ -176,6 +176,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
       content: messageContent,
       senderId: userId,
       chatRoomId,
+      timestamp: new Date().toISOString(),
     };
 
     if (sendMessage) {

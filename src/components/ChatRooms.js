@@ -24,7 +24,7 @@ const ChatRooms = () => {
   const { chatRooms, messages, mergeChatRooms } = useChatRoom();
   const { handleCreateGroup } = useCreateChat();
   const [showAddUserPanel, setShowAddUserPanel] = useState(false);
-  const [tempChatRoom, setTempChatRoom] = useState({});
+  const [tempChatRoom, setTempChatRoom] = useState(null);
 
   const handleCloseAddUser = (chatRoomId, isNewIndividualChat) => {
     if (isNewIndividualChat) {

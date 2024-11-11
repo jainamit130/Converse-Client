@@ -23,9 +23,9 @@ const ChatRoomHeader = ({
   const [options, setOptions] = useState(() => {
     let defaultOptions = ["Clear Chat"];
 
-    if (chatRoom === null || chatRoom.chatRoomType === "INDIVIDUAL") {
+    if (chatRoom === null || chatRoom?.chatRoomType === "INDIVIDUAL") {
       defaultOptions = [...defaultOptions, "Delete Chat"];
-    } else if (chatRoom.chatRoomType === "GROUP") {
+    } else if (chatRoom?.chatRoomType === "GROUP") {
       if (chatRoom.isExited) {
         defaultOptions = [...defaultOptions, "Delete Group"];
       } else {
@@ -75,15 +75,15 @@ const ChatRoomHeader = ({
         </div>
         {!typingUsers.length && (
           <div className="online-status">
-            {chatRoom.chatRoomType === "SELF" ? (
+            {chatRoom?.chatRoomType === "SELF" ? (
               <span>online</span>
-            ) : chatRoom.chatRoomType === "INDIVIDUAL" ? (
+            ) : chatRoom?.chatRoomType === "INDIVIDUAL" ? (
               onlineUsers.size === 1 ? (
                 <span>online</span>
               ) : (
                 lastSeenFormat
               )
-            ) : chatRoom.chatRoomType === "GROUP" ? (
+            ) : chatRoom?.chatRoomType === "GROUP" ? (
               onlineUsers.size > 0 ? (
                 <span>{onlineUsers.size} online</span>
               ) : null
@@ -95,15 +95,15 @@ const ChatRoomHeader = ({
         <img
           src={groupOptionsIcon}
           className="groupOptionsIcon"
-          onClick={() => toggleDropdown(chatRoom.id)}
+          onClick={() => toggleDropdown(chatRoom?.id)}
         />
-        {isOpen === chatRoom.id && (
+        {isOpen === chatRoom?.id && (
           <OptionsDropdown
             options={options}
             onSelect={handleSelectOption}
             isOpen={isOpen}
             toggleDropdown={toggleDropdown}
-            parameter={chatRoom.id}
+            parameter={chatRoom?.id}
             parentButtonRef={"groupOptionsIcon"}
           />
         )}
