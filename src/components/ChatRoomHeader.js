@@ -60,6 +60,8 @@ const ChatRoomHeader = ({
       const isSuccess = handleLeaveChat(chatRoom.id);
       if (isSuccess) {
         exitGroup(chatRoom.id);
+        let defaultOptions = ["Clear Chat", "Delete Group"];
+        setOptions(defaultOptions);
       }
     }
     setIsOpen(null);
