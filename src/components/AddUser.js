@@ -63,6 +63,7 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
       const tempChatRoom = {
         name: user.username,
         chatRoomType,
+        isExited: false,
         members: [user.id, userId],
         createdById: userId,
       };

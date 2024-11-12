@@ -143,9 +143,14 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     }
   }, [messages[chatRoomId], chatRoomId]);
 
+  const [chatRoom, setChatRoom] = useState(chatRooms.get(chatRoomId));
+
+  useEffect(() => {
+    setChatRoom(chatRooms.get(chatRoomId));
+  }, [chatRooms, chatRoomId]);
+
   useEffect(() => {
     if (chatRoomId) {
-      const chatRoom = chatRooms.get(chatRoomId);
       if (chatRoom) {
         setTypingUsers(chatRoom.typingUsers || []);
         setLastSeen(chatRoom.lastSeen || null);
@@ -156,7 +161,6 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     }
   }, [chatRooms, chatRoomId, userId]);
 
-  const chatRoom = chatRooms.get(chatRoomId);
   const messagesLoaded = chatRoom?.messagesLoaded || false;
   const fromCount = messages[chatRoomId]?.length || 0;
 
@@ -172,6 +176,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
       content: messageContent,
       senderId: userId,
       chatRoomId,
+      timestamp: new Date().toISOString(),
     };
 
     if (sendMessage) {
@@ -221,6 +226,8 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
     >
       <ChatRoomHeader
         key={chatRoomId}
+        chatRoom={chatRoomId ? chatRoom : tempChatRoom}
+        isExited={chatRoomId ? chatRoom?.isExited : false}
         chatRoomName={
           chatRoomType === "INDIVIDUAL" && chatRoomId !== null
             ? recipientUsername === username
@@ -233,7 +240,6 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
         typingUsers={typingUsers}
         onlineUsers={onlineUsers}
         lastSeen={lastSeen}
-        chatRoomType={chatRoomType}
       />
 
       <div className="chat-messages" ref={chatMessagesRef}>
@@ -296,6 +302,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
                         isOpen={isOpen}
                         toggleDropdown={toggleDropdown}
                         parameter={message}
+                        parentButtonRef={"messageOptionsIcon"}
                       />
                     )}
                   </div>

@@ -9,6 +9,69 @@ const useDelete = () => {
   const { token, userId } = useUser();
   const BASE_URL = config.CHAT_BASE_URL;
 
+  const handleLeaveChat = async (chatRoomId) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/chat/groups/remove/${chatRoomId}`,
+        [userId],
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      setError(err);
+      console.error("Error exiting chat:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteChat = async (chatRoomId) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/chat/groups/delete/${chatRoomId}`,
+        userId,
+        {
+          headers: {
+            "Content-Type": "text/plain",
+          },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      setError(err);
+      console.error("Error deleting chat:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClearChat = async (chatRoomId) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/chat/groups/clearChat/${chatRoomId}`,
+        userId,
+        {
+          headers: {
+            "Content-Type": "text/plain",
+          },
+        }
+      );
+      return response.data;
+    } catch (err) {
+      setError(err);
+      console.error("Error clearing chat:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteMessageForMe = async (messageId) => {
     setLoading(true);
     try {
@@ -54,6 +117,9 @@ const useDelete = () => {
   return {
     handleDeleteMessageForEveryone,
     handleDeleteMessageForMe,
+    handleClearChat,
+    handleLeaveChat,
+    handleDeleteChat,
     loading,
     error,
   };

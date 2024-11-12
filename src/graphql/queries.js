@@ -9,6 +9,7 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
       userIds
       recipientUsername
       creatorUsername
+      isExited
       unreadMessageCount
       latestMessage {
         id

@@ -6,6 +6,7 @@ const OptionsDropdown = ({
   isOpen,
   toggleDropdown,
   parameter,
+  parentButtonRef,
 }) => {
   const dropdownRef = useRef();
 
@@ -14,7 +15,7 @@ const OptionsDropdown = ({
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target) &&
-        !event.target.classList.contains("messageOptionsIcon")
+        !event.target.classList.contains(parentButtonRef)
       ) {
         toggleDropdown(null);
       }
