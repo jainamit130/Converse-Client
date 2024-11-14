@@ -73,7 +73,7 @@ const MessageInfoPanel = ({ message, onClose }) => {
   );
 
   return (
-    <div className={`message-info-panel ${isVisible ? "visible" : ""}`}>
+    <div className={`info-panel ${isVisible ? "visible" : ""}`}>
       <div style={{ display: "flex", alignItems: "center", margin: "2px" }}>
         <img
           src={closeButtonIcon}

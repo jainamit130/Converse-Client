@@ -21,6 +21,7 @@ import MessageStatusIcon from "./MessageStatusIcon.js";
 import OptionsDropdown from "./reusableComponents/OptionsDropdown.js";
 import useDelete from "../hooks/useDelete.js";
 import DeletedMessageStyle from "./reusableComponents/DeletedMessageStyle.js";
+import UserInfoPanel from "./UserInfoPanel.js";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   return messages.reduce((acc, message, index) => {
@@ -122,7 +123,10 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   const navigate = useNavigate();
 
   const [selectedMessage, setSelectedMessage] = useState(null);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isMessageInfoPanelOpen, setIsMessageInfoPanelOpen] = useState(false);
+
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isUserInfoPanelOpen, setIsUserInfoPanelOpen] = useState(false);
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -207,13 +211,25 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
   const openMessageInfoPanel = (message) => {
+    closeUserInfoPanel();
     setSelectedMessage(message);
-    setIsPanelOpen(true);
+    setIsMessageInfoPanelOpen(true);
   };
 
   const closeMessageInfoPanel = () => {
-    setIsPanelOpen(false);
+    setIsMessageInfoPanelOpen(false);
     setSelectedMessage(null);
+  };
+
+  const openUserInfoPanel = (userId) => {
+    closeMessageInfoPanel();
+    setSelectedUser(userId);
+    setIsMessageInfoPanelOpen(true);
+  };
+
+  const closeUserInfoPanel = () => {
+    setIsUserInfoPanelOpen(false);
+    setSelectedUser(null);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -222,7 +238,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   return (
     <div
       className="chat-messages-section"
-      style={{ width: isPanelOpen ? "60.8%" : "100%" }}
+      style={{ width: isMessageInfoPanelOpen ? "60.8%" : "100%" }}
     >
       <ChatRoomHeader
         key={chatRoomId}
@@ -295,16 +311,18 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
                       }}
                       onClick={() => toggleDropdown(message)}
                     />
-                    {isOpen === message.id && (
-                      <OptionsDropdown
-                        options={options}
-                        onSelect={handleSelectOption}
-                        isOpen={isOpen}
-                        toggleDropdown={toggleDropdown}
-                        parameter={message}
-                        parentButtonRef={"messageOptionsIcon"}
-                      />
-                    )}
+                    <div style={{ position: "absolute" }}>
+                      {isOpen === message.id && (
+                        <OptionsDropdown
+                          options={options}
+                          onSelect={handleSelectOption}
+                          isOpen={isOpen}
+                          toggleDropdown={toggleDropdown}
+                          parameter={message}
+                          parentButtonRef={"messageOptionsIcon"}
+                        />
+                      )}
+                    </div>
                   </div>
                   {
                     <MessageStatusIcon
@@ -345,11 +363,14 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
         {message.trim().length > 0 && <button type="submit">Send</button>}
       </form>
 
-      {isPanelOpen && (
+      {isMessageInfoPanelOpen && (
         <MessageInfoPanel
           message={selectedMessage}
           onClose={closeMessageInfoPanel}
         />
+      )}
+      {isUserInfoPanelOpen && (
+        <UserInfoPanel userId={selectedUser} onClose={closeUserInfoPanel} />
       )}
     </div>
   );
