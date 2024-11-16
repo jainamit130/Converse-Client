@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_MESSAGES_OF_CHAT_ROOM } from "../graphql/queries";
 import { useWebSocket } from "../context/WebSocketContext";
@@ -125,8 +125,22 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [isMessageInfoPanelOpen, setIsMessageInfoPanelOpen] = useState(false);
 
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [isUserInfoPanelOpen, setIsUserInfoPanelOpen] = useState(false);
+
+  const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
+  const [isGroupInfoPanelOpen, setIsGroupInfoPanelOpen] = useState(false);
+
+  const openInfo = useCallback(() => {
+    const targetUserId =
+      chatRoom?.chatRoomType === "INDIVIDUAL"
+        ? chatRoom.userIds.find((id) => id !== userId)
+        : chatRoom.userIds[0];
+
+    return chatRoom?.chatRoomType === "GROUP"
+      ? openGroupInfoPanel(chatRoomId)
+      : openUserInfoPanel(targetUserId);
+  });
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -212,6 +226,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
 
   const openMessageInfoPanel = (message) => {
     closeUserInfoPanel();
+    closeGroupInfoPanel();
     setSelectedMessage(message);
     setIsMessageInfoPanelOpen(true);
   };
@@ -223,13 +238,26 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
 
   const openUserInfoPanel = (userId) => {
     closeMessageInfoPanel();
-    setSelectedUser(userId);
-    setIsMessageInfoPanelOpen(true);
+    closeGroupInfoPanel();
+    setSelectedUserId(userId);
+    setIsUserInfoPanelOpen(true);
   };
 
   const closeUserInfoPanel = () => {
     setIsUserInfoPanelOpen(false);
-    setSelectedUser(null);
+    setSelectedUserId(null);
+  };
+
+  const openGroupInfoPanel = (userId) => {
+    closeMessageInfoPanel();
+    closeUserInfoPanel();
+    setSelectedChatRoomId(userId);
+    setIsGroupInfoPanelOpen(true);
+  };
+
+  const closeGroupInfoPanel = () => {
+    setIsGroupInfoPanelOpen(false);
+    setSelectedChatRoomId(null);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -238,10 +266,16 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
   return (
     <div
       className="chat-messages-section"
-      style={{ width: isMessageInfoPanelOpen ? "60.8%" : "100%" }}
+      style={{
+        width:
+          isMessageInfoPanelOpen || isUserInfoPanelOpen || isGroupInfoPanelOpen
+            ? "60.8%"
+            : "100%",
+      }}
     >
       <ChatRoomHeader
         key={chatRoomId}
+        openInfo={openInfo}
         chatRoom={chatRoomId ? chatRoom : tempChatRoom}
         isExited={chatRoomId ? chatRoom?.isExited : false}
         chatRoomName={
@@ -370,7 +404,7 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
         />
       )}
       {isUserInfoPanelOpen && (
-        <UserInfoPanel userId={selectedUser} onClose={closeUserInfoPanel} />
+        <UserInfoPanel userId={selectedUserId} onClose={closeUserInfoPanel} />
       )}
     </div>
   );

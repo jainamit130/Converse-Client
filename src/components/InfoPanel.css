@@ -7,7 +7,7 @@
     background-color: white;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
     overflow-y: auto; 
-    z-index: 1000; 
+    z-index: 3000; 
     transition: right 0.3s ease;
 }
 
@@ -40,6 +40,11 @@
 .infoPositioning{
     display: "flex"; 
     align-items: "center";
+}
+
+.chatIcon{
+    height: 30px;
+    width: 30px;
 }
 
 .infoTitle{

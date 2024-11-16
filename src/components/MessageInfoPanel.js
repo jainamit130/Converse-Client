@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useMessageInfo } from "../hooks/useMessageInfo";
-import "./MessageInfoPanel.css";
+import "./InfoPanel.css";
 import {
   formatMessageTimestamp,
   formatTime,

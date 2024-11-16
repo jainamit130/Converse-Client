@@ -38,6 +38,7 @@
     width: auto;
   }
 
+
   .deletedMessage{
     font-style: italic;
     color: #858585;
@@ -89,6 +90,7 @@
   }
 
   .groupOptionsIcon{
+    cursor: pointer;
     height: 70px;
     width: 35px;
   }
@@ -101,6 +103,7 @@
   }
 
   .chat-details{
+    flex-grow: 1;
     align-items: center;
     display: flex;
     margin: 0;
@@ -166,6 +169,7 @@
   }
 
   .chatRoomIcon{
+    cursor: pointer;
     width: 30px;
     height: 30px;
     margin-left: 5px;

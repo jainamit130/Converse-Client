@@ -14,6 +14,7 @@ const ChatRoomHeader = ({
   typingUsers,
   onlineUsers,
   lastSeen,
+  openInfo,
 }) => {
   const { handleClearChat, handleDeleteChat, handleLeaveChat } = useDelete();
   const lastSeenFormat = lastSeen ? formatLastSeen(lastSeen) : null;
@@ -36,10 +37,11 @@ const ChatRoomHeader = ({
     return defaultOptions;
   });
 
-  const toggleDropdown = (chatRoomId) => {
+  const toggleDropdown = (event, chatRoomId) => {
     if (isOpen) {
       setIsOpen(null);
     } else {
+      event.stopPropagation();
       setIsOpen(chatRoomId);
     }
   };
@@ -68,9 +70,9 @@ const ChatRoomHeader = ({
   };
 
   return (
-    <div className="chat-details">
+    <div className="chat-details" onClick={openInfo}>
       <img src={profileIcon} className="chatRoomIcon" />
-      <div>
+      <div style={{ cursor: "pointer" }}>
         <div className="chat-room-name">{chatRoomName}</div>
         <div className="typing-status">
           <TypingIndicator typingUsers={typingUsers} />
@@ -97,7 +99,7 @@ const ChatRoomHeader = ({
         <img
           src={groupOptionsIcon}
           className="groupOptionsIcon"
-          onClick={() => toggleDropdown(chatRoom?.id)}
+          onClick={(event) => toggleDropdown(event, chatRoom?.id)}
         />
         {isOpen === chatRoom?.id && (
           <OptionsDropdown

@@ -13,13 +13,7 @@ const useGetUserInfo = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${BASE_URL}/converse/users/getUser/${userInfoId}`,
-        [userId],
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        `${BASE_URL}/converse/users/getUser/${userInfoId}?loggedInUserId=${userId}`
       );
       return response.data;
     } catch (err) {
