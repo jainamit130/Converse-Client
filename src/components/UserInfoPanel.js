@@ -7,9 +7,13 @@ import profileIcon from "../assets/profileIcon.webp"; // Add profile image path
 import "./InfoPanel.css";
 import Tile from "./reusableComponents/Tile";
 import ProfileIcon from "../assets/profileIcon.webp";
+import onlineIcon from "../assets/onlineStatus.png";
+import offlineIcon from "../assets/offline.png";
 import { useChatRoom } from "../context/ChatRoomContext";
+import { useUser } from "../context/UserContext";
 
-const UserInfoPanel = ({ userId, onClose }) => {
+const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
+  const { setActiveChatRoomId, userId } = useUser();
   const { chatRooms } = useChatRoom();
   const { fetchUserInfo } = useGetUserInfo();
   const [fetchedUserId, setFetchedUserId] = useState();
@@ -21,10 +25,30 @@ const UserInfoPanel = ({ userId, onClose }) => {
   const [lastSeenTimestamp, setLastSeenTimestamp] = useState(null);
   const [onlineStatus, setOnlineStatus] = useState("OFFLINE");
 
+  const handleChatRoomClick = (chatRoomId) => {
+    setActiveChatRoomId(chatRoomId);
+  };
+
+  const openChatRoom = () => {
+    if (individualChatId === null) {
+      const tempChatRoom = {
+        name: username,
+        chatRoomType: "INDIVIDUAL",
+        isExited: false,
+        members: [currentUserId, userId],
+        createdById: userId,
+      };
+      setTempChatRoom(tempChatRoom);
+    } else {
+      setActiveChatRoomId(individualChatId);
+    }
+    onClose();
+  };
+
   useEffect(() => {
     const getUserInfo = async () => {
-      if (userId) {
-        const data = await fetchUserInfo(userId);
+      if (currentUserId) {
+        const data = await fetchUserInfo(currentUserId);
         setFetchedUserId(data.id);
         setUsername(data.username);
         setUserStatus(data.userStatus);
@@ -41,7 +65,7 @@ const UserInfoPanel = ({ userId, onClose }) => {
     return () => {
       setIsVisible(false);
     };
-  }, [userId]);
+  }, [currentUserId]);
 
   return (
     <div className={`info-panel ${isVisible ? "visible" : ""}`}>
@@ -89,15 +113,21 @@ const UserInfoPanel = ({ userId, onClose }) => {
         }}
       >
         {onlineStatus === "ONLINE" ? (
-          <span>Online</span>
+          <div className="statusDetails">
+            <img src={onlineIcon} className="statusIcon" />
+            <span>online</span>
+          </div>
         ) : (
-          <span>{lastSeenTimestamp}</span>
+          <div className="statusDetails">
+            <img src={offlineIcon} className="statusIcon" />
+            <span>{lastSeenTimestamp}</span>
+          </div>
         )}
       </div>
 
       {/* Chat Button */}
       <div style={{ textAlign: "center", marginTop: "20px" }}>
-        <img src={userChatIcon} className="chatIcon" />
+        <img src={userChatIcon} className="chatIcon" onClick={openChatRoom} />
       </div>
 
       {/* Groups in Common */}
@@ -106,13 +136,19 @@ const UserInfoPanel = ({ userId, onClose }) => {
           Groups in Common
         </h3>
         <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-          {commonChatRoomIds.map((chatRoomId) => (
-            <Tile
-              id={chatRoomId}
-              name={chatRooms.get(chatRoomId).name}
-              icon={profileIcon}
-            />
-          ))}
+          {commonChatRoomIds.map((chatRoomId) => {
+            const chatRoom = chatRooms.get(chatRoomId);
+
+            return (
+              <Tile
+                key={chatRoomId}
+                id={chatRoomId}
+                onChatRoomClick={handleChatRoomClick}
+                name={chatRoom.name}
+                icon={profileIcon}
+              />
+            );
+          })}
         </ul>
       </div>
     </div>

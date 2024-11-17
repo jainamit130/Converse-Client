@@ -143,6 +143,7 @@ const ChatRooms = () => {
             key={activeChatRoomId}
             handleCreateGroup={createChatRoom}
             tempChatRoom={tempChatRoom}
+            setTempChatRoom={setTempChatRoom}
             handleChatRoomClick={handleChatRoomClick}
           />
         )}

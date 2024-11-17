@@ -41,7 +41,12 @@ const groupMessagesByDate = (messages, unreadMessageCount) => {
   }, {});
 };
 
-const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
+const ChatRoom = ({
+  handleCreateGroup,
+  tempChatRoom,
+  setTempChatRoom,
+  handleChatRoomClick,
+}) => {
   const { userId, username, activeChatRoomId } = useUser();
   const [chatRoomId, setChatRoomId] = useState(activeChatRoomId);
   const { sendMessage, connected, handleStopTyping, handleTyping } =
@@ -404,7 +409,11 @@ const ChatRoom = ({ handleCreateGroup, tempChatRoom, handleChatRoomClick }) => {
         />
       )}
       {isUserInfoPanelOpen && (
-        <UserInfoPanel userId={selectedUserId} onClose={closeUserInfoPanel} />
+        <UserInfoPanel
+          userId={selectedUserId}
+          setTempChatRoom={setTempChatRoom}
+          onClose={closeUserInfoPanel}
+        />
       )}
     </div>
   );
