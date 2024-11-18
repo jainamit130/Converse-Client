@@ -22,6 +22,7 @@ const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [commonChatRoomIds, setCommonChatRoomIds] = useState([]);
   const [individualChatId, setIndividualChatId] = useState();
+  const [selfChatId, setSelfChatId] = useState();
   const [lastSeenTimestamp, setLastSeenTimestamp] = useState(null);
   const [onlineStatus, setOnlineStatus] = useState("OFFLINE");
 
@@ -30,7 +31,9 @@ const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
   };
 
   const openChatRoom = () => {
-    if (individualChatId === null) {
+    if (selfChatId !== null) {
+      setActiveChatRoomId(selfChatId);
+    } else if (individualChatId === null) {
       const tempChatRoom = {
         name: username,
         chatRoomType: "INDIVIDUAL",
@@ -55,6 +58,7 @@ const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
         setLastSeenTimestamp(formatLastSeen(data.lastSeenTimestamp));
         setOnlineStatus(data.status);
         setIndividualChatId(data.commonIndividualChatId);
+        setSelfChatId(data.selfChatId);
         setCommonChatRoomIds(data.commonChatRoomIds);
       }
     };
@@ -101,6 +105,8 @@ const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
             objectFit: "cover",
           }}
         />
+
+        <h2>{username}</h2>
       </div>
 
       {/* Last Seen / Online Status */}

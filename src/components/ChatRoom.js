@@ -22,6 +22,7 @@ import OptionsDropdown from "./reusableComponents/OptionsDropdown.js";
 import useDelete from "../hooks/useDelete.js";
 import DeletedMessageStyle from "./reusableComponents/DeletedMessageStyle.js";
 import UserInfoPanel from "./UserInfoPanel.js";
+import GroupInfoPanel from "./GroupInfoPanel.js";
 
 const groupMessagesByDate = (messages, unreadMessageCount) => {
   return messages.reduce((acc, message, index) => {
@@ -410,9 +411,15 @@ const ChatRoom = ({
       )}
       {isUserInfoPanelOpen && (
         <UserInfoPanel
-          userId={selectedUserId}
+          currentUserId={selectedUserId}
           setTempChatRoom={setTempChatRoom}
           onClose={closeUserInfoPanel}
+        />
+      )}
+      {isGroupInfoPanelOpen && (
+        <GroupInfoPanel
+          chatRoomId={selectedChatRoomId}
+          onClose={closeGroupInfoPanel}
         />
       )}
     </div>
