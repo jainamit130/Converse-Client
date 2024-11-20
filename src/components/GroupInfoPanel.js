@@ -1,7 +1,7 @@
 import { useState } from "react";
 import GroupIcon from "../assets/GroupIcon.png";
-import onlineIcon from "../assets/onlineStatus.png";
-import offlineIcon from "../assets/offline.png";
+import closeButtonIcon from "../assets/CloseButton.png";
+import profileIcon from "../assets/profileIcon.webp";
 import "./InfoPanel.css";
 import Tile from "./reusableComponents/Tile";
 import { useChatRoom } from "../context/ChatRoomContext";
@@ -13,19 +13,18 @@ const GroupInfoPanel = ({ chatRoomId, onClose }) => {
   const chatRoom = chatRooms.get(chatRoomId); // Get chat room details
   const [isVisible, setIsVisible] = useState(true);
 
-  // Handle Add Member button
+  const handleChatRoomClick = () => {
+    console.log("ChatRoom clicked");
+  };
+
   const handleAddMember = () => {
-    // Add your logic to handle adding a new member
     console.log("Add Member clicked");
   };
 
-  // Handle Remove Member button
   const handleRemoveMember = (userId) => {
-    // Add your logic to handle removing a member
     console.log("Remove member:", userId);
   };
 
-  // Handle Group Delete or Exit
   const handleGroupAction = () => {
     if (chatRoom.isExited) {
       console.log("Delete Group logic here");
@@ -36,57 +35,58 @@ const GroupInfoPanel = ({ chatRoomId, onClose }) => {
 
   return (
     <div className={`info-panel ${isVisible ? "visible" : ""}`}>
-      {/* Close button */}
-      <button className="close-button" onClick={onClose}>
-        ✕
-      </button>
-
-      {/* Group Icon */}
-      <div className="group-info-header">
-        <img src={GroupIcon} alt="Group Icon" className="group-icon" />
-      </div>
-
-      {/* Group Name */}
-      <h2 className="group-name">{chatRoom.name}</h2>
-
-      {/* Group Status */}
-      <p className="group-status">
-        Status:{" "}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          margin: "2px",
+        }}
+      >
         <img
-          src={chatRoom.status === "ONLINE" ? onlineIcon : offlineIcon}
-          alt={chatRoom.status === "ONLINE" ? "Online" : "Offline"}
-          className="status-icon"
+          src={closeButtonIcon}
+          className="close-button"
+          alt="close"
+          onClick={onClose}
         />
-        {chatRoom.status === "ONLINE" ? "Online" : "Offline"}
-      </p>
-
-      {/* Group Members Title */}
-      <h3 className="members-title">Group Members</h3>
-
-      {/* Add Member Button */}
-      <button className="add-member-button" onClick={handleAddMember}>
-        + Add Member
-      </button>
-
-      {/* List of Group Members */}
-      <div className="group-members">
-        {chatRoom.userIds.map((userId) => (
-          <Tile key={userId} className="member-tile">
-            <span>{userId}</span>
-            <button
-              className="remove-member-button"
-              onClick={() => handleRemoveMember(userId)}
-            >
-              -
-            </button>
-          </Tile>
-        ))}
+        <span style={{ marginLeft: "10px" }}>Contact info</span>
       </div>
 
-      {/* Exit/Delete Group Button */}
-      <button className="group-action-button" onClick={handleGroupAction}>
-        {chatRoom.isExited ? "Delete Group" : "Exit Group"}
-      </button>
+      <div
+        className="profile-icon-container"
+        style={{ textAlign: "center", marginTop: "20px" }}
+      >
+        <img
+          src={GroupIcon}
+          alt="Profile"
+          style={{
+            width: "150px",
+            height: "150px",
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+        />
+
+        <h2>{chatRoom.name}</h2>
+      </div>
+
+      <div style={{ marginTop: "30px", padding: "0 20px" }}>
+        <h3 style={{ fontSize: "18px", color: "#333", marginBottom: "10px" }}>
+          Group Members
+        </h3>
+        <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+          {chatRoom.userIds.map((userId) => {
+            return (
+              <Tile
+                key={userId}
+                id={userId}
+                onChatRoomClick={handleChatRoomClick}
+                name={userId}
+                icon={profileIcon}
+              />
+            );
+          })}
+        </ul>
+      </div>
     </div>
   );
 };

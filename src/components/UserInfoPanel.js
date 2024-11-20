@@ -3,10 +3,9 @@ import useGetUserInfo from "../hooks/useGetUserInfo";
 import { formatLastSeen } from "../util/dateUtil";
 import closeButtonIcon from "../assets/CloseButton.png";
 import userChatIcon from "../assets/userChat.png";
-import profileIcon from "../assets/profileIcon.webp"; // Add profile image path
+import profileIcon from "../assets/profileIcon.webp";
 import "./InfoPanel.css";
 import Tile from "./reusableComponents/Tile";
-import ProfileIcon from "../assets/profileIcon.webp";
 import onlineIcon from "../assets/onlineStatus.png";
 import offlineIcon from "../assets/offline.png";
 import { useChatRoom } from "../context/ChatRoomContext";
@@ -22,7 +21,6 @@ const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [commonChatRoomIds, setCommonChatRoomIds] = useState([]);
   const [individualChatId, setIndividualChatId] = useState();
-  const [selfChatId, setSelfChatId] = useState();
   const [lastSeenTimestamp, setLastSeenTimestamp] = useState(null);
   const [onlineStatus, setOnlineStatus] = useState("OFFLINE");
 
@@ -31,9 +29,7 @@ const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
   };
 
   const openChatRoom = () => {
-    if (selfChatId !== null) {
-      setActiveChatRoomId(selfChatId);
-    } else if (individualChatId === null) {
+    if (individualChatId === null) {
       const tempChatRoom = {
         name: username,
         chatRoomType: "INDIVIDUAL",
@@ -58,7 +54,6 @@ const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
         setLastSeenTimestamp(formatLastSeen(data.lastSeenTimestamp));
         setOnlineStatus(data.status);
         setIndividualChatId(data.commonIndividualChatId);
-        setSelfChatId(data.selfChatId);
         setCommonChatRoomIds(data.commonChatRoomIds);
       }
     };
@@ -144,7 +139,7 @@ const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
         <ul style={{ listStyle: "none", paddingLeft: 0 }}>
           {commonChatRoomIds.map((chatRoomId) => {
             const chatRoom = chatRooms.get(chatRoomId);
-
+            console.log(chatRoom);
             return (
               <Tile
                 key={chatRoomId}
