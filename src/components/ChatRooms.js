@@ -141,6 +141,7 @@ const ChatRooms = () => {
         ) : (
           <ChatRoom
             key={activeChatRoomId}
+            handleTempChatRoom={handleCloseAddUser}
             handleCreateGroup={createChatRoom}
             tempChatRoom={tempChatRoom}
             setTempChatRoom={setTempChatRoom}

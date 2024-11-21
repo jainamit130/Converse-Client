@@ -44,6 +44,7 @@ const groupMessagesByDate = (messages, unreadMessageCount) => {
 
 const ChatRoom = ({
   handleCreateGroup,
+  handleTempChatRoom,
   tempChatRoom,
   setTempChatRoom,
   handleChatRoomClick,
@@ -411,6 +412,7 @@ const ChatRoom = ({
       )}
       {isUserInfoPanelOpen && (
         <UserInfoPanel
+          handleTempChatRoom={handleTempChatRoom}
           currentUserId={selectedUserId}
           setTempChatRoom={setTempChatRoom}
           onClose={closeUserInfoPanel}
@@ -418,6 +420,7 @@ const ChatRoom = ({
       )}
       {isGroupInfoPanelOpen && (
         <GroupInfoPanel
+          openUserInfoPanel={openUserInfoPanel}
           chatRoomId={selectedChatRoomId}
           onClose={closeGroupInfoPanel}
         />

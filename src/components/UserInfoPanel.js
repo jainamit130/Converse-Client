@@ -11,7 +11,12 @@ import offlineIcon from "../assets/offline.png";
 import { useChatRoom } from "../context/ChatRoomContext";
 import { useUser } from "../context/UserContext";
 
-const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
+const UserInfoPanel = ({
+  currentUserId,
+  handleTempChatRoom,
+  setTempChatRoom,
+  onClose,
+}) => {
   const { setActiveChatRoomId, userId } = useUser();
   const { chatRooms } = useChatRoom();
   const { fetchUserInfo } = useGetUserInfo();
@@ -38,6 +43,7 @@ const UserInfoPanel = ({ currentUserId, setTempChatRoom, onClose }) => {
         createdById: userId,
       };
       setTempChatRoom(tempChatRoom);
+      handleTempChatRoom(null, true);
     } else {
       setActiveChatRoomId(individualChatId);
     }

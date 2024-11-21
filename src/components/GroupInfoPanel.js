@@ -1,20 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GroupIcon from "../assets/GroupIcon.png";
 import closeButtonIcon from "../assets/CloseButton.png";
 import profileIcon from "../assets/profileIcon.webp";
+import addMemberIcon from "../assets/AddMemberIcon.webp";
+import exitIcon from "../assets/ExitIcon.png";
 import "./InfoPanel.css";
 import Tile from "./reusableComponents/Tile";
 import { useChatRoom } from "../context/ChatRoomContext";
-import { useUser } from "../context/UserContext";
+import useGetGroupInfo from "../hooks/useGetGroupInfo";
 
-const GroupInfoPanel = ({ chatRoomId, onClose }) => {
-  const { setActiveChatRoomId } = useUser();
+const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
   const { chatRooms } = useChatRoom();
-  const chatRoom = chatRooms.get(chatRoomId); // Get chat room details
+  const { fetchGroupInfo } = useGetGroupInfo();
+  const chatRoom = chatRooms.get(chatRoomId);
+  const [members, setMembers] = useState([]);
   const [isVisible, setIsVisible] = useState(true);
 
-  const handleChatRoomClick = () => {
-    console.log("ChatRoom clicked");
+  const handleUserClick = (userId) => {
+    openUserInfoPanel(userId);
   };
 
   const handleAddMember = () => {
@@ -32,6 +35,28 @@ const GroupInfoPanel = ({ chatRoomId, onClose }) => {
       console.log("Exit Group logic here");
     }
   };
+
+  useEffect(() => {
+    const getGroupInfo = async () => {
+      if (chatRoomId) {
+        const data = await fetchGroupInfo(chatRoomId);
+
+        const memberDetails = data.members.map((member) => ({
+          userId: member.userId,
+          username: member.username,
+        }));
+
+        setMembers(memberDetails);
+      }
+    };
+
+    getGroupInfo();
+    setIsVisible(true);
+
+    return () => {
+      setIsVisible(false);
+    };
+  }, [chatRoomId]);
 
   return (
     <div className={`info-panel ${isVisible ? "visible" : ""}`}>
@@ -73,19 +98,30 @@ const GroupInfoPanel = ({ chatRoomId, onClose }) => {
         <h3 style={{ fontSize: "18px", color: "#333", marginBottom: "10px" }}>
           Group Members
         </h3>
+        <Tile
+          name={"Add Member"}
+          onChatRoomClick={() => handleAddMember()}
+          icon={addMemberIcon}
+        />
         <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-          {chatRoom.userIds.map((userId) => {
+          {members.map((member) => {
             return (
               <Tile
-                key={userId}
-                id={userId}
-                onChatRoomClick={handleChatRoomClick}
-                name={userId}
+                key={member.userId}
+                id={member.userId}
+                options={["Option 1", "Option 2"]}
+                onChatRoomClick={() => handleUserClick(member.userId)}
+                name={member.username}
                 icon={profileIcon}
               />
             );
           })}
         </ul>
+        <Tile
+          name={chatRoom?.isExited ? "Delete Group" : "Exit Group"}
+          onChatRoomClick={() => handleRemoveMember()}
+          icon={exitIcon}
+        />
       </div>
     </div>
   );
