@@ -59,7 +59,10 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
   }, [chatRoomId]);
 
   return (
-    <div className={`info-panel ${isVisible ? "visible" : ""}`}>
+    <div
+      className={`info-panel ${isVisible ? "visible" : ""}`}
+      style={{ zIndex: "1000" }}
+    >
       <div
         style={{
           display: "flex",
@@ -103,7 +106,7 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
           onChatRoomClick={() => handleAddMember()}
           icon={addMemberIcon}
         />
-        <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+        <div style={{ position: "relative" }}>
           {members.map((member) => {
             return (
               <Tile
@@ -116,7 +119,7 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
               />
             );
           })}
-        </ul>
+        </div>
         <Tile
           name={chatRoom?.isExited ? "Delete Group" : "Exit Group"}
           onChatRoomClick={() => handleRemoveMember()}

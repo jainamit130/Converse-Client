@@ -245,7 +245,6 @@ const ChatRoom = ({
 
   const openUserInfoPanel = (userId) => {
     closeMessageInfoPanel();
-    closeGroupInfoPanel();
     setSelectedUserId(userId);
     setIsUserInfoPanelOpen(true);
   };
@@ -414,6 +413,7 @@ const ChatRoom = ({
         <UserInfoPanel
           handleTempChatRoom={handleTempChatRoom}
           currentUserId={selectedUserId}
+          isGroupInfoPanelOpen={isGroupInfoPanelOpen}
           setTempChatRoom={setTempChatRoom}
           onClose={closeUserInfoPanel}
         />

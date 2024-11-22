@@ -4,6 +4,7 @@ import { formatLastSeen } from "../util/dateUtil";
 import closeButtonIcon from "../assets/CloseButton.png";
 import userChatIcon from "../assets/userChat.png";
 import profileIcon from "../assets/profileIcon.webp";
+import backButtonIcon from "../assets/backButton.png";
 import "./InfoPanel.css";
 import Tile from "./reusableComponents/Tile";
 import onlineIcon from "../assets/onlineStatus.png";
@@ -14,6 +15,7 @@ import { useUser } from "../context/UserContext";
 const UserInfoPanel = ({
   currentUserId,
   handleTempChatRoom,
+  isGroupInfoPanelOpen,
   setTempChatRoom,
   onClose,
 }) => {
@@ -73,7 +75,10 @@ const UserInfoPanel = ({
   }, [currentUserId]);
 
   return (
-    <div className={`info-panel ${isVisible ? "visible" : ""}`}>
+    <div
+      className={`info-panel ${isVisible ? "visible" : ""}`}
+      style={{ zIndex: "2000" }}
+    >
       {/* Header with Close Button */}
       <div
         style={{
@@ -82,12 +87,22 @@ const UserInfoPanel = ({
           margin: "2px",
         }}
       >
-        <img
-          src={closeButtonIcon}
-          className="close-button"
-          alt="close"
-          onClick={onClose}
-        />
+        {isGroupInfoPanelOpen ? (
+          <img
+            src={backButtonIcon}
+            className="back-button"
+            alt="close"
+            onClick={onClose}
+          />
+        ) : (
+          <img
+            src={closeButtonIcon}
+            className="close-button"
+            alt="close"
+            onClick={onClose}
+          />
+        )}
+
         <span style={{ marginLeft: "10px" }}>Contact info</span>
       </div>
 

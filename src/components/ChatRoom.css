@@ -17,14 +17,18 @@
     display: flex; 
   }
 
+
+  .chat-room-tile:hover .messageOptionsIcon {
+    display: flex; 
+  }
+
   .options-dropdown {
     border-radius: 5px;
-    position: relative;
+    position: absolute;
+    z-index: 2000;
   }
   
   .options-list {
-    z-index: 1000;
-    position: absolute;
     top: 100%;
     right: 0px;
     background-color: rgb(255, 250, 250); 

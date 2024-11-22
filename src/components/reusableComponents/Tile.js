@@ -19,10 +19,11 @@ const Tile = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleDropdown = () => {
+  const toggleDropdown = (event) => {
     if (isOpen) {
       setIsOpen(false);
     } else {
+      event.stopPropagation();
       setIsOpen(true);
     }
   };
@@ -56,6 +57,7 @@ const Tile = ({
     <div key={id} className="chat-room-tile" onClick={handleChatRoomClick}>
       <div
         style={{
+          position: "relative",
           display: "flex",
           width: "100%",
           alignItems: "center",
@@ -74,16 +76,13 @@ const Tile = ({
               <div className="latestMessageTime">{formattedTime}</div>
             )}
             {options && (
-              <>
+              <div style={{ zIndex: "9999" }}>
                 <img
                   src={messageOptionsIcon}
                   className="messageOptionsIcon"
-                  style={{
-                    backgroundColor: "rgb(210, 255, 160)",
-                  }}
-                  onClick={() => toggleDropdown()}
+                  onClick={(event) => toggleDropdown(event)}
                 />
-                <div style={{ position: "absolute" }}>
+                <div>
                   {isOpen && (
                     <OptionsDropdown
                       options={options}
@@ -94,7 +93,7 @@ const Tile = ({
                     />
                   )}
                 </div>
-              </>
+              </div>
             )}
           </div>
           <div
