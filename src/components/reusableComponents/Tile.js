@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TypingIndicator from "../TypingIndicator";
 import { formatTime, parseDate } from "../../util/dateUtil";
 import messageOptionsIcon from "../../assets/messageOptions.png";
@@ -15,35 +15,21 @@ const Tile = ({
   unreadMessageCount,
   activeChatRoomId,
   onChatRoomClick,
+  removeMember,
   icon,
+  isOpen,
+  toggleDropdown,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleDropdown = (event) => {
-    if (isOpen) {
-      setIsOpen(false);
-    } else {
-      event.stopPropagation();
-      setIsOpen(true);
+  const handleSelectOption = async (event, option, id) => {
+    if (option === "Remove Member") {
+      removeMember(id);
     }
-  };
-
-  const handleSelectOption = async (option, message) => {
-    // if (option === "Message info") {
-    //   openMessageInfoPanel(message);
-    // } else if (option === "Delete for everyone") {
-    //   const isSuccess = await handleDeleteMessageForEveryone(message.id);
-    // } else if (option === "Delete for me") {
-    //   const isSuccess = await handleDeleteMessageForMe(message.id);
-    //   if (isSuccess) {
-    //     updateDeletedMessage(chatRoomId, message.id, true);
-    //   }
-    // }
-    // setIsOpen(null);
+    toggleDropdown(event, id);
+    event.stopPropagation();
   };
 
   const handleChatRoomClick = () => {
-    if (onChatRoomClick) {
+    if (!isOpen && onChatRoomClick) {
       onChatRoomClick(id, name);
     }
   };
@@ -54,10 +40,16 @@ const Tile = ({
   const formattedTime = messageDate ? formatTime(messageDate) : null;
 
   return (
-    <div key={id} className="chat-room-tile" onClick={handleChatRoomClick}>
+    <div
+      key={id}
+      className={`chat-room-tile`}
+      style={{
+        zIndex: isOpen ? 1000 : 1,
+      }}
+      onClick={handleChatRoomClick}
+    >
       <div
         style={{
-          position: "relative",
           display: "flex",
           width: "100%",
           alignItems: "center",
@@ -76,19 +68,24 @@ const Tile = ({
               <div className="latestMessageTime">{formattedTime}</div>
             )}
             {options && (
-              <div style={{ zIndex: "9999" }}>
+              <div style={{ position: "absolute", right: "0" }}>
                 <img
                   src={messageOptionsIcon}
                   className="messageOptionsIcon"
-                  onClick={(event) => toggleDropdown(event)}
+                  style={{
+                    position: "relative",
+                    alignItems: "center",
+                    justifyItems: "self-end",
+                  }}
+                  onClick={(event) => toggleDropdown(event, id)}
                 />
-                <div>
+                <div style={{ position: "absolute", right: "200px" }}>
                   {isOpen && (
                     <OptionsDropdown
                       options={options}
                       onSelect={handleSelectOption}
-                      isOpen={isOpen}
-                      toggleDropdown={toggleDropdown}
+                      toggleDropdown={(event) => toggleDropdown(event, id)}
+                      parameter={id}
                       parentButtonRef={"messageOptionsIcon"}
                     />
                   )}

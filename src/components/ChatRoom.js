@@ -50,6 +50,7 @@ const ChatRoom = ({
   handleChatRoomClick,
 }) => {
   const { userId, username, activeChatRoomId } = useUser();
+  const { handleClearChat, handleDeleteChat, handleLeaveChat } = useDelete();
   const [chatRoomId, setChatRoomId] = useState(activeChatRoomId);
   const { sendMessage, connected, handleStopTyping, handleTyping } =
     useWebSocket();
@@ -86,7 +87,7 @@ const ChatRoom = ({
     }
   };
 
-  const handleSelectOption = async (option, message) => {
+  const handleSelectOption = async (event, option, message) => {
     if (option === "Message info") {
       openMessageInfoPanel(message);
     } else if (option === "Delete for everyone") {
@@ -176,6 +177,7 @@ const ChatRoom = ({
 
   useEffect(() => {
     if (chatRoomId) {
+      const chatRoom = chatRooms.get(chatRoomId);
       if (chatRoom) {
         setTypingUsers(chatRoom.typingUsers || []);
         setLastSeen(chatRoom.lastSeen || null);
@@ -230,6 +232,13 @@ const ChatRoom = ({
       addMessageToRoom(chatRoomId, data.getMessagesOfChatRoom, true);
     }
   }, [data, connected, chatRoomId, addMessageToRoom]);
+
+  const exitGroup = (chatRoomId) => {
+    const isSuccess = handleLeaveChat(chatRoomId, userId);
+    if (isSuccess) {
+      exitGroup(chatRoomId);
+    }
+  };
 
   const openMessageInfoPanel = (message) => {
     closeUserInfoPanel();
@@ -330,7 +339,7 @@ const ChatRoom = ({
                       : "message-left"
                   }`}
                 >
-                  <div>
+                  <div style={{ position: "relative" }}>
                     {!message?.deletedForEveryone ? (
                       <div className="messageContent">{message.content}</div>
                     ) : (
@@ -339,7 +348,6 @@ const ChatRoom = ({
                         userId={userId}
                       />
                     )}
-
                     <img
                       src={messageOptionsIcon}
                       className="messageOptionsIcon"
@@ -351,12 +359,17 @@ const ChatRoom = ({
                       }}
                       onClick={() => toggleDropdown(message)}
                     />
-                    <div style={{ position: "absolute" }}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "30px",
+                        right: message.senderId === userId ? "200px" : "100px",
+                      }}
+                    >
                       {isOpen === message.id && (
                         <OptionsDropdown
                           options={options}
                           onSelect={handleSelectOption}
-                          isOpen={isOpen}
                           toggleDropdown={toggleDropdown}
                           parameter={message}
                           parentButtonRef={"messageOptionsIcon"}
@@ -421,6 +434,7 @@ const ChatRoom = ({
       {isGroupInfoPanelOpen && (
         <GroupInfoPanel
           openUserInfoPanel={openUserInfoPanel}
+          handleExitGroup={exitGroup}
           chatRoomId={selectedChatRoomId}
           onClose={closeGroupInfoPanel}
         />

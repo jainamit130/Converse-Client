@@ -9,7 +9,7 @@ const useDelete = () => {
   const { token, userId } = useUser();
   const BASE_URL = config.CHAT_BASE_URL;
 
-  const handleLeaveChat = async (chatRoomId) => {
+  const handleLeaveChat = async (chatRoomId, userId) => {
     setLoading(true);
     try {
       const response = await axios.post(

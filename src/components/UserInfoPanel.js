@@ -160,7 +160,9 @@ const UserInfoPanel = ({
         <ul style={{ listStyle: "none", paddingLeft: 0 }}>
           {commonChatRoomIds.map((chatRoomId) => {
             const chatRoom = chatRooms.get(chatRoomId);
-            console.log(chatRoom);
+            if (!chatRoom || chatRoom.chatRoomType !== "GROUP") {
+              return null;
+            }
             return (
               <Tile
                 key={chatRoomId}

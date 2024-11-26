@@ -85,6 +85,9 @@
 
 
 .chat-room-tile {
+  z-index: 1;
+  position: relative;
+  align-items: center;
   opacity: 0.8;
   display: flex;
   color: #000000;
@@ -95,10 +98,6 @@
   transition: background-color 0.2s;
   padding: 10px;
   box-sizing: border-box;
-}
-
-.chat-room-tile:hover {
-  background-color: #d4d4d4;
 }
 
 .chat-header {

@@ -4,10 +4,12 @@ import closeButtonIcon from "../assets/CloseButton.png";
 import profileIcon from "../assets/profileIcon.webp";
 import addMemberIcon from "../assets/AddMemberIcon.webp";
 import exitIcon from "../assets/ExitIcon.png";
+import deleteIcon from "../assets/DeleteIcon.png";
 import "./InfoPanel.css";
 import Tile from "./reusableComponents/Tile";
 import { useChatRoom } from "../context/ChatRoomContext";
 import useGetGroupInfo from "../hooks/useGetGroupInfo";
+import useDelete from "../hooks/useDelete";
 
 const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
   const { chatRooms } = useChatRoom();
@@ -15,6 +17,8 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
   const chatRoom = chatRooms.get(chatRoomId);
   const [members, setMembers] = useState([]);
   const [isVisible, setIsVisible] = useState(true);
+  const { handleLeaveChat } = useDelete();
+  const [openDropdownId, setOpenDropdownId] = useState(null);
 
   const handleUserClick = (userId) => {
     openUserInfoPanel(userId);
@@ -34,6 +38,16 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
     } else {
       console.log("Exit Group logic here");
     }
+  };
+
+  const toggleDropdown = (event, id) => {
+    console.log(openDropdownId + " - " + id);
+    if (openDropdownId === id) {
+      setOpenDropdownId(null);
+    } else {
+      setOpenDropdownId(id);
+    }
+    event.stopPropagation();
   };
 
   useEffect(() => {
@@ -58,11 +72,17 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
     };
   }, [chatRoomId]);
 
+  const removeMember = async (memberId) => {
+    const isSuccess = handleLeaveChat(chatRoom.id, memberId);
+    if (isSuccess) {
+      setMembers((prevMembers) =>
+        prevMembers.filter((member) => member.userId !== memberId)
+      );
+    }
+  };
+
   return (
-    <div
-      className={`info-panel ${isVisible ? "visible" : ""}`}
-      style={{ zIndex: "1000" }}
-    >
+    <div className={`info-panel ${isVisible ? "visible" : ""}`}>
       <div
         style={{
           display: "flex",
@@ -101,30 +121,33 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
         <h3 style={{ fontSize: "18px", color: "#333", marginBottom: "10px" }}>
           Group Members
         </h3>
-        <Tile
-          name={"Add Member"}
-          onChatRoomClick={() => handleAddMember()}
-          icon={addMemberIcon}
-        />
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", zIndex: "1" }}>
+          <Tile
+            name={"Add Member"}
+            onChatRoomClick={() => handleAddMember()}
+            icon={addMemberIcon}
+          />
           {members.map((member) => {
             return (
               <Tile
                 key={member.userId}
                 id={member.userId}
-                options={["Option 1", "Option 2"]}
+                options={["Remove Member"]}
+                removeMember={removeMember}
                 onChatRoomClick={() => handleUserClick(member.userId)}
                 name={member.username}
+                isOpen={openDropdownId === member.userId}
                 icon={profileIcon}
+                toggleDropdown={toggleDropdown}
               />
             );
           })}
+          <Tile
+            name={chatRoom?.isExited ? "Delete Group" : "Exit Group"}
+            onChatRoomClick={() => handleRemoveMember()}
+            icon={chatRoom?.isExited ? deleteIcon : exitIcon}
+          />
         </div>
-        <Tile
-          name={chatRoom?.isExited ? "Delete Group" : "Exit Group"}
-          onChatRoomClick={() => handleRemoveMember()}
-          icon={exitIcon}
-        />
       </div>
     </div>
   );
