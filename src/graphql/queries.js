@@ -40,6 +40,7 @@ export const GET_MESSAGES_OF_CHAT_ROOM = gql`
     ) {
       id
       senderId
+      type
       timestamp
       content
       status

@@ -242,6 +242,8 @@ export const WebSocketProvider = ({ children }) => {
               }
 
               delete subscriptions.current[chatRoomId];
+
+              exitGroup(chatRoomId);
             }
           }
         }

@@ -11,32 +11,29 @@ import { useChatRoom } from "../context/ChatRoomContext";
 import useGetGroupInfo from "../hooks/useGetGroupInfo";
 import useDelete from "../hooks/useDelete";
 
-const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
+const GroupInfoPanel = ({
+  chatRoomId,
+  openUserInfoPanel,
+  onClose,
+  removeMember,
+  handleDeleteGroup,
+}) => {
   const { chatRooms } = useChatRoom();
   const { fetchGroupInfo } = useGetGroupInfo();
   const chatRoom = chatRooms.get(chatRoomId);
   const [members, setMembers] = useState([]);
   const [isVisible, setIsVisible] = useState(true);
-  const { handleLeaveChat } = useDelete();
   const [openDropdownId, setOpenDropdownId] = useState(null);
-
-  const handleUserClick = (userId) => {
-    openUserInfoPanel(userId);
-  };
 
   const handleAddMember = () => {
     console.log("Add Member clicked");
   };
 
-  const handleRemoveMember = (userId) => {
-    console.log("Remove member:", userId);
-  };
-
   const handleGroupAction = () => {
     if (chatRoom.isExited) {
-      console.log("Delete Group logic here");
+      handleDeleteGroup(chatRoom.id);
     } else {
-      console.log("Exit Group logic here");
+      removeMember(chatRoom.id);
     }
   };
 
@@ -71,15 +68,6 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
       setIsVisible(false);
     };
   }, [chatRoomId]);
-
-  const removeMember = async (memberId) => {
-    const isSuccess = handleLeaveChat(chatRoom.id, memberId);
-    if (isSuccess) {
-      setMembers((prevMembers) =>
-        prevMembers.filter((member) => member.userId !== memberId)
-      );
-    }
-  };
 
   return (
     <div className={`info-panel ${isVisible ? "visible" : ""}`}>
@@ -134,7 +122,7 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
                 id={member.userId}
                 options={["Remove Member"]}
                 removeMember={removeMember}
-                onChatRoomClick={() => handleUserClick(member.userId)}
+                onChatRoomClick={() => removeMember(chatRoomId, member.userId)}
                 name={member.username}
                 isOpen={openDropdownId === member.userId}
                 icon={profileIcon}
@@ -144,7 +132,7 @@ const GroupInfoPanel = ({ chatRoomId, openUserInfoPanel, onClose }) => {
           })}
           <Tile
             name={chatRoom?.isExited ? "Delete Group" : "Exit Group"}
-            onChatRoomClick={() => handleRemoveMember()}
+            onChatRoomClick={() => handleGroupAction(chatRoomId)}
             icon={chatRoom?.isExited ? deleteIcon : exitIcon}
           />
         </div>

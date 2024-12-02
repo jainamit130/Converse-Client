@@ -9,12 +9,15 @@ const useDelete = () => {
   const { token, userId } = useUser();
   const BASE_URL = config.CHAT_BASE_URL;
 
-  const handleLeaveChat = async (chatRoomId, userId) => {
+  const handleLeaveChat = async (chatRoomId, toRemoveUserId) => {
     setLoading(true);
     try {
       const response = await axios.post(
         `${BASE_URL}/chat/groups/remove/${chatRoomId}`,
-        [userId],
+        {
+          memberIds: [toRemoveUserId],
+          removedBy: userId,
+        },
         {
           headers: {
             "Content-Type": "application/json",

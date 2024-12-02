@@ -50,10 +50,17 @@ const ChatRoom = ({
   handleChatRoomClick,
 }) => {
   const { userId, username, activeChatRoomId } = useUser();
+  const { clearChat, deleteChat, exitGroup } = useChatRoom();
   const { handleClearChat, handleDeleteChat, handleLeaveChat } = useDelete();
   const [chatRoomId, setChatRoomId] = useState(activeChatRoomId);
-  const { sendMessage, connected, handleStopTyping, handleTyping } =
-    useWebSocket();
+  const {
+    sendMessage,
+    connected,
+    handleStopTyping,
+    handleTyping,
+    unsubscribeChatRoom,
+  } = useWebSocket();
+
   const [message, setMessage] = useState("");
   const {
     messages,
@@ -233,10 +240,28 @@ const ChatRoom = ({
     }
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
-  const exitGroup = (chatRoomId) => {
-    const isSuccess = handleLeaveChat(chatRoomId, userId);
+  const exitGroupAction = (chatRoomId, memberId = null) => {
+    if (memberId === null) {
+      memberId = userId;
+    }
+    const isSuccess = handleLeaveChat(chatRoomId, memberId);
     if (isSuccess) {
       exitGroup(chatRoomId);
+    }
+  };
+
+  const deleteGroupAction = (chatRoomId) => {
+    const isSuccess = handleDeleteChat(chatRoomId);
+    if (isSuccess) {
+      if (chatRoomId) unsubscribeChatRoom(chatRoomId);
+      deleteChat(chatRoomId);
+    }
+  };
+
+  const clearChatAction = (chatRoomId) => {
+    const isSuccess = handleClearChat(chatRoomId);
+    if (isSuccess) {
+      clearChat(chatRoomId);
     }
   };
 
@@ -305,6 +330,9 @@ const ChatRoom = ({
         typingUsers={typingUsers}
         onlineUsers={onlineUsers}
         lastSeen={lastSeen}
+        handleExitGroup={exitGroupAction}
+        handleDeleteGroup={deleteGroupAction}
+        handleClearChat={clearChatAction}
       />
 
       <div className="chat-messages" ref={chatMessagesRef}>
@@ -326,68 +354,76 @@ const ChatRoom = ({
                   </div>
                 );
               }
+              if (message.type === "EXITED") {
+                return (
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <div className="date-header">{message.content}</div>
+                  </div>
+                );
+              } else if (message.type === "MESSAGE" || !message.type) {
+                const messageDate = parseDate(message.timestamp);
+                const formattedTime = formatTime(messageDate);
 
-              const messageDate = parseDate(message.timestamp);
-              const formattedTime = formatTime(messageDate);
-
-              return (
-                <div
-                  key={message.id}
-                  className={`message ${
-                    message.senderId === userId
-                      ? "message-right"
-                      : "message-left"
-                  }`}
-                >
-                  <div style={{ position: "relative" }}>
-                    {!message?.deletedForEveryone ? (
-                      <div className="messageContent">{message.content}</div>
-                    ) : (
-                      <DeletedMessageStyle
-                        senderId={message.senderId}
-                        userId={userId}
-                      />
-                    )}
-                    <img
-                      src={messageOptionsIcon}
-                      className="messageOptionsIcon"
-                      style={{
-                        backgroundColor:
-                          message.senderId !== userId
-                            ? "white"
-                            : "rgb(210, 255, 160)",
-                      }}
-                      onClick={() => toggleDropdown(message)}
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "30px",
-                        right: message.senderId === userId ? "200px" : "100px",
-                      }}
-                    >
-                      {isOpen === message.id && (
-                        <OptionsDropdown
-                          options={options}
-                          onSelect={handleSelectOption}
-                          toggleDropdown={toggleDropdown}
-                          parameter={message}
-                          parentButtonRef={"messageOptionsIcon"}
+                return (
+                  <div
+                    key={message.id}
+                    className={`message ${
+                      message.senderId === userId
+                        ? "message-right"
+                        : "message-left"
+                    }`}
+                  >
+                    <div style={{ position: "relative" }}>
+                      {!message?.deletedForEveryone ? (
+                        <div className="messageContent">{message.content}</div>
+                      ) : (
+                        <DeletedMessageStyle
+                          senderId={message.senderId}
+                          userId={userId}
                         />
                       )}
+                      <img
+                        src={messageOptionsIcon}
+                        className="messageOptionsIcon"
+                        style={{
+                          backgroundColor:
+                            message.senderId !== userId
+                              ? "white"
+                              : "rgb(210, 255, 160)",
+                        }}
+                        onClick={() => toggleDropdown(message)}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "30px",
+                          right:
+                            message.senderId === userId ? "200px" : "100px",
+                        }}
+                      >
+                        {isOpen === message.id && (
+                          <OptionsDropdown
+                            options={options}
+                            onSelect={handleSelectOption}
+                            toggleDropdown={toggleDropdown}
+                            parameter={message}
+                            parentButtonRef={"messageOptionsIcon"}
+                          />
+                        )}
+                      </div>
                     </div>
+                    {
+                      <MessageStatusIcon
+                        key={message.id}
+                        deletedForEveryone={message.deletedForEveryone}
+                        isSender={message.senderId === userId}
+                        status={message.status}
+                        formattedTime={formattedTime}
+                      />
+                    }
                   </div>
-                  {
-                    <MessageStatusIcon
-                      key={message.id}
-                      deletedForEveryone={message.deletedForEveryone}
-                      isSender={message.senderId === userId}
-                      status={message.status}
-                      formattedTime={formattedTime}
-                    />
-                  }
-                </div>
-              );
+                );
+              }
             })}
           </div>
         ))}
@@ -437,6 +473,8 @@ const ChatRoom = ({
           handleExitGroup={exitGroup}
           chatRoomId={selectedChatRoomId}
           onClose={closeGroupInfoPanel}
+          removeMember={exitGroupAction}
+          handleDeleteGroup={deleteGroupAction}
         />
       )}
     </div>

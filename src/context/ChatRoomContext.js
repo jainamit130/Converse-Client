@@ -347,13 +347,18 @@ export const ChatRoomProvider = ({ children }) => {
       setMessages((prevMessages) => {
         const currentMessages = prevMessages[chatRoomId] || [];
         let updatedMessages;
+
         const chatRoom = chatRooms.get(chatRoomId);
         const messagesLoaded = chatRoom?.messagesLoaded;
 
-        if (Array.isArray(messageOrMessages) && base && !messagesLoaded) {
+        const processedMessages = Array.isArray(messageOrMessages)
+          ? messageOrMessages.map((msg) => ({ ...msg, type: "MESSAGE" }))
+          : { ...messageOrMessages, type: "MESSAGE" };
+
+        if (Array.isArray(processedMessages) && base && !messagesLoaded) {
           updatedMessages = {
             ...prevMessages,
-            [chatRoomId]: [...messageOrMessages, ...currentMessages],
+            [chatRoomId]: [...processedMessages, ...currentMessages],
           };
 
           setChatRooms((prevChatRooms) => {
@@ -365,10 +370,10 @@ export const ChatRoomProvider = ({ children }) => {
 
             return newChatRooms;
           });
-        } else if (!Array.isArray(messageOrMessages)) {
+        } else if (!Array.isArray(processedMessages)) {
           updatedMessages = {
             ...prevMessages,
-            [chatRoomId]: [...currentMessages, messageOrMessages],
+            [chatRoomId]: [...currentMessages, processedMessages],
           };
         }
 

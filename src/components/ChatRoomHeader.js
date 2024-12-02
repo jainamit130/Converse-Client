@@ -3,7 +3,7 @@ import profileIcon from "../assets/profileIcon.webp";
 import { formatLastSeen } from "../util/dateUtil";
 import groupOptionsIcon from "../assets/groupOptionsIcon.png";
 import OptionsDropdown from "./reusableComponents/OptionsDropdown";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useDelete from "../hooks/useDelete";
 import { useChatRoom } from "../context/ChatRoomContext";
 import { useWebSocket } from "../context/WebSocketContext";
@@ -16,12 +16,11 @@ const ChatRoomHeader = ({
   onlineUsers,
   lastSeen,
   openInfo,
+  handleExitGroup,
+  handleDeleteGroup,
+  handleClearChat,
 }) => {
-  const { handleClearChat, handleDeleteChat, handleLeaveChat } = useDelete();
   const lastSeenFormat = lastSeen ? formatLastSeen(lastSeen) : null;
-  const { userId } = useUser();
-  const { clearChat, deleteChat, exitGroup } = useChatRoom();
-  const { unsubscribeChatRoom } = useWebSocket();
   const [isOpen, setIsOpen] = useState(null);
   const [options, setOptions] = useState(() => {
     let defaultOptions = ["Clear Chat"];
@@ -50,26 +49,20 @@ const ChatRoomHeader = ({
 
   const handleSelectOption = async (event, option, message) => {
     if (option === "Clear Chat") {
-      const isSuccess = handleClearChat(chatRoom.id);
-      if (isSuccess) {
-        clearChat(chatRoom?.id);
-      }
+      handleClearChat(chatRoom.id);
     } else if (option === "Delete Chat" || option === "Delete Group") {
-      const isSuccess = handleDeleteChat(chatRoom.id);
-      if (isSuccess) {
-        if (chatRoom?.id) unsubscribeChatRoom(chatRoom?.id);
-        deleteChat(chatRoom?.id);
-      }
+      handleDeleteGroup(chatRoom.id);
     } else if (option === "Exit Group") {
-      const isSuccess = handleLeaveChat(chatRoom.id, userId);
-      if (isSuccess) {
-        exitGroup(chatRoom.id);
-        let defaultOptions = ["Clear Chat", "Delete Group"];
-        setOptions(defaultOptions);
-      }
+      handleExitGroup(chatRoom.id);
     }
     setIsOpen(null);
   };
+
+  useEffect(() => {
+    if (chatRoom?.isExited) {
+      setOptions(["Clear Chat", "Delete Group"]);
+    }
+  }, [chatRoom]);
 
   return (
     <div className="chat-details">
