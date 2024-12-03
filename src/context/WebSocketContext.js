@@ -207,7 +207,8 @@ export const WebSocketProvider = ({ children }) => {
 
               if (existingRoom) {
                 const unreadMessageCount =
-                  (activeChatRoom !== chatRoomId &&
+                  (chatMessage.type === "MESSAGE" &&
+                    activeChatRoom !== chatRoomId &&
                     userId !== chatMessage.senderId) ||
                   isInactive
                     ? existingRoom.unreadMessageCount + 1

@@ -240,7 +240,7 @@ const ChatRoom = ({
     }
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
-  const exitGroupAction = (chatRoomId, memberId = null) => {
+  const exitGroupAction = (memberId) => {
     if (memberId === null) {
       memberId = userId;
     }
@@ -248,6 +248,7 @@ const ChatRoom = ({
     if (isSuccess) {
       exitGroup(chatRoomId);
     }
+    return isSuccess;
   };
 
   const deleteGroupAction = (chatRoomId) => {
@@ -361,6 +362,7 @@ const ChatRoom = ({
                   </div>
                 );
               } else if (message.type === "MESSAGE" || !message.type) {
+                console.log(message);
                 const messageDate = parseDate(message.timestamp);
                 const formattedTime = formatTime(messageDate);
 
@@ -470,7 +472,6 @@ const ChatRoom = ({
       {isGroupInfoPanelOpen && (
         <GroupInfoPanel
           openUserInfoPanel={openUserInfoPanel}
-          handleExitGroup={exitGroup}
           chatRoomId={selectedChatRoomId}
           onClose={closeGroupInfoPanel}
           removeMember={exitGroupAction}

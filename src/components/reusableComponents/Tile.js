@@ -14,23 +14,21 @@ const Tile = ({
   typingUsers,
   unreadMessageCount,
   activeChatRoomId,
-  onChatRoomClick,
-  removeMember,
+  tileClick,
+  optionsClicked,
   icon,
   isOpen,
   toggleDropdown,
 }) => {
   const handleSelectOption = async (event, option, id) => {
-    if (option === "Remove Member") {
-      removeMember(id);
-    }
+    optionsClicked(option, id);
     toggleDropdown(event, id);
     event.stopPropagation();
   };
 
   const handleChatRoomClick = () => {
-    if (!isOpen && onChatRoomClick) {
-      onChatRoomClick(id, name);
+    if (!isOpen && tileClick) {
+      tileClick(id, name);
     }
   };
 

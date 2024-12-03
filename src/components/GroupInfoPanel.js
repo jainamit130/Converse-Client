@@ -37,6 +37,17 @@ const GroupInfoPanel = ({
     }
   };
 
+  const handleOptionsClick = (option, id) => {
+    if (option === "Remove Member") {
+      const isSuccess = removeMember(id);
+      if (isSuccess) {
+        setMembers((prevMembers) =>
+          prevMembers.filter((member) => member.userId !== id)
+        );
+      }
+    }
+  };
+
   const toggleDropdown = (event, id) => {
     console.log(openDropdownId + " - " + id);
     if (openDropdownId === id) {
@@ -112,7 +123,7 @@ const GroupInfoPanel = ({
         <div style={{ position: "relative", zIndex: "1" }}>
           <Tile
             name={"Add Member"}
-            onChatRoomClick={() => handleAddMember()}
+            tileClick={() => handleAddMember()}
             icon={addMemberIcon}
           />
           {members.map((member) => {
@@ -121,8 +132,8 @@ const GroupInfoPanel = ({
                 key={member.userId}
                 id={member.userId}
                 options={["Remove Member"]}
-                removeMember={removeMember}
-                onChatRoomClick={() => removeMember(chatRoomId, member.userId)}
+                optionsClicked={handleOptionsClick}
+                tileClick={() => openUserInfoPanel(chatRoomId, member.userId)}
                 name={member.username}
                 isOpen={openDropdownId === member.userId}
                 icon={profileIcon}
@@ -132,7 +143,7 @@ const GroupInfoPanel = ({
           })}
           <Tile
             name={chatRoom?.isExited ? "Delete Group" : "Exit Group"}
-            onChatRoomClick={() => handleGroupAction(chatRoomId)}
+            tileClick={() => handleGroupAction(chatRoomId)}
             icon={chatRoom?.isExited ? deleteIcon : exitIcon}
           />
         </div>

@@ -53,7 +53,7 @@ const ChatRoomHeader = ({
     } else if (option === "Delete Chat" || option === "Delete Group") {
       handleDeleteGroup(chatRoom.id);
     } else if (option === "Exit Group") {
-      handleExitGroup(chatRoom.id);
+      handleExitGroup();
     }
     setIsOpen(null);
   };

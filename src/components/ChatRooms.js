@@ -121,7 +121,7 @@ const ChatRooms = () => {
             typingUsers={room.typingUsers}
             unreadMessageCount={room.unreadMessageCount}
             activeChatRoomId={activeChatRoomId}
-            onChatRoomClick={handleChatRoomClick}
+            tileClick={handleChatRoomClick}
           />
         ))}
         {showTempChatRoom && (
@@ -130,7 +130,7 @@ const ChatRooms = () => {
             name={tempChatRoom.name}
             icon={GroupIcon}
             activeChatRoomId={activeChatRoomId}
-            onChatRoomClick={handleChatRoomClick}
+            tileClick={handleChatRoomClick}
           />
         )}
       </div>

@@ -167,7 +167,7 @@ const UserInfoPanel = ({
               <Tile
                 key={chatRoomId}
                 id={chatRoomId}
-                onChatRoomClick={handleChatRoomClick}
+                tileClick={handleChatRoomClick}
                 name={chatRoom.name}
                 icon={profileIcon}
               />
