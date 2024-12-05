@@ -4,6 +4,7 @@ import { GET_MESSAGES_OF_CHAT_ROOM } from "../graphql/queries";
 import { useWebSocket } from "../context/WebSocketContext";
 import { useUser } from "../context/UserContext";
 import { useChatRoom } from "../context/ChatRoomContext";
+import sendButtonIcon from "../assets/SendButton.png";
 import {
   parseDate,
   formatMessageDate,
@@ -241,13 +242,10 @@ const ChatRoom = ({
   }, [data, connected, chatRoomId, addMessageToRoom]);
 
   const exitGroupAction = (memberId) => {
-    if (memberId === null) {
+    if (!memberId) {
       memberId = userId;
     }
     const isSuccess = handleLeaveChat(chatRoomId, memberId);
-    if (isSuccess) {
-      exitGroup(chatRoomId);
-    }
     return isSuccess;
   };
 
@@ -440,23 +438,44 @@ const ChatRoom = ({
           e.target.reset();
         }}
         className="chat-input"
+        style={{
+          backgroundColor: chatRoom.isExited ? "rgb(155,155,155)" : "",
+        }}
       >
-        <input
-          onKeyDown={(event) => handleTyping(chatRoomId, event)}
-          type="text"
-          value={message}
-          onChange={handleChange}
-          style={{ outline: "None", border: "None" }}
-          name="messageContent"
-          placeholder="Type your message..."
-          required
-        />
-        {message.trim().length > 0 && <button type="submit">Send</button>}
+        {chatRoom.isExited ? (
+          <div
+            style={{
+              opacity: "0.7",
+              fontSize: "17px",
+            }}
+          >
+            You can't send message to this group because you're no longer a
+            member.
+          </div>
+        ) : (
+          <input
+            onKeyDown={(event) => handleTyping(chatRoomId, event)}
+            type="text"
+            value={message}
+            onChange={handleChange}
+            style={{ outline: "none", border: "none" }}
+            name="messageContent"
+            placeholder="Type your message..."
+            required
+          />
+        )}
+
+        {message.trim().length > 0 && (
+          <button type="submit" className="sendButton">
+            <img src={sendButtonIcon} alt="Submit" />
+          </button>
+        )}
       </form>
 
       {isMessageInfoPanelOpen && (
         <MessageInfoPanel
           message={selectedMessage}
+          userClicked={openUserInfoPanel}
           onClose={closeMessageInfoPanel}
         />
       )}

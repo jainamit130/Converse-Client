@@ -14,7 +14,7 @@ import ProfileIcon from "../assets/profileIcon.webp";
 import { useUser } from "../context/UserContext";
 import MessageStatusIcon from "./MessageStatusIcon";
 
-const MessageInfoPanel = ({ message, onClose }) => {
+const MessageInfoPanel = ({ message, userClicked, onClose }) => {
   const { getMessageInfo } = useMessageInfo();
   const { userId, username } = useUser();
   const [messageInfo, setMessageInfo] = useState(null);
@@ -45,28 +45,28 @@ const MessageInfoPanel = ({ message, onClose }) => {
   const recipients = {};
 
   Object.entries(messageInfo.deliveryReceiptsByTime || {}).forEach(
-    ([timestamp, usernames]) => {
-      usernames.forEach((recipientName) => {
-        if (username !== recipientName) {
-          // Exclude sender from delivery recipients
-          if (!recipients[recipientName]) {
-            recipients[recipientName] = {};
+    ([timestamp, userDetails]) => {
+      userDetails.forEach((userDetail) => {
+        if (username !== userDetail.username && userDetail.id) {
+          if (!recipients[userDetail.username]) {
+            recipients[userDetail.username] = {};
           }
-          recipients[recipientName].delivered = timestamp;
+          recipients[userDetail.username].delivered = timestamp;
+          recipients[userDetail.username].id = userDetail.id;
         }
       });
     }
   );
 
   Object.entries(messageInfo.readReceiptsByTime || {}).forEach(
-    ([timestamp, usernames]) => {
-      usernames.forEach((recipientName) => {
-        if (username !== recipientName) {
-          // Exclude sender from read recipients
-          if (!recipients[recipientName]) {
-            recipients[recipientName] = {};
+    ([timestamp, userDetails]) => {
+      userDetails.forEach((userDetail) => {
+        if (username !== userDetail.username && userDetail.id) {
+          if (!recipients[userDetail.username]) {
+            recipients[userDetail.username] = {};
           }
-          recipients[recipientName].read = timestamp;
+          recipients[userDetail.username].read = timestamp;
+          recipients[userDetail.username].id = userDetail.id;
         }
       });
     }
@@ -108,6 +108,8 @@ const MessageInfoPanel = ({ message, onClose }) => {
             .map(([username, receipt]) => (
               <Tile
                 key={username}
+                id={receipt.id}
+                tileClick={userClicked}
                 name={username}
                 icon={ProfileIcon}
                 smallerInfo={
@@ -139,6 +141,8 @@ const MessageInfoPanel = ({ message, onClose }) => {
             .map(([username, receipt]) => (
               <Tile
                 key={username}
+                id={receipt.id}
+                tileClick={userClicked}
                 name={username}
                 icon={ProfileIcon}
                 smallerInfo={

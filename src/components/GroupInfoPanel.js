@@ -10,6 +10,7 @@ import Tile from "./reusableComponents/Tile";
 import { useChatRoom } from "../context/ChatRoomContext";
 import useGetGroupInfo from "../hooks/useGetGroupInfo";
 import useDelete from "../hooks/useDelete";
+import { useUser } from "../context/UserContext";
 
 const GroupInfoPanel = ({
   chatRoomId,
@@ -20,6 +21,7 @@ const GroupInfoPanel = ({
 }) => {
   const { chatRooms } = useChatRoom();
   const { fetchGroupInfo } = useGetGroupInfo();
+  const { userId } = useUser();
   const chatRoom = chatRooms.get(chatRoomId);
   const [members, setMembers] = useState([]);
   const [isVisible, setIsVisible] = useState(true);
@@ -33,7 +35,10 @@ const GroupInfoPanel = ({
     if (chatRoom.isExited) {
       handleDeleteGroup(chatRoom.id);
     } else {
-      removeMember(chatRoom.id);
+      const isSuccess = removeMember();
+      if (isSuccess) {
+        removeMemberFromGroupDetails(userId);
+      }
     }
   };
 
@@ -41,11 +46,15 @@ const GroupInfoPanel = ({
     if (option === "Remove Member") {
       const isSuccess = removeMember(id);
       if (isSuccess) {
-        setMembers((prevMembers) =>
-          prevMembers.filter((member) => member.userId !== id)
-        );
+        removeMemberFromGroupDetails(id);
       }
     }
+  };
+
+  const removeMemberFromGroupDetails = (id) => {
+    setMembers((prevMembers) =>
+      prevMembers.filter((member) => member.userId !== id)
+    );
   };
 
   const toggleDropdown = (event, id) => {

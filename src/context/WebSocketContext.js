@@ -158,7 +158,7 @@ export const WebSocketProvider = ({ children }) => {
   useEffect(() => {
     if (stompClient && connected) {
       chatRooms.forEach((chatRoom) => {
-        subscribeToChatRoom(chatRoom.id);
+        if (!chatRoom?.isExited) subscribeToChatRoom(chatRoom.id);
       });
     }
   }, [stompClient, connected, chatRooms]);
@@ -243,7 +243,7 @@ export const WebSocketProvider = ({ children }) => {
               }
 
               delete subscriptions.current[chatRoomId];
-
+              console.log(subscriptionData);
               exitGroup(chatRoomId);
             }
           }
