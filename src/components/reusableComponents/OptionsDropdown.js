@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from "react";
 const OptionsDropdown = ({
   options,
   onSelect,
-  isOpen,
   toggleDropdown,
   parameter,
   parentButtonRef,
@@ -17,7 +16,7 @@ const OptionsDropdown = ({
         !dropdownRef.current.contains(event.target) &&
         !event.target.classList.contains(parentButtonRef)
       ) {
-        toggleDropdown(null);
+        toggleDropdown(event);
       }
     };
 
@@ -29,15 +28,18 @@ const OptionsDropdown = ({
 
   return (
     <div ref={dropdownRef} className="options-dropdown">
-      {isOpen && (
+      {
         <ul className="options-list">
           {options.map((option, index) => (
-            <li key={index} onClick={() => onSelect(option, parameter)}>
+            <li
+              key={index}
+              onClick={(event) => onSelect(event, option, parameter)}
+            >
               {option}
             </li>
           ))}
         </ul>
-      )}
+      }
     </div>
   );
 };

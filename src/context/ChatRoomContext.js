@@ -347,6 +347,7 @@ export const ChatRoomProvider = ({ children }) => {
       setMessages((prevMessages) => {
         const currentMessages = prevMessages[chatRoomId] || [];
         let updatedMessages;
+
         const chatRoom = chatRooms.get(chatRoomId);
         const messagesLoaded = chatRoom?.messagesLoaded;
 

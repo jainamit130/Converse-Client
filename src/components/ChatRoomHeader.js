@@ -3,10 +3,11 @@ import profileIcon from "../assets/profileIcon.webp";
 import { formatLastSeen } from "../util/dateUtil";
 import groupOptionsIcon from "../assets/groupOptionsIcon.png";
 import OptionsDropdown from "./reusableComponents/OptionsDropdown";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useDelete from "../hooks/useDelete";
 import { useChatRoom } from "../context/ChatRoomContext";
 import { useWebSocket } from "../context/WebSocketContext";
+import { useUser } from "../context/UserContext";
 
 const ChatRoomHeader = ({
   chatRoom,
@@ -14,11 +15,12 @@ const ChatRoomHeader = ({
   typingUsers,
   onlineUsers,
   lastSeen,
+  openInfo,
+  handleExitGroup,
+  handleDeleteGroup,
+  handleClearChat,
 }) => {
-  const { handleClearChat, handleDeleteChat, handleLeaveChat } = useDelete();
   const lastSeenFormat = lastSeen ? formatLastSeen(lastSeen) : null;
-  const { clearChat, deleteChat, exitGroup } = useChatRoom();
-  const { unsubscribeChatRoom } = useWebSocket();
   const [isOpen, setIsOpen] = useState(null);
   const [options, setOptions] = useState(() => {
     let defaultOptions = ["Clear Chat"];
@@ -36,79 +38,80 @@ const ChatRoomHeader = ({
     return defaultOptions;
   });
 
-  const toggleDropdown = (chatRoomId) => {
+  const toggleDropdown = (event, chatRoomId) => {
     if (isOpen) {
       setIsOpen(null);
     } else {
+      event.stopPropagation();
       setIsOpen(chatRoomId);
     }
   };
 
-  const handleSelectOption = async (option) => {
+  const handleSelectOption = async (event, option, message) => {
     if (option === "Clear Chat") {
-      const isSuccess = handleClearChat(chatRoom.id);
-      if (isSuccess) {
-        clearChat(chatRoom?.id);
-      }
+      handleClearChat(chatRoom.id);
     } else if (option === "Delete Chat" || option === "Delete Group") {
-      const isSuccess = handleDeleteChat(chatRoom.id);
-      if (isSuccess) {
-        if (chatRoom?.id) unsubscribeChatRoom(chatRoom?.id);
-        deleteChat(chatRoom?.id);
-      }
+      handleDeleteGroup(chatRoom.id);
     } else if (option === "Exit Group") {
-      const isSuccess = handleLeaveChat(chatRoom.id);
-      if (isSuccess) {
-        exitGroup(chatRoom.id);
-        let defaultOptions = ["Clear Chat", "Delete Group"];
-        setOptions(defaultOptions);
-      }
+      handleExitGroup();
     }
     setIsOpen(null);
   };
 
+  useEffect(() => {
+    if (chatRoom?.isExited) {
+      setOptions(["Clear Chat", "Delete Group"]);
+    }
+  }, [chatRoom]);
+
   return (
     <div className="chat-details">
-      <img src={profileIcon} className="chatRoomIcon" />
-      <div>
-        <div className="chat-room-name">{chatRoomName}</div>
-        <div className="typing-status">
-          <TypingIndicator typingUsers={typingUsers} />
-        </div>
-        {!typingUsers.length && (
-          <div className="online-status">
-            {chatRoom?.chatRoomType === "SELF" ? (
-              <span>online</span>
-            ) : chatRoom?.chatRoomType === "INDIVIDUAL" ? (
-              onlineUsers.size === 1 ? (
-                <span>online</span>
-              ) : (
-                lastSeenFormat
-              )
-            ) : chatRoom?.chatRoomType === "GROUP" ? (
-              onlineUsers.size > 0 ? (
-                <span>{onlineUsers.size} online</span>
-              ) : null
-            ) : null}
+      <div
+        style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+        onClick={openInfo}
+      >
+        <img src={profileIcon} className="chatRoomIcon" />
+        <div style={{ cursor: "pointer" }}>
+          <div className="chat-room-name">{chatRoomName}</div>
+          <div className="typing-status">
+            <TypingIndicator typingUsers={typingUsers} />
           </div>
-        )}
+          {!typingUsers.length && (
+            <div className="online-status">
+              {chatRoom?.chatRoomType === "SELF" ? (
+                <span>online</span>
+              ) : chatRoom?.chatRoomType === "INDIVIDUAL" ? (
+                onlineUsers.size === 1 ? (
+                  <span>online</span>
+                ) : (
+                  lastSeenFormat
+                )
+              ) : chatRoom?.chatRoomType === "GROUP" ? (
+                onlineUsers.size > 0 ? (
+                  <span>{onlineUsers.size} online</span>
+                ) : null
+              ) : null}
+            </div>
+          )}
+        </div>
       </div>
       <div className="groupOptions">
         <img
           src={groupOptionsIcon}
           className="groupOptionsIcon"
-          onClick={() => toggleDropdown(chatRoom?.id)}
+          onClick={(event) => toggleDropdown(event, chatRoom?.id)}
         />
-        {isOpen === chatRoom?.id && (
-          <OptionsDropdown
-            options={options}
-            onSelect={handleSelectOption}
-            isOpen={isOpen}
-            toggleDropdown={toggleDropdown}
-            parameter={chatRoom?.id}
-            parentButtonRef={"groupOptionsIcon"}
-          />
-        )}
+        <div style={{ position: "absolute", right: "200px" }}>
+          {isOpen === chatRoom?.id && (
+            <OptionsDropdown
+              options={options}
+              onSelect={handleSelectOption}
+              toggleDropdown={toggleDropdown}
+              parameter={chatRoom?.id}
+              parentButtonRef={"groupOptionsIcon"}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

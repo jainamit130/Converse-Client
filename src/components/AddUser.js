@@ -156,6 +156,7 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
           <input
             type="text"
             value={groupName}
+            className="searchUsers"
             onChange={(e) => setGroupName(e.target.value)}
             placeholder="Enter group name"
           />

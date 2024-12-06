@@ -1,21 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TypingIndicator from "../TypingIndicator";
 import { formatTime, parseDate } from "../../util/dateUtil";
+import messageOptionsIcon from "../../assets/messageOptions.png";
+import OptionsDropdown from "./OptionsDropdown";
+import "../ChatRoom.css";
 
 const Tile = ({
   id,
   name,
+  options,
   latestMessageTimestamp,
   smallerInfo,
   typingUsers,
   unreadMessageCount,
   activeChatRoomId,
-  onChatRoomClick,
+  tileClick,
+  optionsClicked,
   icon,
+  isOpen,
+  toggleDropdown,
 }) => {
+  const handleSelectOption = async (event, option, id) => {
+    optionsClicked(option, id);
+    toggleDropdown(event, id);
+    event.stopPropagation();
+  };
+
   const handleChatRoomClick = () => {
-    if (onChatRoomClick) {
-      onChatRoomClick(id, name);
+    if (!isOpen && tileClick) {
+      tileClick(id, name);
     }
   };
 
@@ -25,7 +38,14 @@ const Tile = ({
   const formattedTime = messageDate ? formatTime(messageDate) : null;
 
   return (
-    <div key={id} className="chat-room-tile" onClick={handleChatRoomClick}>
+    <div
+      key={id}
+      className={`chat-room-tile`}
+      style={{
+        zIndex: isOpen ? 1000 : 1,
+      }}
+      onClick={handleChatRoomClick}
+    >
       <div
         style={{
           display: "flex",
@@ -44,6 +64,31 @@ const Tile = ({
             <div className="chatRoomTitle smallerInfo">{name}</div>
             {formattedTime && (
               <div className="latestMessageTime">{formattedTime}</div>
+            )}
+            {options && (
+              <div style={{ position: "absolute", right: "0" }}>
+                <img
+                  src={messageOptionsIcon}
+                  className="messageOptionsIcon"
+                  style={{
+                    position: "relative",
+                    alignItems: "center",
+                    justifyItems: "self-end",
+                  }}
+                  onClick={(event) => toggleDropdown(event, id)}
+                />
+                <div style={{ position: "absolute", right: "200px" }}>
+                  {isOpen && (
+                    <OptionsDropdown
+                      options={options}
+                      onSelect={handleSelectOption}
+                      toggleDropdown={(event) => toggleDropdown(event, id)}
+                      parameter={id}
+                      parentButtonRef={"messageOptionsIcon"}
+                    />
+                  )}
+                </div>
+              </div>
             )}
           </div>
           <div
