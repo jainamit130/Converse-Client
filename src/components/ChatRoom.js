@@ -439,10 +439,10 @@ const ChatRoom = ({
         }}
         className="chat-input"
         style={{
-          backgroundColor: chatRoom.isExited ? "rgb(155,155,155)" : "",
+          backgroundColor: chatRoom?.isExited ? "rgb(155,155,155)" : "",
         }}
       >
-        {chatRoom.isExited ? (
+        {chatRoom?.isExited ? (
           <div
             style={{
               opacity: "0.7",
