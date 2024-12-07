@@ -142,7 +142,7 @@ const GroupInfoPanel = ({
                 id={member.userId}
                 options={["Remove Member"]}
                 optionsClicked={handleOptionsClick}
-                tileClick={() => openUserInfoPanel(chatRoomId, member.userId)}
+                tileClick={() => openUserInfoPanel(member.userId)}
                 name={member.username}
                 isOpen={openDropdownId === member.userId}
                 icon={profileIcon}
