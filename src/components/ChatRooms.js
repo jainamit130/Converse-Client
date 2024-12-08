@@ -24,6 +24,7 @@ const ChatRooms = () => {
   const { chatRooms, messages, mergeChatRooms } = useChatRoom();
   const { handleCreateGroup } = useCreateChat();
   const [showAddUserPanel, setShowAddUserPanel] = useState(false);
+  const [addMemberChatRoomId, setAdddMemberChatRoomId] = useState(null);
   const [tempChatRoom, setTempChatRoom] = useState(null);
 
   const handleCloseAddUser = (chatRoomId, isNewIndividualChat) => {
@@ -31,6 +32,7 @@ const ChatRooms = () => {
       setShowTempChatRoom(true);
     }
     setShowAddUserPanel(false);
+    setAdddMemberChatRoomId(null);
     handleChatRoomClick(chatRoomId);
   };
 
@@ -44,6 +46,11 @@ const ChatRooms = () => {
       console.error("Error creating chat room:", err);
       throw err;
     }
+  };
+
+  const handleAddMember = (chatRoomId) => {
+    setAdddMemberChatRoomId(chatRoomId);
+    setShowAddUserPanel(true);
   };
 
   useEffect(() => {
@@ -141,6 +148,7 @@ const ChatRooms = () => {
         ) : (
           <ChatRoom
             key={activeChatRoomId}
+            handleAddMember={handleAddMember}
             handleTempChatRoom={handleCloseAddUser}
             handleCreateGroup={createChatRoom}
             tempChatRoom={tempChatRoom}
@@ -152,6 +160,7 @@ const ChatRooms = () => {
       {showAddUserPanel && (
         <AddUser
           onClose={handleCloseAddUser}
+          addMemberChatRoom={chatRooms.get(addMemberChatRoomId)}
           handleCreateGroup={createChatRoom}
           setTempChatRoom={setTempChatRoom}
         />

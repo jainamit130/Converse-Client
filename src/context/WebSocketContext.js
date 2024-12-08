@@ -21,6 +21,7 @@ export const WebSocketProvider = ({ children }) => {
     addMessageToRoom,
     updateDeletedMessage,
     exitGroup,
+    memberLeft,
     mergeChatRooms,
     messages,
     setMessages,
@@ -243,9 +244,9 @@ export const WebSocketProvider = ({ children }) => {
               }
 
               delete subscriptions.current[chatRoomId];
-              console.log(subscriptionData);
               exitGroup(chatRoomId);
             }
+            memberLeft(chatRoomId, elementId);
           }
         }
       );

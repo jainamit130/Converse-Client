@@ -48,10 +48,11 @@ const ChatRoom = ({
   handleTempChatRoom,
   tempChatRoom,
   setTempChatRoom,
+  handleAddMember,
   handleChatRoomClick,
 }) => {
   const { userId, username, activeChatRoomId } = useUser();
-  const { clearChat, deleteChat, exitGroup } = useChatRoom();
+  const { clearChat, deleteChat } = useChatRoom();
   const { handleClearChat, handleDeleteChat, handleLeaveChat } = useDelete();
   const [chatRoomId, setChatRoomId] = useState(activeChatRoomId);
   const {
@@ -282,6 +283,12 @@ const ChatRoom = ({
     setIsUserInfoPanelOpen(true);
   };
 
+  const closeAllPanels = () => {
+    setIsGroupInfoPanelOpen(false);
+    setIsUserInfoPanelOpen(false);
+    setIsMessageInfoPanelOpen(false);
+  };
+
   const closeUserInfoPanel = () => {
     setIsUserInfoPanelOpen(false);
     setSelectedUserId(null);
@@ -485,12 +492,14 @@ const ChatRoom = ({
           currentUserId={selectedUserId}
           isGroupInfoPanelOpen={isGroupInfoPanelOpen}
           setTempChatRoom={setTempChatRoom}
+          handleGroupOpen={closeAllPanels}
           onClose={closeUserInfoPanel}
         />
       )}
       {isGroupInfoPanelOpen && (
         <GroupInfoPanel
           openUserInfoPanel={openUserInfoPanel}
+          handleAddMember={handleAddMember}
           chatRoomId={selectedChatRoomId}
           onClose={closeGroupInfoPanel}
           removeMember={exitGroupAction}

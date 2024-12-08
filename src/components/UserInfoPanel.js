@@ -17,6 +17,7 @@ const UserInfoPanel = ({
   handleTempChatRoom,
   isGroupInfoPanelOpen,
   setTempChatRoom,
+  handleGroupOpen,
   onClose,
 }) => {
   const { setActiveChatRoomId, userId } = useUser();
@@ -33,6 +34,7 @@ const UserInfoPanel = ({
 
   const handleChatRoomClick = (chatRoomId) => {
     setActiveChatRoomId(chatRoomId);
+    handleGroupOpen();
   };
 
   const openChatRoom = () => {

@@ -31,6 +31,25 @@ const useCreateChat = () => {
     }
   };
 
+  const handleAddMember = async (chatRoomId, selectedUserIds) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/chat/groups/add/${chatRoomId}`,
+        {
+          actionedBy: userId,
+          memberIds: selectedUserIds,
+        }
+      );
+      return response.data;
+    } catch (err) {
+      setError(err);
+      console.error("Error adding members:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreateGroup = async (
     groupName,
     selectedUserIds,
@@ -55,7 +74,7 @@ const useCreateChat = () => {
     }
   };
 
-  return { getUsers, handleCreateGroup, loading, error };
+  return { getUsers, handleCreateGroup, handleAddMember, loading, error };
 };
 
 export default useCreateChat;

@@ -15,8 +15,8 @@ const useDelete = () => {
       const response = await axios.post(
         `${BASE_URL}/chat/groups/remove/${chatRoomId}`,
         {
+          actionedBy: userId,
           memberIds: [toRemoveUserId],
-          removedBy: userId,
         },
         {
           headers: {

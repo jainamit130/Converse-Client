@@ -10,11 +10,15 @@ import { useUser } from "../context/UserContext";
 import { useChatRoom } from "../context/ChatRoomContext";
 import useCreateChat from "../hooks/useCreateChat";
 
-const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
+const AddUser = ({
+  onClose,
+  handleCreateGroup,
+  setTempChatRoom,
+  addMemberChatRoom,
+}) => {
   const [users, setUsers] = useState([]);
   const { usernameToChatRoomMap } = useChatRoom();
-  const { getUsers } = useCreateChat();
-
+  const { getUsers, handleAddMember } = useCreateChat();
   const [focus, setFocus] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const inputRef = useRef(null);
@@ -22,13 +26,25 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [groupName, setGroupName] = useState("");
   const [chatRoomType, setChatRoomType] = useState("INDIVIDUAL");
-  const [isNewGroup, setIsNewGroup] = useState(false);
+  const [isNewGroup, setIsNewGroup] = useState(() => {
+    if (addMemberChatRoom) {
+      return true;
+    }
+    return false;
+  });
   const { userId } = useUser();
 
   useEffect(() => {
     const fetchUsers = async () => {
       const data = await getUsers();
-      setUsers(data);
+      if (addMemberChatRoom) {
+        const filteredUsers = data.filter(
+          (user) => !addMemberChatRoom.userIds.includes(user.id)
+        );
+        setUsers(filteredUsers);
+      } else {
+        setUsers(data);
+      }
     };
 
     fetchUsers();
@@ -50,7 +66,7 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
 
   const openChatRoom = async (user) => {
     let chatRoomId = null;
-    if (chatRoomType === "INDIVIDUAL") {
+    if (chatRoomType === "INDIVIDUAL" && addMemberChatRoom === null) {
       const existingChatRoomId = usernameToChatRoomMap[user.id];
       if (existingChatRoomId) {
         onClose(existingChatRoomId);
@@ -71,11 +87,16 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
       onClose(chatRoomId, true);
     } else {
       const selectedUserIds = selectedUsers.map((user) => user.id);
-      const result = await handleCreateGroup(
-        groupName,
-        selectedUserIds,
-        chatRoomType
-      );
+      let result;
+      if (addMemberChatRoom) {
+        result = await handleAddMember(addMemberChatRoom.id, selectedUserIds);
+      } else {
+        result = await handleCreateGroup(
+          groupName,
+          selectedUserIds,
+          chatRoomType
+        );
+      }
       chatRoomId = result.chatRoomId;
       onClose(chatRoomId);
     }
@@ -106,8 +127,12 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
             src={backButton}
             className="back-btn"
             onClick={() => {
-              if (isNewGroup) setIsNewGroup(false);
-              else onClose(null);
+              if (isNewGroup) {
+                if (addMemberChatRoom) {
+                  onClose(null);
+                }
+                setIsNewGroup(false);
+              } else onClose(null);
               setChatRoomType("INDIVIDUAL");
             }}
           />
@@ -151,17 +176,20 @@ const AddUser = ({ onClose, handleCreateGroup, setTempChatRoom }) => {
         </div>
       )}
 
-      {isNewGroup && (
-        <div className="group-name-input">
-          <input
-            type="text"
-            value={groupName}
-            className="searchUsers"
-            onChange={(e) => setGroupName(e.target.value)}
-            placeholder="Enter group name"
-          />
-        </div>
-      )}
+      {isNewGroup &&
+        (addMemberChatRoom ? (
+          addMemberChatRoom.name
+        ) : (
+          <div className="group-name-input">
+            <input
+              type="text"
+              value={groupName}
+              className="searchUsers"
+              onChange={(e) => setGroupName(e.target.value)}
+              placeholder="Enter group name"
+            />
+          </div>
+        ))}
 
       <div style={{ fontSize: "17px", color: "green", margin: "20px" }}>
         CONTACTS ON CONVERSE
