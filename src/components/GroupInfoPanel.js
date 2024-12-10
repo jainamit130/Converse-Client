@@ -16,6 +16,7 @@ const GroupInfoPanel = ({
   chatRoomId,
   openUserInfoPanel,
   onClose,
+  handleAddMember,
   removeMember,
   handleDeleteGroup,
 }) => {
@@ -26,10 +27,6 @@ const GroupInfoPanel = ({
   const [members, setMembers] = useState([]);
   const [isVisible, setIsVisible] = useState(true);
   const [openDropdownId, setOpenDropdownId] = useState(null);
-
-  const handleAddMember = () => {
-    console.log("Add Member clicked");
-  };
 
   const handleGroupAction = () => {
     if (chatRoom.isExited) {
@@ -132,7 +129,7 @@ const GroupInfoPanel = ({
         <div style={{ position: "relative", zIndex: "1" }}>
           <Tile
             name={"Add Member"}
-            tileClick={() => handleAddMember()}
+            tileClick={() => handleAddMember(chatRoomId)}
             icon={addMemberIcon}
           />
           {members.map((member) => {

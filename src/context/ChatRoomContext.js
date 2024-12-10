@@ -196,6 +196,26 @@ export const ChatRoomProvider = ({ children }) => {
     });
   }, []);
 
+  const memberLeft = (chatRoomId, userId) => {
+    setChatRooms((prevChatRooms) => {
+      const updatedChatRooms = new Map(prevChatRooms);
+      const chatRoom = updatedChatRooms.get(chatRoomId);
+
+      if (chatRoom) {
+        const updatedUserIds = chatRoom.userIds.filter((id) => id !== userId);
+        const updatedOnlineUsers = chatRoom.onlineUsers || new Set();
+        updatedOnlineUsers.delete(username);
+        updatedChatRooms.set(chatRoomId, {
+          ...chatRoom,
+          userIds: updatedUserIds,
+          onlineUsers: updatedOnlineUsers,
+        });
+      }
+
+      return updatedChatRooms;
+    });
+  };
+
   const exitGroup = (chatRoomId) => {
     setChatRooms((prevChatRooms) => {
       const updatedChatRooms = new Map(prevChatRooms);
@@ -396,6 +416,7 @@ export const ChatRoomProvider = ({ children }) => {
         usernameToChatRoomMap,
         mergeChatRooms,
         resetChatRoomContext,
+        memberLeft,
       }}
     >
       {children}
