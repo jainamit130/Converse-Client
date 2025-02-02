@@ -66,7 +66,7 @@ const AddUser = ({
 
   const openChatRoom = async (user) => {
     let chatRoomId = null;
-    if (chatRoomType === "INDIVIDUAL" && addMemberChatRoom === null) {
+    if (chatRoomType === "INDIVIDUAL" && addMemberChatRoom == null) {
       const existingChatRoomId = usernameToChatRoomMap[user.id];
       if (existingChatRoomId) {
         onClose(existingChatRoomId);
