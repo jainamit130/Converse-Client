@@ -1,24 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+import ApolloProvider from "./config/provider/ApolloProvider";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // use BrowserRouter for routing
+import "./App.css";
+import LoginSignUpPage from "./components/authComponents/LoginSignUpPage";
+import client from "./config/client/ApolloClient";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ApolloProvider client={client}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<LoginSignUpPage />} />
+        </Routes>
+      </Router>
+    </ApolloProvider>
   );
 }
 
