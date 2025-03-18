@@ -1,54 +1,34 @@
 import { gql } from "@apollo/client";
 
 export const GET_CHAT_ROOMS_OF_USER = gql`
-  query GetChatRoomsOfUser($userId: String!) {
-    getChatRoomsOfUser(userId: $userId) {
+  query GetChatRoomsOfUser {
+    getChatRoomsOfUser {
       id
-      name
+      chatRoomName
       chatRoomType
       userIds
-      recipientUsername
-      creatorUsername
-      isExited
       unreadMessageCount
       latestMessage {
-        id
-        senderId
-        timestamp
-        content
-        deletedForEveryone
-        status
-        user {
-          id
-          username
-        }
+        id         // can be null if no message present
+        senderId   // can be null if not chatMessage but a notification/system message
+        name       // can be null if not chatMessage but a notification/system message
+        timestamp  // can be null if no messages present
+        content    // always present even no messages have some content 
+        status     // can be null if the user is not the message sender
       }
     }
   }
 `;
 
-export const GET_MESSAGES_OF_CHAT_ROOM = gql`
-  query getMessagesOfChatRoom(
-    $chatRoomId: String!
-    $userId: String!
-    $fromCount: Int
-  ) {
-    getMessagesOfChatRoom(
-      chatRoomId: $chatRoomId
-      userId: $userId
-      fromCount: $fromCount
-    ) {
-      id
-      senderId
-      type
-      timestamp
-      content
-      status
-      deletedForEveryone
-      user {
-        id
-        username
-      }
+export const GET_CHAT_ROOM_DATA = gql`
+  query getChatRoomData {
+    getMessagesOfChatRoom {
+      id         // can be null if no message present
+      senderId   // can be null if not chatMessage but a notification/system message
+      name       // can be null if not chatMessage but a notification/system message
+      timestamp  // can be null if no messages present
+      content    // always present even no messages have some content 
+      status     // can be null if the user is not the message sender
     }
   }
 `;
