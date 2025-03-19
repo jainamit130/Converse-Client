@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // us
 import "./App.css";
 import LoginSignUpPage from "./components/authComponents/LoginSignUpPage";
 import client from "./config/client/ApolloClient";
+import ChatRooms from "./components/home/chatRooms/ChatRooms";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LoginSignUpPage />} />
+          <Route path="/chat-rooms" element={<ChatRooms />} />
         </Routes>
       </Router>
     </ApolloProvider>

@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Client } from '@stomp/stompjs';
+import { useState, useEffect } from "react";
+import { Client } from "@stomp/stompjs";
+import config from "../config/environment";
 
-const useWebSocket = (brokerURL, topic, onMessage) => {
+const useWebSocket = (topic, onMessage) => {
+  const brokerURL = `${config.CHAT_BASE_URL}`;
   const [client, setClient] = useState(null);
 
   useEffect(() => {
@@ -25,7 +27,7 @@ const useWebSocket = (brokerURL, topic, onMessage) => {
         console.log(`${topic} WebSocket disconnected`);
       },
       onStompError: (error) => {
-        console.error('STOMP Error:', error);
+        console.error("STOMP Error:", error);
       },
     });
 

@@ -1,48 +1,56 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Client } from "@stomp/stompjs";
-import config from "../../config/environment";
+import {
+  handleMessageMarkedNotification,
+  handleNewChatNotification,
+} from "../../handlers/notification/user/NotificationHandlers";
+import { NotificationType } from "../../components/MappingTypes/NotificationTypes";
+import useWebSocket from "../../hooks/WebSocketHook";
 
-const UserWebSocketContext = createContext(null);
+const UserWebSocketContext = createContext({
+  userId: null,
+  setUserId: () => {},
+});
 
 export const useUserWebSocket = () => useContext(UserWebSocketContext);
 
 export const UserWebSocketProvider = ({ children }) => {
-  const [client, setClient] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+  const onMessage = (messageData) => {
+    switch (messageData.type) {
+      case NotificationType.NEW_CHAT:
+        handleNewChatNotification(messageData);
+        break;
+      case NotificationType.MESSAGE_MARKED:
+        handleMessageMarkedNotification(messageData);
+        break;
+      default:
+        console.error("Unknown message type:", messageData.type);
+        break;
+    }
+  };
+
+  const useWebSooketHook = () => {
+    useWebSocket(`/topic/user/${userId}`, onMessage);
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("authenticationToken");
-    const stompClient = new Client({
-      brokerURL: `${config.CHAT_BASE_URL}`,
-      connectHeaders: {
-        token,
-      },
-      debug: (str) => {
-        console.log(str);
-      },
-      onConnect: () => {
-        console.log("User WebSocket connected");
-        stompClient.subscribe("/topic/user", (message) => {
-          console.log("Received message on User WebSocket:", message.body);
-        });
-      },
-      onDisconnect: () => {
-        console.log("User WebSocket disconnected");
-      },
-      onStompError: (error) => {
-        console.error("STOMP Error:", error);
-      },
-    });
+    const storedUserId = localStorage.getItem("userId");
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
 
-    stompClient.activate();
-    setClient(stompClient);
-
-    return () => {
-      stompClient.deactivate();
-    };
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("userId");
+    if (storedUserId) {
+      setUserId(storedUserId);
+      useWebSooketHook();
+    }
   }, []);
 
   return (
-    <UserWebSocketContext.Provider value={client}>
+    <UserWebSocketContext.Provider value={{ userId }}>
       {children}
     </UserWebSocketContext.Provider>
   );

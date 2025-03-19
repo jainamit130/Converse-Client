@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
-import TypingIndicator from "../TypingIndicator";
-import { formatTime, parseDate } from "../../util/dateUtil";
-import messageOptionsIcon from "../../assets/messageOptions.png";
-import OptionsDropdown from "./OptionsDropdown";
-import "../ChatRoom.css";
+import React from "react";
+import TypingIndicator from "../../sideComponents/TypingIndicator";
+import { formatTime, parseDate } from "../../../util/dateUtil";
+import messageOptionsIcon from "../../../assets/MessageOptions.png";
+import OptionsDropdown from "../OptionsDropdown/OptionsDropdown";
+import "../Tile/Tile.css";
 
 const Tile = ({
   id,
   name,
   options,
-  latestMessageTimestamp,
-  smallerInfo,
-  typingUsers,
-  unreadMessageCount,
-  activeChatRoomId,
+  timestamp,
+  titleSubInfo, // Nullable
+  primarySubInfo, // Nullable
+  typingUsers, // Nullable Ex: user types then the primary info gets replaced by secondary subinfo
+  unreadMessageCount, // Nullable/0 then dont show
   tileClick,
   optionsClicked,
-  icon,
+  icon, // Not Nullable, Group/Direct PNG
   isOpen,
   toggleDropdown,
 }) => {
@@ -32,9 +32,7 @@ const Tile = ({
     }
   };
 
-  const messageDate = latestMessageTimestamp
-    ? parseDate(latestMessageTimestamp)
-    : null;
+  const messageDate = timestamp ? parseDate(timestamp) : null;
   const formattedTime = messageDate ? formatTime(messageDate) : null;
 
   return (
@@ -53,7 +51,7 @@ const Tile = ({
           alignItems: "center",
         }}
       >
-        <img src={icon} className="chatRoomIcon" alt="Group Icon" />
+        <img src={icon} className="icon" alt="Group Icon" />
         <div style={{ marginLeft: "10px", width: "100%" }}>
           <div
             style={{
@@ -61,10 +59,8 @@ const Tile = ({
               alignItems: "center",
             }}
           >
-            <div className="chatRoomTitle smallerInfo">{name}</div>
-            {formattedTime && (
-              <div className="latestMessageTime">{formattedTime}</div>
-            )}
+            <div className="chatRoomTitle primarySubInfo">{name}</div>
+            {formattedTime && <div className="timestamp">{formattedTime}</div>}
             {options && (
               <div style={{ position: "absolute", right: "0" }}>
                 <img
@@ -100,9 +96,13 @@ const Tile = ({
             {typingUsers && typingUsers.length > 0 ? (
               <TypingIndicator typingUsers={typingUsers} />
             ) : (
-              <div className="smallerInfo">{smallerInfo}</div>
+              <div className="primarySubInfo">
+                {titleSubInfo
+                  ? `${titleSubInfo}: ${primarySubInfo}`
+                  : primarySubInfo}
+              </div>
             )}
-            {activeChatRoomId !== id && unreadMessageCount > 0 && (
+            {unreadMessageCount > 0 && (
               <div className="unreadMessages">{unreadMessageCount}</div>
             )}
           </div>

@@ -1,0 +1,72 @@
+.chat-room-tile {
+    z-index: 1;
+    position: relative;
+    align-items: center;
+    opacity: 0.8;
+    display: flex;
+    color: #000000;
+    width: 100%;
+    justify-content: space-between;
+    cursor: pointer;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .icon{
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
+  }
+
+  .chatRoomTitle {
+    font-size: 17px;
+    font-weight: 500;
+  }
+
+  .primarySubInfo {
+    white-space: nowrap;      
+    overflow: hidden;
+    text-overflow: ellipsis;  
+    max-width: 280px;          
+  }
+
+  .messageOptionsIcon {
+    position: absolute;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 20px 20px 20px rgba(210, 255, 160, 0.2); 
+    padding: 8px;
+    border-radius: 8px;
+    right: 0px;
+    top: 3px;
+    height: 8px; 
+    width: 15px; 
+    display: none; 
+    z-index: 1;
+  }
+
+  .timestamp {
+    color: #008000;
+    font-size: 12.5px;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .unreadMessages{
+    margin-right: 10px;
+    height: 20px;
+    width: 20px;
+    border-radius: 50px;
+    background-color: green;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    margin-left: auto;
+  }
+

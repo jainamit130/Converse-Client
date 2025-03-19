@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import config from "../../config/environment";
-import backgroundImage from "../assets/LoginBackground.png";
-import chatBackgroundImage from "../assets/ChatBackground.png";
+import { useNavigate } from "react-router-dom";
+import backgroundImage from "../../assets/LoginBackground.png";
+import chatBackgroundImage from "../../assets/ChatBackground.png";
 
 const LoginSignUpPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isLoginPage, setIsLoginPage] = useState(true);
+  const navigate = useNavigate();
   const BASE_URL = config.USER_BASE_URL + "/converse/auth";
 
   const togglePage = () => {
@@ -43,13 +45,12 @@ const LoginSignUpPage = () => {
         const data = await response.json();
         const { userId, username, authenticationToken, refreshToken } = data;
 
-        if (JSON.stringify(userId) !== localStorage.getItem("userId")) {
-          localStorage.setItem("userId", userId);
-          localStorage.setItem("username", username);
-          localStorage.setItem("authenticationToken", authenticationToken);
-          localStorage.setItem("refreshToken", refreshToken);
-          localStorage.setItem("isLogin", true);
-        }
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("username", username);
+        localStorage.setItem("authenticationToken", authenticationToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        localStorage.setItem("active", true);
+        navigate("/chat-rooms");
       }
     } catch (error) {
       console.error("There was an error!", error);
@@ -153,7 +154,6 @@ const styles = {
     width: "93%",
     padding: "10px",
     fontSize: "16px",
-    border: "2px solid rgba(0, 1, 87,0.6)",
     borderRadius: "4px",
     border: "1px solid #ccc",
     outline: "none",
