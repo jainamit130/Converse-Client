@@ -1,17 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Client } from "@stomp/stompjs";
 import config from "../config/environment";
 
 const useWebSocket = (topic, onMessage) => {
-  const brokerURL = `${config.CHAT_BASE_URL}`;
+  const brokerURL = `${config.CHAT_BASE_URL}/ws`;
   const [client, setClient] = useState(null);
 
-  useEffect(() => {
+  const initWebSocket = () => {
     const token = localStorage.getItem("authenticationToken") || "";
     const stompClient = new Client({
       brokerURL: brokerURL,
       connectHeaders: {
-        token,
+        token: `Bearer ${token}`,
       },
       debug: (str) => {
         console.log(str);
@@ -20,7 +20,7 @@ const useWebSocket = (topic, onMessage) => {
         console.log(`${topic} WebSocket connected`);
         stompClient.subscribe(topic, (message) => {
           const messageData = JSON.parse(message.body);
-          onMessage(messageData); // Custom handler passed by the provider
+          onMessage(messageData);
         });
       },
       onDisconnect: () => {
@@ -33,13 +33,15 @@ const useWebSocket = (topic, onMessage) => {
 
     stompClient.activate();
     setClient(stompClient);
+  };
 
-    return () => {
-      stompClient.deactivate();
-    };
-  }, [brokerURL, topic, onMessage]);
+  const closeWebSocket = () => {
+    if (client) {
+      client.deactivate();
+    }
+  };
 
-  return client;
+  return { initWebSocket, closeWebSocket, client };
 };
 
 export default useWebSocket;

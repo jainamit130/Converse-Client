@@ -14,7 +14,8 @@ const UserWebSocketContext = createContext({
 export const useUserWebSocket = () => useContext(UserWebSocketContext);
 
 export const UserWebSocketProvider = ({ children }) => {
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const { initWebSocket, closeWebSocket } = useWebSocket();
 
   const onMessage = (messageData) => {
     switch (messageData.type) {
@@ -30,27 +31,18 @@ export const UserWebSocketProvider = ({ children }) => {
     }
   };
 
-  const useWebSooketHook = () => {
-    useWebSocket(`/topic/user/${userId}`, onMessage);
-  };
-
   useEffect(() => {
-    const storedUserId = localStorage.getItem("userId");
-    if (storedUserId) {
-      setUserId(storedUserId);
+    if (userId) {
+      initWebSocket(`/topic/user/${userId}`, onMessage);
     }
-  }, []);
 
-  useEffect(() => {
-    const storedUserId = localStorage.getItem("userId");
-    if (storedUserId) {
-      setUserId(storedUserId);
-      useWebSooketHook();
-    }
-  }, []);
+    return () => {
+      closeWebSocket();
+    };
+  }, [userId]);
 
   return (
-    <UserWebSocketContext.Provider value={{ userId }}>
+    <UserWebSocketContext.Provider value={{ userId, setUserId }}>
       {children}
     </UserWebSocketContext.Provider>
   );
