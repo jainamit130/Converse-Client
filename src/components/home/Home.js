@@ -5,7 +5,7 @@ const home = () => {
   return (
     <div>
       <ChatRooms></ChatRooms>
-      <ChatRoom></ChatRoom>
+      {<ChatRoom></ChatRoom>}
     </div>
   );
 };

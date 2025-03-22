@@ -26,7 +26,7 @@ const ChatRooms = () => {
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER);
 
   useEffect(() => {
-    if (data) {
+    if (!data) {
       setChatRooms(data.getChatRoomsOfUser);
     }
   }, [data, setChatRooms]);
@@ -40,6 +40,7 @@ const ChatRooms = () => {
       <ul>
         {data.getChatRoomsOfUser.map((room) => (
           <Tile
+            key={room.id}
             id={room.id}
             name={room.chatRoomName}
             titleSubInfo={room.latestMessage.name}

@@ -18,10 +18,7 @@ export const useChatRoomWebSocket = () => useContext(ChatRoomWebSocketContext);
 
 export const ChatRoomWebSocketProvider = ({ children }) => {
   const [chatRooms, setChatRooms] = useState([]);
-
-  const useWebSocketHook = (chatRoomId) => {
-    useWebSocket(`/topic/chat/${chatRoomId}`, onMessage);
-  };
+  const { initWebSocket, closeWebSocket } = useWebSocket();
 
   const onMessage = (messageData) => {
     switch (messageData.type) {
@@ -48,9 +45,15 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
 
   useEffect(() => {
     chatRooms.forEach((chatRoom) => {
-      useWebSocketHook(chatRoom.id);
+      initWebSocket(`/topic/chat/${chatRoom.id}`, onMessage);
     });
-  }, [chatRooms]);
+
+    return () => {
+      chatRooms.forEach((chatRoom) => {
+        closeWebSocket(`/topic/chat/${chatRoom.id}`);
+      });
+    };
+  }, [chatRooms, initWebSocket, closeWebSocket]);
 
   return (
     <ChatRoomWebSocketContext.Provider value={{ chatRooms, setChatRooms }}>

@@ -2,19 +2,16 @@ import { useState } from "react";
 import { Client } from "@stomp/stompjs";
 import config from "../config/environment";
 
-const useWebSocket = (topic, onMessage) => {
+const useWebSocket = () => {
   const brokerURL = `${config.CHAT_BASE_URL}/ws`;
   const [client, setClient] = useState(null);
 
-  const initWebSocket = () => {
+  const initWebSocket = (topic, onMessage) => {
     const token = localStorage.getItem("authenticationToken") || "";
     const stompClient = new Client({
       brokerURL: brokerURL,
       connectHeaders: {
         token: `Bearer ${token}`,
-      },
-      debug: (str) => {
-        console.log(str);
       },
       onConnect: () => {
         console.log(`${topic} WebSocket connected`);
