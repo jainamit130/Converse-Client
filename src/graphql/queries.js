@@ -29,13 +29,15 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
 
 export const GET_CHAT_ROOM_DATA = gql`
   query getChatRoomData {
-    getMessagesOfChatRoom {
-      id
-      senderId
-      name
-      timestamp
-      content
-      status
+    getChatRoomData {
+      messages {
+        id
+        senderId
+        name
+        timestamp
+        content
+        status
+      }
     }
   }
 `;

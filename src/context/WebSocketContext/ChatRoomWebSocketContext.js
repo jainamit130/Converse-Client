@@ -10,18 +10,21 @@ import {
 import { NotificationType } from "../../components/MappingTypes/NotificationTypes";
 
 const ChatRoomWebSocketContext = createContext({
-  chatRooms: [],
+  chatRooms: new Map(),
+  messages: new Map(),
   setChatRooms: () => {},
+  setMessages: () => {},
 });
 
 export const useChatRoomWebSocket = () => useContext(ChatRoomWebSocketContext);
 
 export const ChatRoomWebSocketProvider = ({ children }) => {
-  const [chatRooms, setChatRooms] = useState([]);
+  const [chatRooms, setChatRooms] = useState(new Map());
+  const [messages, setMessages] = useState(new Map());
   const { initWebSocket, closeWebSocket } = useWebSocket();
 
   const onMessage = (messageData) => {
-    switch (messageData.type) {
+    switch (messageData.notificationType) {
       case NotificationType.MESSAGE:
         handleMessageNotification(messageData);
         break;
@@ -53,10 +56,12 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
         closeWebSocket(`/topic/chat/${chatRoom.id}`);
       });
     };
-  }, [chatRooms, initWebSocket, closeWebSocket]);
+  }, [chatRooms]);
 
   return (
-    <ChatRoomWebSocketContext.Provider value={{ chatRooms, setChatRooms }}>
+    <ChatRoomWebSocketContext.Provider
+      value={{ chatRooms, messages, setChatRooms, setMessages }}
+    >
       {children}
     </ChatRoomWebSocketContext.Provider>
   );

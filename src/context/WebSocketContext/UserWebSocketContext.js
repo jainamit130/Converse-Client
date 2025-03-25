@@ -14,7 +14,7 @@ const UserWebSocketContext = createContext({
 export const useUserWebSocket = () => useContext(UserWebSocketContext);
 
 export const UserWebSocketProvider = ({ children }) => {
-  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const [userId, setUserId] = useState();
   const { initWebSocket, closeWebSocket } = useWebSocket();
 
   const onMessage = (messageData) => {

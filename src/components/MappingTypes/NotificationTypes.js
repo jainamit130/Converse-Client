@@ -1,9 +1,9 @@
 export const NotificationType = {
-  MESSAGE: "MessageNotification",
-  STATUS: "UserStatusNotification",
-  TYPING: "TypingNotification",
-  MESSAGE_DELETED: "MessageDeletedNotification",
-  MESSAGE_MARKED: "MessageMarkedNotification",
-  NEW_CHAT: "NewChatNotification",
-  TRANSACTION: "TransactionNotification",
+  MESSAGE: "MESSAGE",
+  STATUS: "STATUS",
+  TYPING: "TYPING",
+  MESSAGE_DELETED: "MESSAGE_DELETED",
+  MESSAGE_MARKED: "MESSAGE_MARKED",
+  NEW_CHAT: "NEW_CHAT",
+  TRANSACTION: "TRANSACTION",
 };

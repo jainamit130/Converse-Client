@@ -28,7 +28,7 @@ const Tile = ({
 
   const handleChatRoomClick = () => {
     if (!isOpen && tileClick) {
-      tileClick(id, name);
+      tileClick({ chatRoomId: id, chatRoomName: name });
     }
   };
 

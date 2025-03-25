@@ -7,10 +7,15 @@ import Tile from "../../reusableComponents/Tile/Tile";
 import { useChatRoomWebSocket } from "../../../context/WebSocketContext/ChatRoomWebSocketContext";
 import { useUserWebSocket } from "../../../context/WebSocketContext/UserWebSocketContext";
 
-const ChatRooms = () => {
+const ChatRooms = ({ onChatRoomSelect }) => {
   const { userId, setUserId } = useUserWebSocket();
   const { chatRooms, setChatRooms } = useChatRoomWebSocket();
   const navigate = useNavigate();
+
+  const openChatRoom = ({ chatRoomId, chatRoomName }) => {
+    localStorage.setItem("activeChatRoomId", chatRoomId);
+    localStorage.setItem("activeChatRoomName", chatRoomName);
+  };
 
   useEffect(() => {
     if (!userId) {
@@ -21,15 +26,15 @@ const ChatRooms = () => {
         setUserId(storedUserId);
       }
     }
-  }, [navigate, userId, setUserId]);
+  }, [userId, setUserId]);
 
   const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER);
 
   useEffect(() => {
-    if (!data) {
-      setChatRooms(data.getChatRoomsOfUser);
+    if (data && userId) {
+      setChatRooms(data.getChatRoomsOfUser || []);
     }
-  }, [data, setChatRooms]);
+  }, [data, userId, setChatRooms]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -38,18 +43,23 @@ const ChatRooms = () => {
     <div>
       <h2>Chats</h2>
       <ul>
-        {data.getChatRoomsOfUser.map((room) => (
-          <Tile
-            key={room.id}
-            id={room.id}
-            name={room.chatRoomName}
-            titleSubInfo={room.latestMessage.name}
-            primarySubInfo={room.latestMessage.content}
-            unreadMessageCount={room.unreadMessageCount}
-            timestamp={room.latestMessage.timestamp}
-            icon={iconType(room.chatRoomType)}
-          ></Tile>
-        ))}
+        {chatRooms.length > 0 ? (
+          chatRooms.map((room) => (
+            <Tile
+              key={room.id}
+              tileClick={() => onChatRoomSelect(room.id, room.chatRoomName)}
+              id={room.id}
+              name={room.chatRoomName}
+              titleSubInfo={room.latestMessage.name}
+              primarySubInfo={room.latestMessage.content}
+              unreadMessageCount={room.unreadMessageCount}
+              timestamp={room.latestMessage.timestamp}
+              icon={iconType(room.chatRoomType)}
+            ></Tile>
+          ))
+        ) : (
+          <p>No chat rooms available</p>
+        )}
       </ul>
     </div>
   );

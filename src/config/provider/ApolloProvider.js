@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ApolloClient,
+  ApolloLink,
   InMemoryCache,
   ApolloProvider as Provider,
   createHttpLink,
@@ -23,8 +24,24 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const urlParamsLink = new ApolloLink((operation, forward) => {
+  const { operationName } = operation;
+
+  if (operationName === "getChatRoomData") {
+    const chatRoomId = localStorage.getItem("activeChatRoomId");
+    if (chatRoomId && chatRoomId.trim() !== "") {
+      const newUri = `${config.CHAT_BASE_URL}/graphql?chatRoomId=${chatRoomId}`;
+      operation.setContext({
+        uri: newUri,
+      });
+    }
+  }
+
+  return forward(operation);
+});
+
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: authLink.concat(urlParamsLink).concat(httpLink),
   cache: new InMemoryCache(),
 });
 

@@ -3,19 +3,27 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // us
 import "./App.css";
 import LoginSignUpPage from "./components/authComponents/LoginSignUpPage";
 import client from "./config/client/ApolloClient";
-import ChatRooms from "./components/home/chatRooms/ChatRooms";
 import { UserWebSocketProvider } from "./context/WebSocketContext/UserWebSocketContext";
+import { ChatRoomWebSocketProvider } from "./context/WebSocketContext/ChatRoomWebSocketContext";
+import Home from "./components/home/Home";
+import { useEffect } from "react";
 
 function App() {
+  useEffect(() => {
+    localStorage.removeItem("activeChatRoomId");
+    localStorage.removeItem("activeChatRoomName");
+  }, []);
   return (
     <ApolloProvider client={client}>
       <UserWebSocketProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<LoginSignUpPage />} />
-            <Route path="/chat-rooms" element={<ChatRooms />} />
-          </Routes>
-        </Router>
+        <ChatRoomWebSocketProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<LoginSignUpPage />} />
+              <Route path="/chat-rooms" element={<Home />} />
+            </Routes>
+          </Router>
+        </ChatRoomWebSocketProvider>
       </UserWebSocketProvider>
     </ApolloProvider>
   );

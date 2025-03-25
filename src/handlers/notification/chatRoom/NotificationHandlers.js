@@ -1,3 +1,5 @@
+import { useChatRoomWebSocket } from "../../../context/WebSocketContext/ChatRoomWebSocketContext";
+
 export const handleChatTransactionNotification = (data) => {
   console.log("Group Transaction:", data.message);
   // Update your UI based on the message data
@@ -8,9 +10,30 @@ export const handleMessageDeletedNotification = (data) => {
   // Update your UI based on the message data
 };
 
-export const handleMessageNotification = (data) => {
+export const handleMessageNotification = (
+  data,
+  chatRooms,
+  setChatRooms,
+  setMessages
+) => {
   console.log("Message Received:", data.message);
-  // Update your UI based on the message data
+
+  // Find the respective chat room
+  const chatRoom = chatRooms.find(
+    (room) => room.id === data.message.chatRoomId
+  );
+
+  if (chatRoom) {
+    // Update the latestMessage for the chatRoom
+    chatRoom.setLatestMessage(data.message);
+
+    // If the user has the chatRoom opened, add the message to the list
+    const activeChatRoomId = localStorage.getItem("activeChatRoomId");
+    if (activeChatRoomId && activeChatRoomId === chatRoom.id) {
+      // Assuming that messages is an array inside the chat room
+      setMessages((prevMessages) => [...prevMessages, data.message]);
+    }
+  }
 };
 
 export const handleTypingNotification = (data) => {

@@ -23,9 +23,6 @@ const useWebSocket = () => {
       onDisconnect: () => {
         console.log(`${topic} WebSocket disconnected`);
       },
-      onStompError: (error) => {
-        console.error("STOMP Error:", error);
-      },
     });
 
     stompClient.activate();

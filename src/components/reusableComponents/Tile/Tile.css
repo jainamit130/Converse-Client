@@ -1,5 +1,4 @@
 .chat-room-tile {
-    z-index: 1;
     position: relative;
     align-items: center;
     opacity: 0.8;
@@ -45,7 +44,6 @@
     height: 8px; 
     width: 15px; 
     display: none; 
-    z-index: 1;
   }
 
   .timestamp {
