@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useQuery } from "@apollo/client";
+import "./ChatRoom.css";
 import { GET_CHAT_ROOM_DATA } from "../../../graphql/queries";
 import { useChatRoomWebSocket } from "../../../context/WebSocketContext/ChatRoomWebSocketContext";
+import ChatDetails from "./chatDetails/ChatDetails";
+import Message from "./message/Message";
 
 const ChatRoom = ({ activeChatRoomId, activeChatRoomName }) => {
   const { messages, setMessages } = useChatRoomWebSocket([]);
@@ -11,18 +14,21 @@ const ChatRoom = ({ activeChatRoomId, activeChatRoomName }) => {
 
   useEffect(() => {
     if (data && activeChatRoomId) {
-      setMessages(data.GET_CHAT_ROOM_DATA || []);
+      console.log(data.getChatRoomData.messages);
+      setMessages(data.getChatRoomData.messages || []);
     }
-  }, [data, activeChatRoomId, setMessages]);
+  }, [data, activeChatRoomId]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div>
-      <ul>
-        {messages.length > 0 && messages.map((message) => message.content)}
-      </ul>
+    <div className="chatRoom">
+      <ChatDetails></ChatDetails>
+      <div className="message">
+        {messages.length > 0 &&
+          messages.map((message) => <Message message={message}></Message>)}
+      </div>
     </div>
   );
 };

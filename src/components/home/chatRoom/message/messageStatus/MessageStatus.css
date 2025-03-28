@@ -1,0 +1,18 @@
+.messageTimeStatus{
+    justify-content: right;
+    display: flex;
+    align-items: center;
+  }
+
+  .messagetStatus{
+    padding: 2px;
+    width:18px;
+    height: 11px;
+  }
+
+  .message-time {
+    padding: 2px;
+    font-size: 12px;
+    color: #141414;
+    opacity: 0.7;
+  }

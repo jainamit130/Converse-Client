@@ -24,21 +24,25 @@ const Home = () => {
 
   return (
     <div className="homePage">
-      <ChatRooms onChatRoomSelect={handleChatRoomSelect} />
-      {activeChatRoomId ? (
-        <ChatRoom
-          activeChatRoomId={activeChatRoomId}
-          activeChatRoomName={activeChatRoomName}
-        />
-      ) : (
-        <div
-          style={{
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "cover",
-            height: "100vh",
-          }}
-        ></div>
-      )}
+      <div className="chatRooms">
+        <ChatRooms onChatRoomSelect={handleChatRoomSelect} />
+      </div>
+      <div className="chatRoom">
+        {activeChatRoomId ? (
+          <ChatRoom
+            activeChatRoomId={activeChatRoomId}
+            activeChatRoomName={activeChatRoomName}
+          />
+        ) : (
+          <div
+            style={{
+              backgroundImage: `url(${backgroundImage})`,
+              backgroundSize: "cover",
+              height: "100vh",
+            }}
+          ></div>
+        )}
+      </div>
     </div>
   );
 };

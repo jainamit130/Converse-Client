@@ -1,10 +1,9 @@
 .chat-room-tile {
-    position: relative;
+    width: 92%;
     align-items: center;
     opacity: 0.8;
     display: flex;
     color: #000000;
-    width: 100%;
     justify-content: space-between;
     cursor: pointer;
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);

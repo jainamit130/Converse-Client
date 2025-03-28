@@ -1,0 +1,25 @@
+.message{
+    background-color: rgb(210, 255, 160);
+}
+
+.message-right {
+    padding: 10px;
+    height: max-content;
+}
+
+.message-left {
+    color: rgb(0, 0, 0);
+    font-size: medium;
+    font-weight: 400;
+    background-color: #ffffff;
+    text-align: left;
+    margin-right: auto;
+  }
+
+  .message-content {
+    min-height: 80px;
+    background-image: url('../../../../assets/ChatBackground.png');
+    justify-content: right;
+    display: flex;
+    font-family: Arial, sans-serif; 
+}

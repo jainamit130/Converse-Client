@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
+import "./ChatRooms.css";
 import { GET_CHAT_ROOMS_OF_USER } from "../../../graphql/queries";
 import { useNavigate } from "react-router-dom";
 import { iconType } from "../../MappingTypes/iconFactory";
@@ -40,27 +41,25 @@ const ChatRooms = ({ onChatRoomSelect }) => {
   if (error) return <p>Error: {error.message}</p>;
 
   return (
-    <div>
+    <div className="chatRooms">
       <h2>Chats</h2>
-      <ul>
-        {chatRooms.length > 0 ? (
-          chatRooms.map((room) => (
-            <Tile
-              key={room.id}
-              tileClick={() => onChatRoomSelect(room.id, room.chatRoomName)}
-              id={room.id}
-              name={room.chatRoomName}
-              titleSubInfo={room.latestMessage.name}
-              primarySubInfo={room.latestMessage.content}
-              unreadMessageCount={room.unreadMessageCount}
-              timestamp={room.latestMessage.timestamp}
-              icon={iconType(room.chatRoomType)}
-            ></Tile>
-          ))
-        ) : (
-          <p>No chat rooms available</p>
-        )}
-      </ul>
+      {chatRooms.length > 0 ? (
+        chatRooms.map((room) => (
+          <Tile
+            key={room.id}
+            tileClick={() => onChatRoomSelect(room.id, room.chatRoomName)}
+            id={room.id}
+            name={room.chatRoomName}
+            titleSubInfo={room.latestMessage.name}
+            primarySubInfo={room.latestMessage.content}
+            unreadMessageCount={room.unreadMessageCount}
+            timestamp={room.latestMessage.timestamp}
+            icon={iconType(room.chatRoomType)}
+          ></Tile>
+        ))
+      ) : (
+        <p>No chat rooms available</p>
+      )}
     </div>
   );
 };
