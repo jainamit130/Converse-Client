@@ -24,7 +24,7 @@ const ChatRoom = ({ activeChatRoomId, activeChatRoomName }) => {
 
   return (
     <div className="chatRoom">
-      <ChatDetails></ChatDetails>
+      <ChatDetails key={activeChatRoomId}></ChatDetails>
       <div className="message">
         {messages.length > 0 &&
           messages.map((message) => <Message message={message}></Message>)}

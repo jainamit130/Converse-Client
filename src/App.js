@@ -9,10 +9,6 @@ import Home from "./components/home/Home";
 import { useEffect } from "react";
 
 function App() {
-  useEffect(() => {
-    localStorage.removeItem("activeChatRoomId");
-    localStorage.removeItem("activeChatRoomName");
-  }, []);
   return (
     <ApolloProvider client={client}>
       <UserWebSocketProvider>
