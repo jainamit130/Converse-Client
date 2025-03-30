@@ -28,8 +28,8 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
 // status can be null if the user is not the message sender
 
 export const GET_CHAT_ROOM_DATA = gql`
-  query getChatRoomData {
-    getChatRoomData {
+  query getChatRoomData($chatRoomId: String!) {
+    getChatRoomData(chatRoomId: $chatRoomId) {
       messages {
         id
         senderId

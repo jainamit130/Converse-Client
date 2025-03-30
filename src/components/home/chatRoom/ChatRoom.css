@@ -1,7 +1,8 @@
 .chatRoom{
     right: 0;
-}
+    background-image: url('../../../assets/ChatBackground.png');}
 
 .message{
-    width: 40%;
+    margin: 10px;
+    max-width: 40%;
 }

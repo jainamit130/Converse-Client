@@ -6,7 +6,6 @@ import client from "./config/client/ApolloClient";
 import { UserWebSocketProvider } from "./context/WebSocketContext/UserWebSocketContext";
 import { ChatRoomWebSocketProvider } from "./context/WebSocketContext/ChatRoomWebSocketContext";
 import Home from "./components/home/Home";
-import { useEffect } from "react";
 
 function App() {
   return (

@@ -9,12 +9,13 @@ import Message from "./message/Message";
 const ChatRoom = ({ activeChatRoomId, activeChatRoomName }) => {
   const { messages, setMessages } = useChatRoomWebSocket([]);
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
+    variables: { chatRoomId: activeChatRoomId },
     skip: !activeChatRoomId,
+    fetchPolicy: "network-only",
   });
 
   useEffect(() => {
     if (data && activeChatRoomId) {
-      console.log(data.getChatRoomData.messages);
       setMessages(data.getChatRoomData.messages || []);
     }
   }, [data, activeChatRoomId]);
@@ -25,7 +26,7 @@ const ChatRoom = ({ activeChatRoomId, activeChatRoomName }) => {
   return (
     <div className="chatRoom">
       <ChatDetails key={activeChatRoomId}></ChatDetails>
-      <div className="message">
+      <div>
         {messages.length > 0 &&
           messages.map((message) => <Message message={message}></Message>)}
       </div>

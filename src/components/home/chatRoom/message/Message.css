@@ -1,9 +1,10 @@
 .message{
+    border: 10px;
+    min-width: 10%;
     background-color: rgb(210, 255, 160);
 }
 
 .message-right {
-    padding: 10px;
     height: max-content;
 }
 

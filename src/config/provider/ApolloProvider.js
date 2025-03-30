@@ -24,24 +24,8 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-const urlParamsLink = new ApolloLink((operation, forward) => {
-  const { operationName } = operation;
-
-  if (operationName === "getChatRoomData") {
-    const chatRoomId = localStorage.getItem("activeChatRoomId");
-    if (chatRoomId && chatRoomId.trim() !== "") {
-      const newUri = `${config.CHAT_BASE_URL}/graphql?chatRoomId=${chatRoomId}`;
-      operation.setContext({
-        uri: newUri,
-      });
-    }
-  }
-
-  return forward(operation);
-});
-
 const client = new ApolloClient({
-  link: authLink.concat(urlParamsLink).concat(httpLink),
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
 
