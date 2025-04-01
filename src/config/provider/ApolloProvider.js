@@ -8,6 +8,7 @@ import {
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import config from "../environment";
+import { useNavigate } from "react-router-dom";
 
 const httpLink = createHttpLink({
   uri: config.CHAT_BASE_URL + "/graphql",
@@ -24,8 +25,21 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const errorLink = new ApolloLink((operation, forward) => {
+  return forward(operation).map((response) => {
+    if (
+      response.errors &&
+      response.errors.some((err) => err.message === "403")
+    ) {
+      const navigate = useNavigate();
+      navigate("/");
+    }
+    return response;
+  });
+});
+
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: errorLink.concat(authLink.concat(httpLink)),
   cache: new InMemoryCache(),
 });
 

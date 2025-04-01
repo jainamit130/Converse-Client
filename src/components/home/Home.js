@@ -7,10 +7,12 @@ import "./Home.css";
 const Home = () => {
   const [activeChatRoomId, setActiveChatRoomId] = useState(null);
   const [activeChatRoomName, setActiveChatRoomName] = useState(null);
+  const [activeChatRoomType, setActiveChatRoomType] = useState(null);
 
-  const handleChatRoomSelect = (chatRoomId, chatRoomName) => {
+  const handleChatRoomSelect = (chatRoomId, chatRoomName, chatRoomType) => {
     localStorage.setItem("activeChatRoomId", chatRoomId);
     localStorage.setItem("activeChatRoomName", chatRoomName);
+    localStorage.setItem("activeChatRoomType", chatRoomType);
     setActiveChatRoomId(chatRoomId);
     setActiveChatRoomName(chatRoomName);
   };
@@ -32,6 +34,7 @@ const Home = () => {
           <ChatRoom
             activeChatRoomId={activeChatRoomId}
             activeChatRoomName={activeChatRoomName}
+            activeChatRoomType={activeChatRoomType}
           />
         ) : (
           <div

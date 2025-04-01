@@ -19,14 +19,28 @@ const ChatRoomWebSocketContext = createContext({
 export const useChatRoomWebSocket = () => useContext(ChatRoomWebSocketContext);
 
 export const ChatRoomWebSocketProvider = ({ children }) => {
+  const [baseTopic] = useState("/app/chat/");
   const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState(new Map());
-  const { initWebSocket, closeWebSocket } = useWebSocket();
+  const { initWebSocket, closeWebSocket, sendMessage } = useWebSocket();
+
+  const send = (subTopic, message) => {
+    const activeChatRoomId = localStorage.getItem("activeChatRoomId");
+    if (activeChatRoomId) {
+      const topic = baseTopic + subTopic + activeChatRoomId;
+      sendMessage(topic, message);
+    }
+  };
 
   const onMessage = (messageData) => {
     switch (messageData.notificationType) {
       case NotificationType.MESSAGE:
-        handleMessageNotification(messageData);
+        handleMessageNotification(
+          messageData,
+          chatRooms,
+          setChatRooms,
+          setMessages
+        );
         break;
       case NotificationType.STATUS:
         handleUserStatusNotification(messageData);
@@ -60,7 +74,7 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
 
   return (
     <ChatRoomWebSocketContext.Provider
-      value={{ chatRooms, messages, setChatRooms, setMessages }}
+      value={{ chatRooms, messages, setChatRooms, setMessages, send }}
     >
       {children}
     </ChatRoomWebSocketContext.Provider>

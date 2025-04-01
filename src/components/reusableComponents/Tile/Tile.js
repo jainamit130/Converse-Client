@@ -8,6 +8,7 @@ import "../Tile/Tile.css";
 const Tile = ({
   id,
   name,
+  type,
   options,
   timestamp,
   titleSubInfo, // Nullable
@@ -28,7 +29,11 @@ const Tile = ({
 
   const handleChatRoomClick = () => {
     if (!isOpen && tileClick) {
-      tileClick({ chatRoomId: id, chatRoomName: name });
+      tileClick({
+        chatRoomId: id,
+        chatRoomName: name,
+        chatRoomType: type,
+      });
     }
   };
 

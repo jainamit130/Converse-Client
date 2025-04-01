@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MessageStatusIcon from "../message/messageStatus/MessageStatus";
 import { formatTime, parseDate } from "../../../../util/dateUtil";
 import "./Message.css";
 
 const Message = ({ message }) => {
-  const { userId } = useState(localStorage.getItem("userId"));
+  const [userId] = useState(localStorage.getItem("userId"));
+  const [chatRoomType] = useState(localStorage.getItem("activeChatRoomType"));
   const { name, content, timestamp, id, senderId, status } = message;
   const messageDate = parseDate(timestamp);
   const formattedTime = formatTime(messageDate);
@@ -16,7 +17,11 @@ const Message = ({ message }) => {
         senderId === userId ? "message-right" : "message-left"
       }`}
     >
-      <div>{senderId === userId ? "You" : name}</div>
+      {chatRoomType === "GROUP" && (
+        <div className="messageSenderName">
+          {senderId === userId ? "You" : name}
+        </div>
+      )}
       <div className="messageContent">{content}</div>
       {
         <MessageStatusIcon

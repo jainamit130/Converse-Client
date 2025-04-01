@@ -1,6 +1,15 @@
 .chatDetails{
     width: 100%;
+    position: sticky;
     height: 60px;
-    position: relative;
-    background-color: rgb(83, 138, 163);
+    background-color: rgb(54, 89, 105);
+    flex-shrink: 0;
+    top: 0;
+}
+
+.chatRoomName{
+    font-weight: 600;
+    padding: 15px;
+    font-size: larger;
+    color: white;
 }

@@ -1,11 +1,23 @@
 .message{
-    border: 10px;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 10px;
     min-width: 10%;
+    width: fit-content;
+    max-width: 40%;
     background-color: rgb(210, 255, 160);
+}
+
+.messageSenderName{
+    padding-bottom: 2px;
+    font-style: normal;
+    font-weight: 500;
+    color: rgb(94, 168, 141);
 }
 
 .message-right {
     height: max-content;
+    justify-self: right;
 }
 
 .message-left {
@@ -14,10 +26,10 @@
     font-weight: 400;
     background-color: #ffffff;
     text-align: left;
-    margin-right: auto;
   }
 
   .message-content {
+    padding: 10px;
     min-height: 80px;
     background-image: url('../../../../assets/ChatBackground.png');
     justify-content: right;

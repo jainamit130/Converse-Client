@@ -13,9 +13,10 @@ const ChatRooms = ({ onChatRoomSelect }) => {
   const { chatRooms, setChatRooms } = useChatRoomWebSocket();
   const navigate = useNavigate();
 
-  const openChatRoom = ({ chatRoomId, chatRoomName }) => {
+  const openChatRoom = ({ chatRoomId, chatRoomName, chatRoomType }) => {
     localStorage.setItem("activeChatRoomId", chatRoomId);
     localStorage.setItem("activeChatRoomName", chatRoomName);
+    localStorage.setItem("activeChatRoomType", chatRoomType);
   };
 
   useEffect(() => {
@@ -33,9 +34,14 @@ const ChatRooms = ({ onChatRoomSelect }) => {
 
   useEffect(() => {
     if (data && userId) {
-      setChatRooms(data.getChatRoomsOfUser || []);
+      const newChatRooms = new Map();
+      (data.getChatRoomsOfUser || []).forEach((chatRoom) => {
+        newChatRooms.set(chatRoom.id, chatRoom);
+      });
+
+      setChatRooms(newChatRooms);
     }
-  }, [data, userId, setChatRooms]);
+  }, [data, userId]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -43,19 +49,23 @@ const ChatRooms = ({ onChatRoomSelect }) => {
   return (
     <div className="chatRooms">
       <h2>Chats</h2>
-      {chatRooms.length > 0 ? (
-        chatRooms.map((room) => (
+      {chatRooms.size > 0 ? (
+        // Convert the Map to an array to use map()
+        Array.from(chatRooms.values()).map((room) => (
           <Tile
             key={room.id}
-            tileClick={() => onChatRoomSelect(room.id, room.chatRoomName)}
+            tileClick={() =>
+              onChatRoomSelect(room.id, room.chatRoomName, room.chatRoomType)
+            }
             id={room.id}
             name={room.chatRoomName}
+            type={room.chatRoomType}
             titleSubInfo={room.latestMessage.name}
             primarySubInfo={room.latestMessage.content}
             unreadMessageCount={room.unreadMessageCount}
             timestamp={room.latestMessage.timestamp}
             icon={iconType(room.chatRoomType)}
-          ></Tile>
+          />
         ))
       ) : (
         <p>No chat rooms available</p>

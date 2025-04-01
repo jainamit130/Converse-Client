@@ -1,8 +1,10 @@
 .chatRoom{
-    right: 0;
-    background-image: url('../../../assets/ChatBackground.png');}
+    flex-direction: column;
+    display: flex;
+    background-image: url('../../../assets/ChatBackground.png');
+}
 
-.message{
-    margin: 10px;
-    max-width: 40%;
+.messagesContainer{
+    flex-grow: 1; 
+    overflow-y: auto; 
 }

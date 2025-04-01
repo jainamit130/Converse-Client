@@ -5,8 +5,9 @@ import { GET_CHAT_ROOM_DATA } from "../../../graphql/queries";
 import { useChatRoomWebSocket } from "../../../context/WebSocketContext/ChatRoomWebSocketContext";
 import ChatDetails from "./chatDetails/ChatDetails";
 import Message from "./message/Message";
+import ChatInput from "./chatInput/ChatInput";
 
-const ChatRoom = ({ activeChatRoomId, activeChatRoomName }) => {
+const ChatRoom = ({ activeChatRoomId }) => {
   const { messages, setMessages } = useChatRoomWebSocket([]);
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
@@ -25,10 +26,16 @@ const ChatRoom = ({ activeChatRoomId, activeChatRoomName }) => {
 
   return (
     <div className="chatRoom">
-      <ChatDetails key={activeChatRoomId}></ChatDetails>
       <div>
-        {messages.length > 0 &&
-          messages.map((message) => <Message message={message}></Message>)}
+        <ChatDetails></ChatDetails>
+        {messages.length > 0 && (
+          <div className="messagesContainer">
+            {messages.map((message) => (
+              <Message message={message} key={message.id} />
+            ))}
+          </div>
+        )}
+        <ChatInput></ChatInput>
       </div>
     </div>
   );

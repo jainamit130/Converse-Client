@@ -5,6 +5,7 @@ import config from "../config/environment";
 const useWebSocket = () => {
   const brokerURL = `${config.CHAT_BASE_URL}/ws`;
   const [client, setClient] = useState(null);
+  const [connected, setConnected] = useState(false);
 
   const initWebSocket = (topic, onMessage) => {
     const token = localStorage.getItem("authenticationToken") || "";
@@ -19,9 +20,11 @@ const useWebSocket = () => {
           const messageData = JSON.parse(message.body);
           onMessage(messageData);
         });
+        setConnected(true); // Mark as connected
       },
       onDisconnect: () => {
         console.log(`${topic} WebSocket disconnected`);
+        setConnected(false); // Mark as disconnected
       },
     });
 
@@ -35,7 +38,18 @@ const useWebSocket = () => {
     }
   };
 
-  return { initWebSocket, closeWebSocket, client };
+  const sendMessage = (topic, message) => {
+    if (client && connected) {
+      client.publish({
+        destination: topic,
+        body: JSON.stringify(message),
+      });
+    } else {
+      console.error("WebSocket not connected. Cannot send message.");
+    }
+  };
+
+  return { initWebSocket, closeWebSocket, sendMessage, client };
 };
 
 export default useWebSocket;
