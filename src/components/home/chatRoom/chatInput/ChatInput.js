@@ -15,7 +15,7 @@ const ChatInput = ({ chatRoomId }) => {
     const newMessage = {
       content: messageContent,
     };
-    send("send/Message/", newMessage);
+    send("send/message/", newMessage);
     setMessage("");
   };
 

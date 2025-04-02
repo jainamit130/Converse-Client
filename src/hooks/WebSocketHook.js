@@ -40,9 +40,15 @@ const useWebSocket = () => {
 
   const sendMessage = (topic, message) => {
     if (client && connected) {
+      const token = localStorage.getItem("authenticationToken") || "";
+
+      const messageWithToken = {
+        ...message,
+      };
+
       client.publish({
         destination: topic,
-        body: JSON.stringify(message),
+        body: JSON.stringify(messageWithToken),
       });
     } else {
       console.error("WebSocket not connected. Cannot send message.");
