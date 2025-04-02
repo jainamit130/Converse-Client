@@ -6,6 +6,8 @@ import { useChatRoom } from "../../context/ChatRoomContext";
 import { usePageActivity } from "../../context/PageActivityContext";
 import { useWebSocket } from "../../context/WebSocketContext";
 import config from "../../config/environment";
+import loginChatBackgroundImage from "../../assets/LoginChatBackground.png";
+import backgroundImage from "../../assets/LoginBackground.png";
 
 const LoginSignUpPage = () => {
   const {
@@ -82,6 +84,8 @@ const LoginSignUpPage = () => {
 
   return (
     <div style={styles.container}>
+      <div style={styles.dimmer}></div>
+
       <div style={styles.loginBox}>
         <h2 style={styles.title}>{isLoginPage ? "Login" : "Sign Up"}</h2>
         <form onSubmit={handle}>
@@ -121,6 +125,88 @@ const LoginSignUpPage = () => {
   );
 };
 
-const styles = {};
+const styles = {
+  container: {
+    display: "flex",
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "100vh",
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center center",
+    backgroundRepeat: "no-repeat",
+  },
+  dimmer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(47, 49, 139, 0.2)",
+    zIndex: 1,
+  },
+  loginBox: {
+    width: "300px",
+    padding: "40px",
+    zIndex: 2,
+    backgroundImage: `url(${loginChatBackgroundImage})`,
+    borderRadius: "10px",
+    borderColor: "black",
+    boxShadow: "0 4px 8px rgba(0, 1, 87, 0.1)",
+    textAlign: "center",
+    border: "2px solid rgba(0, 1, 87,0.6)",
+  },
+  title: {
+    fontSize: "24px",
+    marginBottom: "20px",
+    fontWeight: "bold",
+    color: "#333",
+  },
+  inputGroup: {
+    marginBottom: "20px",
+    textAlign: "left",
+  },
+  label: {
+    display: "block",
+    fontSize: "15px",
+    fontWeight: "450",
+    marginBottom: "5px",
+    color: "#555",
+  },
+  input: {
+    width: "93%",
+    padding: "10px",
+    fontSize: "16px",
+    borderRadius: "4px",
+    border: "1px solid #ccc",
+    outline: "none",
+    marginBottom: "10px",
+  },
+  button: {
+    width: "100%",
+    padding: "12px",
+    fontSize: "16px",
+    backgroundColor: "#4CAF50",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+  switchText: {
+    fontSize: "15px",
+    marginTop: "20px",
+    color: "#555",
+  },
+  link: {
+    fontSize: "15px",
+    color: "#4CAF50",
+    fontWeight: "500",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    textDecoration: "underline",
+  },
+};
 
 export default LoginSignUpPage;
