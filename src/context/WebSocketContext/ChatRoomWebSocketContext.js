@@ -55,7 +55,7 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
         handleChatTransactionNotification(messageData);
         break;
       default:
-        console.error("Unknown message type:", messageData.type);
+        console.error("Unknown message type:", messageData);
         break;
     }
   };

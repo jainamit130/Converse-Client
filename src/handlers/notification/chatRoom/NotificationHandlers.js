@@ -27,7 +27,9 @@ export const handleMessageNotification = (
       setMessages((prevMessages) => [...prevMessages, data.message]);
     }
 
-    setChatRooms(new Map(chatRooms).set(chatRoom.id, updatedChatRoom));
+    const updatedChatRooms = new Map(chatRooms);
+    updatedChatRooms.set(chatRoom.id, updatedChatRoom);
+    setChatRooms(updatedChatRooms);
   }
 };
 

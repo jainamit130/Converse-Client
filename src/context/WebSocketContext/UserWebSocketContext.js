@@ -18,7 +18,7 @@ export const UserWebSocketProvider = ({ children }) => {
   const { initWebSocket, closeWebSocket } = useWebSocket();
 
   const onMessage = (messageData) => {
-    switch (messageData.type) {
+    switch (messageData.notificationType) {
       case NotificationType.NEW_CHAT:
         handleNewChatNotification(messageData);
         break;
@@ -26,7 +26,7 @@ export const UserWebSocketProvider = ({ children }) => {
         handleMessageMarkedNotification(messageData);
         break;
       default:
-        console.error("Unknown message type:", messageData.type);
+        console.error("Unknown message type:", messageData);
         break;
     }
   };
