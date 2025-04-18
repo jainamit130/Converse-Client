@@ -1,61 +1,79 @@
-import { useState } from "react";
 import { Client } from "@stomp/stompjs";
 import config from "../config/environment";
 
-const useWebSocket = () => {
-  const brokerURL = `${config.CHAT_BASE_URL}/ws`;
-  const [client, setClient] = useState(null);
-  const [connected, setConnected] = useState(false);
+let client = null;
+const clients = new Map(); // Only tracks subscriptions by topic
 
-  const initWebSocket = (topic, onMessage) => {
+const initWebSocket = (topic, onMessage) => {
+  if (!client) {
     const token = localStorage.getItem("authenticationToken") || "";
-    const stompClient = new Client({
-      brokerURL: brokerURL,
-      connectHeaders: {
-        token: `Bearer ${token}`,
-      },
+    client = new Client({
+      brokerURL: `${config.CHAT_BASE_URL}/ws`,
+      connectHeaders: { token: `Bearer ${token}` },
       onConnect: () => {
-        console.log(`${topic} WebSocket connected`);
-        stompClient.subscribe(topic, (message) => {
-          const messageData = JSON.parse(message.body);
-          onMessage(messageData);
+        // Subscribe once client is connected
+        clients.forEach((_, subscribedTopic) => {
+          client.subscribe(subscribedTopic, (message) => {
+            const data = JSON.parse(message.body);
+            clients.get(subscribedTopic)(data);
+          });
         });
-        setConnected(true); // Mark as connected
       },
-      onDisconnect: () => {
-        console.log(`${topic} WebSocket disconnected`);
-        setConnected(false); // Mark as disconnected
-      },
+      onDisconnect: () => console.log(`Disconnected WebSocket`),
     });
 
-    stompClient.activate();
-    setClient(stompClient);
-  };
+    client.activate();
+  }
 
-  const closeWebSocket = () => {
-    if (client) {
-      client.deactivate();
-    }
-  };
+  if (!clients.has(topic)) {
+    clients.set(topic, onMessage);
 
-  const sendMessage = (topic, message) => {
-    if (client && connected) {
-      const token = localStorage.getItem("authenticationToken") || "";
-
-      const messageWithToken = {
-        ...message,
-      };
-
-      client.publish({
-        destination: topic,
-        body: JSON.stringify(messageWithToken),
+    // If already connected, subscribe immediately
+    if (client.connected) {
+      client.subscribe(topic, (message) => {
+        const data = JSON.parse(message.body);
+        onMessage(data);
       });
-    } else {
-      console.error("WebSocket not connected. Cannot send message.");
     }
-  };
+  }
 
-  return { initWebSocket, closeWebSocket, sendMessage, client };
+  return client;
 };
 
-export default useWebSocket;
+const closeWebSocket = (topic) => {
+  if (clients.has(topic)) {
+    const { subscription } = clients.get(topic);
+
+    try {
+      subscription?.unsubscribe();
+    } catch (err) {
+      console.warn(`Failed to unsubscribe from topic: ${topic}`, err);
+    }
+
+    clients.delete(topic);
+
+    if (clients.size === 0 && client?.connected) {
+      client.deactivate();
+      client = null;
+    }
+  }
+};
+
+const sendMessage = (destination, message) => {
+  if (client?.connected) {
+    const token = localStorage.getItem("authenticationToken") || "";
+    client.publish({
+      destination,
+      connectHeaders: { token: `Bearer ${token}` },
+      body: JSON.stringify(message),
+    });
+  } else {
+    console.error(
+      "WebSocket client not connected. Cannot publish to:",
+      destination
+    );
+  }
+};
+
+export default () => ({ initWebSocket, closeWebSocket, sendMessage });
+export { clients };

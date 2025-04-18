@@ -8,12 +8,22 @@ import Message from "./message/Message";
 import ChatInput from "./chatInput/ChatInput";
 
 const ChatRoom = ({ activeChatRoomId }) => {
-  const { messages, setMessages } = useChatRoomWebSocket([]);
+  const { messages, setMessages } = useChatRoomWebSocket();
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
     skip: !activeChatRoomId,
     fetchPolicy: "network-only",
   });
+
+  const bottomRef = useRef(null);
+
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "auto" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     if (data && activeChatRoomId) {
@@ -26,16 +36,16 @@ const ChatRoom = ({ activeChatRoomId }) => {
 
   return (
     <div className="chatRoom">
-      <div>
-        <ChatDetails></ChatDetails>
-        {messages.length > 0 && (
-          <div className="messagesContainer">
-            {messages.map((message) => (
+      <ChatDetails />
+      <div className="chatContainer">
+        <div className="messagesContainer">
+          {Array.isArray(messages) &&
+            messages.map((message) => (
               <Message message={message} key={message.id} />
             ))}
-          </div>
-        )}
-        <ChatInput></ChatInput>
+          <div ref={bottomRef} />
+        </div>
+        <ChatInput />
       </div>
     </div>
   );

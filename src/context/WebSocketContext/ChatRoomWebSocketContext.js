@@ -1,5 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import useWebSocket from "../../hooks/WebSocketHook";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
+import useWebSocket, { clients } from "../../hooks/WebSocketHook";
 import {
   handleUserStatusNotification,
   handleTypingNotification,
@@ -22,6 +28,7 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   const [baseTopic] = useState("/app/chat/");
   const [chatRooms, setChatRooms] = useState(new Map());
   const [messages, setMessages] = useState(new Map());
+  const [webSockets, setWebSockets] = useState(new Map());
   const { initWebSocket, closeWebSocket, sendMessage } = useWebSocket();
 
   const send = (subTopic, message) => {
@@ -61,15 +68,19 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    chatRooms.forEach((chatRoom) => {
-      initWebSocket(`/topic/chat/${chatRoom.id}`, onMessage);
+    chatRooms.forEach((room) => {
+      initWebSocket(`/topic/chat/${room.id}`, onMessage);
     });
 
-    return () => {
-      chatRooms.forEach((chatRoom) => {
-        closeWebSocket(`/topic/chat/${chatRoom.id}`);
-      });
-    };
+    const currentTopics = new Set(
+      [...chatRooms.keys()].map((id) => `/topic/chat/${id}`)
+    );
+
+    [...clients.keys()].forEach((topic) => {
+      if (topic.startsWith("/topic/chat/") && !currentTopics.has(topic)) {
+        closeWebSocket(topic);
+      }
+    });
   }, [chatRooms]);
 
   return (

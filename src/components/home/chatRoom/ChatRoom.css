@@ -1,10 +1,16 @@
 .chatRoom{
     flex-direction: column;
     display: flex;
+    height: 100vh;
     background-image: url('../../../assets/ChatBackground.png');
 }
 
+.chatContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; 
+  }  
+
 .messagesContainer{
     flex-grow: 1; 
-    overflow-y: auto; 
 }

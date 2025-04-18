@@ -32,13 +32,10 @@ export const UserWebSocketProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (userId) {
-      initWebSocket(`/topic/user/${userId}`, onMessage);
-    }
+    const topic = `/topic/user/${userId}`;
+    if (userId) initWebSocket(topic, onMessage);
 
-    return () => {
-      closeWebSocket();
-    };
+    return () => closeWebSocket(topic);
   }, [userId]);
 
   return (
