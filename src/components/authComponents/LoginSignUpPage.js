@@ -50,6 +50,9 @@ const LoginSignUpPage = () => {
         localStorage.setItem("authenticationToken", authenticationToken);
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("active", true);
+        localStorage.removeItem("activeChatRoomName");
+        localStorage.removeItem("activeChatRoomType");
+        localStorage.removeItem("activeChatRoomId");
         navigate("/chat-rooms");
       }
     } catch (error) {

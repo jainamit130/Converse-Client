@@ -14,20 +14,16 @@ import {
   handleMessageDeletedNotification,
 } from "../../handlers/notification/chatRoom/NotificationHandlers";
 import { NotificationType } from "../../components/MappingTypes/NotificationTypes";
+import { useChatRoomContext } from "../ChatRoomContext";
 
-const ChatRoomWebSocketContext = createContext({
-  chatRooms: new Map(),
-  messages: new Map(),
-  setChatRooms: () => {},
-  setMessages: () => {},
-});
+const ChatRoomWebSocketContext = createContext();
 
 export const useChatRoomWebSocket = () => useContext(ChatRoomWebSocketContext);
 
 export const ChatRoomWebSocketProvider = ({ children }) => {
   const [baseTopic] = useState("/app/chat/");
-  const [chatRooms, setChatRooms] = useState(new Map());
-  const [messages, setMessages] = useState(new Map());
+  const { messages, setMessages, chatRooms, setChatRooms } =
+    useChatRoomContext();
   const [webSockets, setWebSockets] = useState(new Map());
   const { initWebSocket, closeWebSocket, sendMessage } = useWebSocket();
 
@@ -37,6 +33,11 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
       const topic = baseTopic + subTopic + activeChatRoomId;
       sendMessage(topic, message);
     }
+  };
+
+  const closeAllWebSockets = () => {
+    [...clients.keys()].forEach(closeWebSocket);
+    console.log("🧹 All WebSocket connections closed");
   };
 
   const onMessage = (messageData) => {
@@ -67,26 +68,39 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
     }
   };
 
+  const prevChatRoomIds = useRef(new Set());
+
   useEffect(() => {
-    chatRooms.forEach((room) => {
-      initWebSocket(`/topic/chat/${room.id}`, onMessage);
-    });
+    const currentIds = new Set(chatRooms.keys());
+
+    const hasChanged =
+      currentIds.size !== prevChatRoomIds.current.size ||
+      [...currentIds].some((id) => !prevChatRoomIds.current.has(id));
+
+    if (!hasChanged) return;
 
     const currentTopics = new Set(
-      [...chatRooms.keys()].map((id) => `/topic/chat/${id}`)
+      [...currentIds].map((id) => `/topic/chat/${id}`)
     );
+    const existingTopics = new Set(clients.keys());
 
-    [...clients.keys()].forEach((topic) => {
+    currentTopics.forEach((topic) => {
+      if (!clients.has(topic)) {
+        initWebSocket(topic, onMessage);
+      }
+    });
+
+    existingTopics.forEach((topic) => {
       if (topic.startsWith("/topic/chat/") && !currentTopics.has(topic)) {
         closeWebSocket(topic);
       }
     });
+
+    prevChatRoomIds.current = currentIds;
   }, [chatRooms]);
 
   return (
-    <ChatRoomWebSocketContext.Provider
-      value={{ chatRooms, messages, setChatRooms, setMessages, send }}
-    >
+    <ChatRoomWebSocketContext.Provider value={{ send }}>
       {children}
     </ChatRoomWebSocketContext.Provider>
   );

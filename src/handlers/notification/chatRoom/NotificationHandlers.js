@@ -24,7 +24,15 @@ export const handleMessageNotification = (
 
     const activeChatRoomId = localStorage.getItem("activeChatRoomId");
     if (activeChatRoomId && activeChatRoomId === chatRoom.id) {
-      setMessages((prevMessages) => [...prevMessages, data.message]);
+      setMessages((prevMap) => {
+        const prevMessages = prevMap.get(activeChatRoomId) || [];
+        const updatedMessages = [...prevMessages, data.message];
+
+        const updatedMap = new Map(prevMap); // ✅ create a new Map
+        updatedMap.set(activeChatRoomId, updatedMessages);
+
+        return updatedMap;
+      });
     }
 
     const updatedChatRooms = new Map(chatRooms);
@@ -39,6 +47,6 @@ export const handleTypingNotification = (data) => {
 };
 
 export const handleUserStatusNotification = (data) => {
-  console.log("User Status Changed:", data.username, data.status);
+  console.log("User Status Changed:", data.username, data.status, data);
   // Handle user status change (e.g., show them as online or offline)
 };

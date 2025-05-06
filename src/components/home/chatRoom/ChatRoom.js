@@ -2,13 +2,13 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useQuery } from "@apollo/client";
 import "./ChatRoom.css";
 import { GET_CHAT_ROOM_DATA } from "../../../graphql/queries";
-import { useChatRoomWebSocket } from "../../../context/WebSocketContext/ChatRoomWebSocketContext";
 import ChatDetails from "./chatDetails/ChatDetails";
 import Message from "./message/Message";
 import ChatInput from "./chatInput/ChatInput";
+import { useChatRoomContext } from "../../../context/ChatRoomContext";
 
 const ChatRoom = ({ activeChatRoomId }) => {
-  const { messages, setMessages } = useChatRoomWebSocket();
+  const { messages, setMessages } = useChatRoomContext();
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
     skip: !activeChatRoomId,
@@ -27,9 +27,22 @@ const ChatRoom = ({ activeChatRoomId }) => {
 
   useEffect(() => {
     if (data && activeChatRoomId) {
-      setMessages(data.getChatRoomData.messages || []);
+      setMessages((prevMap) => {
+        const updatedMap = new Map(prevMap); // copy the existing Map
+        const newMessagesArray = data.getChatRoomData.messages || [];
+        updatedMap.set(activeChatRoomId, newMessagesArray);
+        return updatedMap; // ✅ must return the updated Map
+      });
     }
   }, [data, activeChatRoomId]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  const chatRoomMessages =
+    messages instanceof Map && messages.get(activeChatRoomId)
+      ? messages.get(activeChatRoomId)
+      : [];
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -39,10 +52,9 @@ const ChatRoom = ({ activeChatRoomId }) => {
       <ChatDetails />
       <div className="chatContainer">
         <div className="messagesContainer">
-          {Array.isArray(messages) &&
-            messages.map((message) => (
-              <Message message={message} key={message.id} />
-            ))}
+          {chatRoomMessages.map((message) => (
+            <Message message={message} key={message.id} />
+          ))}
           <div ref={bottomRef} />
         </div>
         <ChatInput />

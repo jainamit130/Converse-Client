@@ -5,19 +5,22 @@ import { UserWebSocketProvider } from "./context/WebSocketContext/UserWebSocketC
 import { ChatRoomWebSocketProvider } from "./context/WebSocketContext/ChatRoomWebSocketContext";
 import Home from "./components/home/Home";
 import ApolloProviderWrapper from "./config/provider/ApolloProvider";
+import { ChatRoomContextProvider } from "./context/ChatRoomContext";
 
 function App() {
   return (
     <Router>
       <ApolloProviderWrapper>
-        <UserWebSocketProvider>
-          <ChatRoomWebSocketProvider>
-            <Routes>
-              <Route path="/" element={<LoginSignUpPage />} />
-              <Route path="/chat-rooms" element={<Home />} />
-            </Routes>
-          </ChatRoomWebSocketProvider>
-        </UserWebSocketProvider>
+        <ChatRoomContextProvider>
+          <UserWebSocketProvider>
+            <ChatRoomWebSocketProvider>
+              <Routes>
+                <Route path="/" element={<LoginSignUpPage />} />
+                <Route path="/chat-rooms" element={<Home />} />
+              </Routes>
+            </ChatRoomWebSocketProvider>
+          </UserWebSocketProvider>
+        </ChatRoomContextProvider>
       </ApolloProviderWrapper>
     </Router>
   );

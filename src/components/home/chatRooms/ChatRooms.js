@@ -5,12 +5,12 @@ import { GET_CHAT_ROOMS_OF_USER } from "../../../graphql/queries";
 import { useNavigate } from "react-router-dom";
 import { iconType } from "../../MappingTypes/iconFactory";
 import Tile from "../../reusableComponents/Tile/Tile";
-import { useChatRoomWebSocket } from "../../../context/WebSocketContext/ChatRoomWebSocketContext";
 import { useUserWebSocket } from "../../../context/WebSocketContext/UserWebSocketContext";
+import { useChatRoomContext } from "../../../context/ChatRoomContext";
 
 const ChatRooms = ({ onChatRoomSelect }) => {
   const { userId, setUserId } = useUserWebSocket();
-  const { chatRooms, setChatRooms } = useChatRoomWebSocket();
+  const { chatRooms, setChatRooms } = useChatRoomContext();
   const navigate = useNavigate();
 
   const openChatRoom = ({ chatRoomId, chatRoomName, chatRoomType }) => {
@@ -30,7 +30,9 @@ const ChatRooms = ({ onChatRoomSelect }) => {
     }
   }, [userId, setUserId]);
 
-  const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER);
+  const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
+    fetchPolicy: "network-only",
+  });
 
   useEffect(() => {
     if (data && userId) {

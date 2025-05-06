@@ -5,6 +5,7 @@ import {
 } from "../../handlers/notification/user/NotificationHandlers";
 import { NotificationType } from "../../components/MappingTypes/NotificationTypes";
 import useWebSocket from "../../hooks/WebSocketHook";
+import { useChatRoomContext } from "../ChatRoomContext";
 
 const UserWebSocketContext = createContext({
   userId: null,
@@ -16,20 +17,27 @@ export const useUserWebSocket = () => useContext(UserWebSocketContext);
 export const UserWebSocketProvider = ({ children }) => {
   const [userId, setUserId] = useState();
   const { initWebSocket, closeWebSocket } = useWebSocket();
+  const { messages, setMessages } = useChatRoomContext();
 
   const onMessage = (messageData) => {
     switch (messageData.notificationType) {
       case NotificationType.NEW_CHAT:
         handleNewChatNotification(messageData);
         break;
-      case NotificationType.MESSAGE_MARKED:
-        handleMessageMarkedNotification(messageData);
+      case NotificationType.MESSAGE_DELIVERED:
+      case NotificationType.MESSAGE_READ:
+        handleMessageMarkedNotification(messageData, setMessages);
         break;
       default:
         console.error("Unknown message type:", messageData);
         break;
     }
   };
+
+  useEffect(() => {
+    console.log("messages in UserWebSocketProvider:", messages);
+    console.log("setMessages in UserWebSocketProvider:", setMessages);
+  }, []);
 
   useEffect(() => {
     const topic = `/topic/user/${userId}`;
