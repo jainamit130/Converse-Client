@@ -6,9 +6,10 @@ import ChatDetails from "./chatDetails/ChatDetails";
 import Message from "./message/Message";
 import ChatInput from "./chatInput/ChatInput";
 import { useChatRoomContext } from "../../../context/ChatRoomContext";
+import { readChatRoom } from "./util/ChatRoomUtil";
 
 const ChatRoom = ({ activeChatRoomId }) => {
-  const { messages, setMessages } = useChatRoomContext();
+  const { messages, setMessages, setChatRooms } = useChatRoomContext();
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
     skip: !activeChatRoomId,
@@ -28,10 +29,11 @@ const ChatRoom = ({ activeChatRoomId }) => {
   useEffect(() => {
     if (data && activeChatRoomId) {
       setMessages((prevMap) => {
-        const updatedMap = new Map(prevMap); // copy the existing Map
+        const updatedMap = new Map(prevMap);
         const newMessagesArray = data.getChatRoomData.messages || [];
         updatedMap.set(activeChatRoomId, newMessagesArray);
-        return updatedMap; // ✅ must return the updated Map
+        readChatRoom(setChatRooms, activeChatRoomId);
+        return updatedMap;
       });
     }
   }, [data, activeChatRoomId]);

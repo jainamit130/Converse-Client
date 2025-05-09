@@ -15,30 +15,36 @@ export const handleMessageNotification = (
   setMessages
 ) => {
   const chatRoom = chatRooms.get(data.message.chatRoomId);
+  if (!chatRoom) return;
 
-  if (chatRoom) {
-    const updatedChatRoom = {
-      ...chatRoom,
-      latestMessage: data.message,
-    };
+  let updatedChatRoom = {
+    ...chatRoom,
+    latestMessage: data.message,
+  };
 
-    const activeChatRoomId = localStorage.getItem("activeChatRoomId");
-    if (activeChatRoomId && activeChatRoomId === chatRoom.id) {
+  const activeChatRoomId = localStorage.getItem("activeChatRoomId");
+
+  if (activeChatRoomId) {
+    if (activeChatRoomId === chatRoom.id) {
       setMessages((prevMap) => {
         const prevMessages = prevMap.get(activeChatRoomId) || [];
         const updatedMessages = [...prevMessages, data.message];
 
-        const updatedMap = new Map(prevMap); // ✅ create a new Map
+        const updatedMap = new Map(prevMap);
         updatedMap.set(activeChatRoomId, updatedMessages);
-
         return updatedMap;
       });
+    } else {
+      updatedChatRoom = {
+        ...updatedChatRoom,
+        unreadMessageCount: (chatRoom.unreadMessageCount || 0) + 1,
+      };
     }
-
-    const updatedChatRooms = new Map(chatRooms);
-    updatedChatRooms.set(chatRoom.id, updatedChatRoom);
-    setChatRooms(updatedChatRooms);
   }
+
+  const updatedChatRooms = new Map(chatRooms);
+  updatedChatRooms.set(chatRoom.id, updatedChatRoom);
+  setChatRooms(updatedChatRooms);
 };
 
 export const handleTypingNotification = (data) => {
