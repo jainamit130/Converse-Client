@@ -1,9 +1,8 @@
-import React from "react";
 import TypingIndicator from "../../sideComponents/TypingIndicator";
 import { formatTime, parseDate } from "../../../util/dateUtil";
-import messageOptionsIcon from "../../../assets/MessageOptions.png";
-import OptionsDropdown from "../OptionsDropdown/OptionsDropdown";
 import "../Tile/Tile.css";
+import MessageOptions from "../OptionsDropdown/MessageOptions";
+import MessageStatusIcon from "../../home/chatRoom/message/messageStatus/MessageStatus";
 
 const Tile = ({
   id,
@@ -11,6 +10,8 @@ const Tile = ({
   type,
   options,
   timestamp,
+  message, // Nullable or present
+  userId, // Nullable or present
   titleSubInfo, // Nullable
   primarySubInfo, // Nullable
   typingUsers, // Nullable Ex: user types then the primary info gets replaced by secondary subinfo
@@ -67,29 +68,13 @@ const Tile = ({
             <div className="chatRoomTitle primarySubInfo">{name}</div>
             {formattedTime && <div className="timestamp">{formattedTime}</div>}
             {options && (
-              <div style={{ position: "absolute", right: "0" }}>
-                <img
-                  src={messageOptionsIcon}
-                  className="messageOptionsIcon"
-                  style={{
-                    position: "relative",
-                    alignItems: "center",
-                    justifyItems: "self-end",
-                  }}
-                  onClick={(event) => toggleDropdown(event, id)}
-                />
-                <div style={{ position: "absolute", right: "200px" }}>
-                  {isOpen && (
-                    <OptionsDropdown
-                      options={options}
-                      onSelect={handleSelectOption}
-                      toggleDropdown={(event) => toggleDropdown(event, id)}
-                      parameter={id}
-                      parentButtonRef={"messageOptionsIcon"}
-                    />
-                  )}
-                </div>
-              </div>
+              <MessageOptions
+                id={id}
+                isOpen={isOpen}
+                options={options}
+                toggleDropdown={toggleDropdown}
+                onSelect={handleSelectOption}
+              ></MessageOptions>
             )}
           </div>
           <div
@@ -101,11 +86,20 @@ const Tile = ({
             {typingUsers && typingUsers.length > 0 ? (
               <TypingIndicator typingUsers={typingUsers} />
             ) : (
-              <div className="primarySubInfo">
-                {titleSubInfo
-                  ? `${titleSubInfo}: ${primarySubInfo}`
-                  : primarySubInfo}
-              </div>
+              message && (
+                <div className="latestMessageContainer">
+                  <MessageStatusIcon
+                    status={message.status}
+                    isSender={message.senderId === userId}
+                    deletedForEveryone={message.deletedForEveryone}
+                  ></MessageStatusIcon>
+                  <div className="primarySubInfo">
+                    {titleSubInfo
+                      ? `${titleSubInfo}: ${primarySubInfo}`
+                      : primarySubInfo}
+                  </div>
+                </div>
+              )
             )}
             {unreadMessageCount > 0 && (
               <div className="unreadMessages">{unreadMessageCount}</div>

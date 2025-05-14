@@ -5,6 +5,7 @@
     background-color: rgb(54, 89, 105);
     flex-shrink: 0;
     top: 0;
+    z-index: 999;
 }
 
 .chatRoomName{

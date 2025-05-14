@@ -1,0 +1,18 @@
+  .messageOptionsIcon {
+    position: relative;
+    align-items: center;
+    justify-self: end;
+    cursor: pointer;
+    box-shadow: 20px 20px 20px rgba(210, 255, 160, 0.2); 
+    padding: 8px;
+    border-radius: 8px;
+    right: 0px;
+    top: 3px;
+    height: 8px; 
+    width: 15px; 
+    display: none; 
+  }
+
+  .messageOptionsIcon.visible {
+  display: block !important;
+}

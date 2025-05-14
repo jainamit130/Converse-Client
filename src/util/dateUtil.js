@@ -1,5 +1,22 @@
 export const parseDate = (timestamp) => {
-  return new Date(timestamp);
+  if (typeof timestamp === "number") {
+    if (timestamp < 1e12) {
+      return new Date(timestamp * 1000);
+    }
+    return new Date(timestamp);
+  }
+
+  if (typeof timestamp === "string") {
+    if (timestamp.includes(".") && timestamp.endsWith("Z")) {
+      const [datePart, timePart] = timestamp.split("T");
+      const [time] = timePart.split(".");
+      return new Date(`${datePart}T${time}Z`);
+    }
+
+    return new Date(timestamp);
+  }
+
+  return new Date();
 };
 
 export const isToday = (date) => {

@@ -26,6 +26,8 @@ export const handleMessageNotification = (
 
   if (activeChatRoomId) {
     if (activeChatRoomId === chatRoom.id) {
+      updatedChatRoom.unreadMessageCount = 0;
+
       setMessages((prevMap) => {
         const prevMessages = prevMap.get(activeChatRoomId) || [];
         const updatedMessages = [...prevMessages, data.message];
@@ -48,7 +50,7 @@ export const handleMessageNotification = (
 };
 
 export const handleTypingNotification = (data) => {
-  console.log("User Typing:", data.typingUsernames);
+  console.log("User Typing:", data);
   // Show typing indicator for the user
 };
 

@@ -1,12 +1,22 @@
 .message{
+    position: relative;
     border-radius: 4px;
     padding: 10px;
     margin: 10px;
-    min-width: 10%;
+    min-width: 13%;
     width: fit-content;
     max-width: 40%;
     background-color: rgb(210, 255, 160);
 }
+
+  .message:hover .messageOptionsIcon{
+      display: flex; 
+  }
+
+  .messageHeader{
+    justify-content: space-between;
+    display: flex;
+  }
 
 .messageSenderName{
     padding-bottom: 2px;
@@ -27,12 +37,3 @@
     background-color: #ffffff;
     text-align: left;
   }
-
-  .message-content {
-    padding: 10px;
-    min-height: 80px;
-    background-image: url('../../../../assets/ChatBackground.png');
-    justify-content: right;
-    display: flex;
-    font-family: Arial, sans-serif; 
-}

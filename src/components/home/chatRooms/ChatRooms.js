@@ -62,6 +62,8 @@ const ChatRooms = ({ onChatRoomSelect }) => {
             id={room.id}
             name={room.chatRoomName}
             type={room.chatRoomType}
+            userId={userId}
+            message={room.latestMessage}
             titleSubInfo={room.latestMessage.name}
             primarySubInfo={room.latestMessage.content}
             unreadMessageCount={room.unreadMessageCount}

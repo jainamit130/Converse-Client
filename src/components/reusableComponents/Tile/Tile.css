@@ -1,4 +1,5 @@
 .chat-room-tile {
+  position: relative;
     width: 92%;
     align-items: center;
     opacity: 0.8;
@@ -24,25 +25,19 @@
     font-weight: 500;
   }
 
+  .chat-room-tile:hover .messageOptionsIcon{
+      display: flex; 
+  }
+
+  .latestMessageContainer{
+    display: flex;
+  }
+
   .primarySubInfo {
     white-space: nowrap;      
     overflow: hidden;
     text-overflow: ellipsis;  
     max-width: 280px;          
-  }
-
-  .messageOptionsIcon {
-    position: absolute;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 20px 20px 20px rgba(210, 255, 160, 0.2); 
-    padding: 8px;
-    border-radius: 8px;
-    right: 0px;
-    top: 3px;
-    height: 8px; 
-    width: 15px; 
-    display: none; 
   }
 
   .timestamp {
