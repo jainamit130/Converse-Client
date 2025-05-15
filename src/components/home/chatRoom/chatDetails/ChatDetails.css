@@ -1,6 +1,7 @@
 .chatDetails{
     width: 100%;
     position: sticky;
+    justify-content: space-evenly;
     height: 60px;
     background-color: rgb(54, 89, 105);
     flex-shrink: 0;

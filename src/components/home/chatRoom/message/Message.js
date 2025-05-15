@@ -4,9 +4,12 @@ import { formatTime, parseDate } from "../../../../util/dateUtil";
 import "./Message.css";
 import { toggleDropdown } from "./util/MessageUtil";
 import MessageOptions from "../../../reusableComponents/OptionsDropdown/MessageOptions";
+import DeletedMessageStyle from "./util/DeletedMessageStyle";
+import useDelete from "./hook/useDelete";
 
 const Message = ({ message }) => {
   const [userId] = useState(localStorage.getItem("userId"));
+  const [chatRoomId] = useState(localStorage.getItem("activeChatRoomId"));
   const [chatRoomType] = useState(localStorage.getItem("activeChatRoomType"));
   const { name, content, timestamp, id, senderId, status } = message;
   const [isUserMessage] = useState(senderId === userId);
@@ -15,9 +18,19 @@ const Message = ({ message }) => {
   const [isOptionsOpen, setIsOptionsOpen] = useState(null);
   const [options, setOptions] = useState(["Delete for me", "Message info"]);
   const formattedTime = formatTime(messageDate);
+  const { deleteMessages } = useDelete();
 
-  const handleSelectOption = async (option, message) => {
+  const handleSelectOption = async (option, messageId) => {
     console.log(option + " -> " + message);
+    if (option === "Delete for me") {
+      await deleteMessages({ chatRoomId, messageIds: [messageId] });
+    } else if (option === "Delete for everyone") {
+      await deleteMessages({
+        chatRoomId,
+        messageIds: [messageId],
+        forEveryone: true,
+      });
+    }
     setIsOptionsOpen(null);
   };
 
@@ -55,7 +68,13 @@ const Message = ({ message }) => {
           }
         </div>
       </div>
-      <div className="messageContent">{content}</div>
+      <div className="messageContent">
+        {message.deletedForEveryOne ? (
+          <DeletedMessageStyle senderId={message.senderId} userId={userId} />
+        ) : (
+          content
+        )}
+      </div>
       {
         <MessageStatusIcon
           key={id}

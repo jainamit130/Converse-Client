@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import sendButtonIcon from "../../../../assets/SendButton.png";
 import "./ChatInput.css";
 import { useChatRoomWebSocket } from "../../../../context/WebSocketContext/ChatRoomWebSocketContext";
@@ -9,8 +9,11 @@ const ChatInput = ({ chatRoomId }) => {
   const [message, setMessage] = useState("");
 
   const typingTimeoutRef = useRef(null);
-  const { handleTyping, handleStopTyping } =
-    TypingHandlerService(typingTimeoutRef);
+  const isTypingRef = useRef(false);
+  const { handleTyping, handleStopTyping } = TypingHandlerService({
+    typingTimeoutRef,
+    isTypingRef,
+  });
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -24,12 +27,20 @@ const ChatInput = ({ chatRoomId }) => {
     setMessage("");
   };
 
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="chatInputComponent">
       <form
         className="chatInputForm"
         onSubmit={(e) => {
-          handleStopTyping();
+          handleStopTyping(send);
           e.preventDefault();
           const messageContent = e.target.elements.messageContent.value;
           handleSendMessage(messageContent);
@@ -38,7 +49,7 @@ const ChatInput = ({ chatRoomId }) => {
       >
         <input
           className="chatInput"
-          onKeyDown={(event) => handleTyping(event)}
+          onKeyDown={(event) => handleTyping(event, send)}
           type="text"
           value={message}
           onChange={handleChange}

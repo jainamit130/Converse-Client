@@ -20,7 +20,7 @@ const MessageOptions = ({ id, isOpen, options, toggleDropdown, onSelect }) => {
         {isOpen && (
           <OptionsDropdown
             options={options}
-            onSelect={(event, option) => onSelect(event, option, id)}
+            onSelect={(event, option) => onSelect(option, id)}
             toggleDropdown={toggleDropdown}
             parameter={id}
             parentButtonRef="messageOptionsIcon"

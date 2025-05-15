@@ -1,34 +1,41 @@
-import { useChatRoomWebSocket } from "../../../../../context/WebSocketContext/ChatRoomWebSocketContext";
+import { useRef } from "react";
 
-export const TypingHandlerService = (typingTimeoutRef) => {
-  const { send } = useChatRoomWebSocket();
+export const TypingHandlerService = ({ typingTimeoutRef, isTypingRef }) => {
+  const username = localStorage.getItem("username");
 
-  const handleTyping = (event) => {
-    clearTimeout(typingTimeoutRef.current);
-
+  const handleTyping = (event, send) => {
     const isCharacterKey =
       event.key.length === 1 &&
       !event.ctrlKey &&
       !event.altKey &&
       !event.metaKey;
 
-    if (isCharacterKey) {
-      const username = localStorage.getItem("username");
+    if (!isCharacterKey) return;
+
+    if (!isTypingRef.current) {
       send(`typing/`, username);
+      isTypingRef.current = true;
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
     }
 
     typingTimeoutRef.current = setTimeout(() => {
-      handleStopTyping();
+      handleStopTyping(send);
     }, 1000);
   };
 
-  const handleStopTyping = () => {
-    const username = localStorage.getItem("username");
-    send(`stopTyping/`, username);
+  const handleStopTyping = (send) => {
+    if (isTypingRef.current) {
+      send(`stopTyping/`, username);
+      isTypingRef.current = false;
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
   };
 
-  return {
-    handleTyping,
-    handleStopTyping,
-  };
+  return { handleTyping, handleStopTyping };
 };

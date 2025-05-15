@@ -3,9 +3,67 @@ export const handleChatTransactionNotification = (data) => {
   // Update your UI based on the message data
 };
 
-export const handleMessageDeletedNotification = (data) => {
-  console.log("Message Deleted:", data.message);
-  // Update your UI based on the message data
+export const handleMessageDeletedNotification = (
+  data,
+  chatRooms,
+  setChatRooms,
+  setMessages,
+  userId
+) => {
+  const { messageIds } = data;
+  const chatRoomId = localStorage.getItem("activeChatRoomId");
+  const messageIdsToUpdate = new Set(messageIds);
+
+  const updatedChatRooms = new Map(chatRooms);
+  const chatRoom = updatedChatRooms.get(chatRoomId);
+  if (!chatRoom) return;
+
+  setMessages((prevMessages) => {
+    const updatedMessages = new Map(prevMessages);
+    const messagesForRoom = updatedMessages.get(chatRoomId) || [];
+
+    const newMessages = messagesForRoom.map((msg) => {
+      if (messageIdsToUpdate.has(msg.id)) {
+        const content =
+          msg.senderId === userId
+            ? "You deleted this message!"
+            : "This message was deleted!";
+        return {
+          ...msg,
+          content,
+          deletedForEveryOne: true,
+          status: null,
+        };
+      }
+      return msg;
+    });
+
+    updatedMessages.set(chatRoomId, newMessages);
+    return updatedMessages;
+  });
+
+  if (
+    chatRoom.latestMessage &&
+    messageIdsToUpdate.has(chatRoom.latestMessage.id)
+  ) {
+    const latest = chatRoom.latestMessage;
+    const content =
+      latest.senderId === userId
+        ? "You deleted this message!"
+        : "This message was deleted!";
+
+    updatedChatRooms.set(chatRoomId, {
+      ...chatRoom,
+      latestMessage: {
+        ...latest,
+        content,
+        deletedForEveryOne: true,
+        status: null,
+      },
+    });
+
+    setChatRooms(updatedChatRooms);
+  }
 };
 
 export const handleMessageNotification = (
@@ -49,9 +107,14 @@ export const handleMessageNotification = (
   setChatRooms(updatedChatRooms);
 };
 
-export const handleTypingNotification = (data) => {
+export const handleTypingNotification = (data, setTyping) => {
   console.log("User Typing:", data);
-  // Show typing indicator for the user
+
+  if (data.typingUsernames && data.typingUsernames.length > 0) {
+    setTyping(data.typingUsernames);
+  } else {
+    setTyping([]);
+  }
 };
 
 export const handleUserStatusNotification = (data) => {

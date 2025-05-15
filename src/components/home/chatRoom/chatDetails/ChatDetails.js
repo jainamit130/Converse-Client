@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import "./ChatDetails.css";
+import { useChatRoomContext } from "../../../../context/ChatRoomContext";
+import TypingIndicator from "../../../sideComponents/TypingIndicator";
 
 const ChatDetails = () => {
   const [chatRoomName, setChatRoomName] = useState(
@@ -8,16 +10,15 @@ const ChatDetails = () => {
   const [chatRoomId, setChatRoomId] = useState(
     localStorage.getItem("activeChatRoomId")
   );
-  // number of people online
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  // online or last seen
-  const [lastSeen, setLastSeen] = useState();
-  // typing - name or count
-  const [typing, setTyping] = useState([]);
+
+  const { typing } = useChatRoomContext();
 
   return (
     <div className="chatDetails">
-      <div className="chatRoomName">{chatRoomName}</div>
+      <div className="chatRoomName">
+        {chatRoomName}
+        <TypingIndicator typingUsers={typing}></TypingIndicator>
+      </div>
     </div>
   );
 };
