@@ -1,4 +1,5 @@
-import deletedMessageIcon from "../../../../../assets/messageDeleted.png";
+import deletedMessageIcon from "../../../../../../assets/messageDeleted.png";
+import "./DeletedMessageStyle.css";
 
 const DeletedMessageStyle = ({ senderId, userId }) => {
   return (

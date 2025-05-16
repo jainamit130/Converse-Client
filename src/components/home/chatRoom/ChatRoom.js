@@ -7,6 +7,8 @@ import Message from "./message/Message";
 import ChatInput from "./chatInput/ChatInput";
 import { useChatRoomContext } from "../../../context/ChatRoomContext";
 import { readChatRoom } from "./util/ChatRoomUtil";
+import useDelete from "./message/hook/useDelete";
+import { handleDeleteMessages } from "../chatRooms/util/HandleDeleteMessages";
 
 const ChatRoom = ({ activeChatRoomId }) => {
   const { messages, setMessages, setChatRooms } = useChatRoomContext();
@@ -15,6 +17,26 @@ const ChatRoom = ({ activeChatRoomId }) => {
     skip: !activeChatRoomId,
     fetchPolicy: "network-only",
   });
+
+  const deleteMessageHandler = async ({ messageIds, deleteMessages }) => {
+    try {
+      const response = await deleteMessages({
+        chatRoomId: activeChatRoomId,
+        messageIds,
+      });
+
+      if (response && !response.error) {
+        handleDeleteMessages({
+          chatRoomId: activeChatRoomId,
+          setMessages,
+          setChatRooms,
+          messageIds,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to delete message:", error);
+    }
+  };
 
   const bottomRef = useRef(null);
 
@@ -55,7 +77,11 @@ const ChatRoom = ({ activeChatRoomId }) => {
       <div className="chatContainer">
         <div className="messagesContainer">
           {chatRoomMessages.map((message) => (
-            <Message message={message} key={message.id} />
+            <Message
+              message={message}
+              key={message.id}
+              handleDeleteMessages={deleteMessageHandler}
+            />
           ))}
           <div ref={bottomRef} />
         </div>

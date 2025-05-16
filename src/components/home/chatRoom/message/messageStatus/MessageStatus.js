@@ -24,16 +24,18 @@ const MessageStatusIcon = ({
   };
 
   return (
-    <div className="messageTimeStatus">
-      {formattedTime && <div className="message-time">{formattedTime}</div>}
-      {!deletedForEveryone && isSender && (
-        <img
-          src={getStatusIcon()}
-          className="messagetStatus"
-          alt="Message Status"
-        />
-      )}
-    </div>
+    !deletedForEveryone && (
+      <div className="messageTimeStatus">
+        {formattedTime && <div className="message-time">{formattedTime}</div>}
+        {isSender && (
+          <img
+            src={getStatusIcon()}
+            className="messagetStatus"
+            alt="Message Status"
+          />
+        )}
+      </div>
+    )
   );
 };
 

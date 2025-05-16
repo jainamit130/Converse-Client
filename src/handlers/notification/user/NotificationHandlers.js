@@ -1,9 +1,12 @@
 export const handleNewChatNotification = (data) => {
   console.log("New Chat Received:", data.message);
-  // Update your UI based on the message data
 };
 
-export const handleMessageMarkedNotification = (notification, setMessages) => {
+export const handleMessageMarkedNotification = (
+  notification,
+  setMessages,
+  setChatRooms
+) => {
   const { chatRoomId, messageIds, notificationType } = notification;
 
   setMessages((prevMessages) => {
@@ -25,8 +28,32 @@ export const handleMessageMarkedNotification = (notification, setMessages) => {
 
     const updatedMessagesArray = Array.from(messageMap.values());
 
+    const latestMessage = updatedMessagesArray[updatedMessagesArray.length - 1];
+    if (latestMessage) {
+      const updatedChatRoomMessage = {
+        ...latestMessage,
+        status: notificationType === "MESSAGE_READ" ? "READ" : "DELIVERED",
+      };
+      updatedMessagesArray[updatedMessagesArray.length - 1] =
+        updatedChatRoomMessage;
+    }
+
     const newMessagesMap = new Map(prevMessages);
     newMessagesMap.set(chatRoomId, updatedMessagesArray);
+
+    setChatRooms((prevChatRooms) => {
+      const updatedChatRooms = new Map(prevChatRooms);
+      const chatRoom = updatedChatRooms.get(chatRoomId);
+      if (chatRoom) {
+        const updatedChatRoom = {
+          ...chatRoom,
+          latestMessage: updatedMessagesArray[updatedMessagesArray.length - 1], // Set the latest message's updated status
+        };
+        updatedChatRooms.set(chatRoomId, updatedChatRoom);
+      }
+      return updatedChatRooms;
+    });
+
     return newMessagesMap;
   });
 };

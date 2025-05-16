@@ -17,7 +17,7 @@ export const useUserWebSocket = () => useContext(UserWebSocketContext);
 export const UserWebSocketProvider = ({ children }) => {
   const [userId, setUserId] = useState();
   const { initWebSocket, closeWebSocket } = useWebSocket();
-  const { messages, setMessages } = useChatRoomContext();
+  const { messages, setMessages, setChatRooms } = useChatRoomContext();
 
   const onMessage = (messageData) => {
     switch (messageData.notificationType) {
@@ -26,7 +26,7 @@ export const UserWebSocketProvider = ({ children }) => {
         break;
       case NotificationType.MESSAGE_DELIVERED:
       case NotificationType.MESSAGE_READ:
-        handleMessageMarkedNotification(messageData, setMessages);
+        handleMessageMarkedNotification(messageData, setMessages, setChatRooms);
         break;
       default:
         console.error("Unknown message type:", messageData);

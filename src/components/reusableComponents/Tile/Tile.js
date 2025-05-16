@@ -94,7 +94,7 @@ const Tile = ({
                     deletedForEveryone={message.deletedForEveryone}
                   ></MessageStatusIcon>
                   <div className="primarySubInfo">
-                    {titleSubInfo
+                    {titleSubInfo && !message.deletedForEveryone
                       ? `${titleSubInfo}: ${primarySubInfo}`
                       : primarySubInfo}
                   </div>

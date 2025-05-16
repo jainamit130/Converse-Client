@@ -57,7 +57,12 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
         handleTypingNotification(messageData, setTyping);
         break;
       case NotificationType.MESSAGE_DELETED:
-        handleMessageDeletedNotification(messageData);
+        handleMessageDeletedNotification(
+          messageData,
+          chatRooms,
+          setChatRooms,
+          setMessages
+        );
         break;
       case NotificationType.TRANSACTION:
         handleChatTransactionNotification(messageData);

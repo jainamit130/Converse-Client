@@ -4,26 +4,30 @@ import { formatTime, parseDate } from "../../../../util/dateUtil";
 import "./Message.css";
 import { toggleDropdown } from "./util/MessageUtil";
 import MessageOptions from "../../../reusableComponents/OptionsDropdown/MessageOptions";
-import DeletedMessageStyle from "./util/DeletedMessageStyle";
+import DeletedMessageStyle from "./util/DeletedMessageStyle/DeletedMessageStyle";
 import useDelete from "./hook/useDelete";
 
-const Message = ({ message }) => {
+const Message = ({ message, handleDeleteMessages }) => {
   const [userId] = useState(localStorage.getItem("userId"));
   const [chatRoomId] = useState(localStorage.getItem("activeChatRoomId"));
   const [chatRoomType] = useState(localStorage.getItem("activeChatRoomType"));
-  const { name, content, timestamp, id, senderId, status } = message;
+  const { name, content, deletedForEveryone, timestamp, id, senderId, status } =
+    message;
   const [isUserMessage] = useState(senderId === userId);
   const messageDate = parseDate(timestamp);
+  const { deleteMessages } = useDelete();
   const isWithinDeleteWindow = Date.now() - messageDate.getTime() <= 60000;
   const [isOptionsOpen, setIsOptionsOpen] = useState(null);
   const [options, setOptions] = useState(["Delete for me", "Message info"]);
   const formattedTime = formatTime(messageDate);
-  const { deleteMessages } = useDelete();
 
   const handleSelectOption = async (option, messageId) => {
     console.log(option + " -> " + message);
     if (option === "Delete for me") {
-      await deleteMessages({ chatRoomId, messageIds: [messageId] });
+      handleDeleteMessages({
+        messageIds: [messageId],
+        deleteMessages,
+      });
     } else if (option === "Delete for everyone") {
       await deleteMessages({
         chatRoomId,
@@ -42,7 +46,7 @@ const Message = ({ message }) => {
       }`}
     >
       <div className="messageHeader">
-        {chatRoomType === "GROUP" && (
+        {chatRoomType === "GROUP" && !deletedForEveryone && (
           <div className="messageSenderName">
             {isUserMessage ? "You" : name}
           </div>
@@ -69,7 +73,7 @@ const Message = ({ message }) => {
         </div>
       </div>
       <div className="messageContent">
-        {message.deletedForEveryOne ? (
+        {deletedForEveryone ? (
           <DeletedMessageStyle senderId={message.senderId} userId={userId} />
         ) : (
           content
@@ -81,6 +85,7 @@ const Message = ({ message }) => {
           isSender={senderId === userId}
           status={status}
           formattedTime={formattedTime}
+          deletedForEveryone={deletedForEveryone}
         />
       }
     </div>

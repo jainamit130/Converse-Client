@@ -15,6 +15,7 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
         timestamp
         content
         status
+        deletedForEveryone
       }
     }
   }

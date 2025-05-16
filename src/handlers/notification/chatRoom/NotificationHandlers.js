@@ -1,16 +1,15 @@
 export const handleChatTransactionNotification = (data) => {
   console.log("Group Transaction:", data.message);
-  // Update your UI based on the message data
 };
 
 export const handleMessageDeletedNotification = (
   data,
   chatRooms,
   setChatRooms,
-  setMessages,
-  userId
+  setMessages
 ) => {
   const { messageIds } = data;
+  const userId = localStorage.getItem("userId");
   const chatRoomId = localStorage.getItem("activeChatRoomId");
   const messageIdsToUpdate = new Set(messageIds);
 
@@ -32,7 +31,6 @@ export const handleMessageDeletedNotification = (
           ...msg,
           content,
           deletedForEveryOne: true,
-          status: null,
         };
       }
       return msg;
@@ -58,7 +56,6 @@ export const handleMessageDeletedNotification = (
         ...latest,
         content,
         deletedForEveryOne: true,
-        status: null,
       },
     });
 
@@ -108,8 +105,6 @@ export const handleMessageNotification = (
 };
 
 export const handleTypingNotification = (data, setTyping) => {
-  console.log("User Typing:", data);
-
   if (data.typingUsernames && data.typingUsernames.length > 0) {
     setTyping(data.typingUsernames);
   } else {
