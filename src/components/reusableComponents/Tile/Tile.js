@@ -1,7 +1,7 @@
 import TypingIndicator from "../../sideComponents/TypingIndicator";
 import { formatTime, parseDate } from "../../../util/dateUtil";
 import "../Tile/Tile.css";
-import MessageOptions from "../OptionsDropdown/MessageOptions";
+import Options from "../OptionsDropdown/Options";
 import MessageStatusIcon from "../../home/chatRoom/message/messageStatus/MessageStatus";
 
 const Tile = ({
@@ -68,13 +68,13 @@ const Tile = ({
             <div className="chatRoomTitle primarySubInfo">{name}</div>
             {formattedTime && <div className="timestamp">{formattedTime}</div>}
             {options && (
-              <MessageOptions
+              <Options
                 id={id}
                 isOpen={isOpen}
                 options={options}
                 toggleDropdown={toggleDropdown}
                 onSelect={handleSelectOption}
-              ></MessageOptions>
+              ></Options>
             )}
           </div>
           <div

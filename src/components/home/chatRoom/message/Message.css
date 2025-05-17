@@ -9,7 +9,7 @@
     background-color: rgb(210, 255, 160);
 }
 
-  .message:hover .messageOptionsIcon{
+  .message:hover .optionsIcon{
       display: flex; 
   }
 

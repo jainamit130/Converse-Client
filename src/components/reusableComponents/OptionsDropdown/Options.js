@@ -1,9 +1,15 @@
 import React from "react";
-import OptionsDropdown from "../OptionsDropdown/OptionsDropdown";
-import messageOptionsIcon from "../../../assets/MessageOptions.png";
-import "./MessageOptions.css";
+import OptionsDropdown from "./OptionsDropdown";
+import "./Options.css";
 
-const MessageOptions = ({ id, isOpen, options, toggleDropdown, onSelect }) => {
+const Options = ({
+  id,
+  isOpen,
+  optionsIcon,
+  options,
+  toggleDropdown,
+  onSelect,
+}) => {
   const handleClick = (event) => {
     toggleDropdown(event, id);
     event.stopPropagation();
@@ -12,8 +18,8 @@ const MessageOptions = ({ id, isOpen, options, toggleDropdown, onSelect }) => {
   return (
     <div>
       <img
-        src={messageOptionsIcon}
-        className={`messageOptionsIcon ${isOpen ? "visible" : ""}`}
+        src={optionsIcon}
+        className={`optionsIcon ${isOpen ? "visible" : ""}`}
         onClick={handleClick}
       />
       <div>
@@ -23,7 +29,7 @@ const MessageOptions = ({ id, isOpen, options, toggleDropdown, onSelect }) => {
             onSelect={(event, option) => onSelect(option, id)}
             toggleDropdown={toggleDropdown}
             parameter={id}
-            parentButtonRef="messageOptionsIcon"
+            parentButtonRef="optionsIcon"
           />
         )}
       </div>
@@ -31,4 +37,4 @@ const MessageOptions = ({ id, isOpen, options, toggleDropdown, onSelect }) => {
   );
 };
 
-export default MessageOptions;
+export default Options;

@@ -3,7 +3,8 @@ import MessageStatusIcon from "../message/messageStatus/MessageStatus";
 import { formatTime, parseDate } from "../../../../util/dateUtil";
 import "./Message.css";
 import { toggleDropdown } from "./util/MessageUtil";
-import MessageOptions from "../../../reusableComponents/OptionsDropdown/MessageOptions";
+import Options from "../../../reusableComponents/OptionsDropdown/Options";
+import messageOptionsIcon from "../../../../assets/MessageOptions.png";
 import DeletedMessageStyle from "./util/DeletedMessageStyle/DeletedMessageStyle";
 import useDelete from "./hook/useDelete";
 
@@ -51,11 +52,12 @@ const Message = ({ message, handleDeleteMessages }) => {
             {isUserMessage ? "You" : name}
           </div>
         )}
-        <div className="messageAction">
+        <div>
           {
-            <MessageOptions
+            <Options
               id={id}
               isOpen={isOptionsOpen}
+              optionsIcon={messageOptionsIcon}
               options={options}
               toggleDropdown={() =>
                 toggleDropdown(
@@ -68,7 +70,7 @@ const Message = ({ message, handleDeleteMessages }) => {
                 )
               }
               onSelect={handleSelectOption}
-            ></MessageOptions>
+            ></Options>
           }
         </div>
       </div>

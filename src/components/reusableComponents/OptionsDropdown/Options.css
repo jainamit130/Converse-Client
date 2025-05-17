@@ -1,4 +1,4 @@
-  .messageOptionsIcon {
+  .optionsIcon {
     position: relative;
     align-items: center;
     justify-self: end;
@@ -11,8 +11,9 @@
     height: 8px; 
     width: 15px; 
     display: none; 
+
   }
 
-  .messageOptionsIcon.visible {
+  .optionsIcon.visible {
   display: block !important;
 }

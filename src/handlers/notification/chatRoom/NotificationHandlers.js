@@ -30,7 +30,7 @@ export const handleMessageDeletedNotification = (
         return {
           ...msg,
           content,
-          deletedForEveryOne: true,
+          deletedForEveryone: true,
         };
       }
       return msg;
@@ -55,7 +55,7 @@ export const handleMessageDeletedNotification = (
       latestMessage: {
         ...latest,
         content,
-        deletedForEveryOne: true,
+        deletedForEveryone: true,
       },
     });
 

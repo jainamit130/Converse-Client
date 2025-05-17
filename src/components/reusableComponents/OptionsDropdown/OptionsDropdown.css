@@ -9,7 +9,7 @@
   max-width: 200px;
   overflow: hidden;
   right:5px;
-  z-index: 999;
+  z-index: 1000;
 }
 
 .options-list {
@@ -21,9 +21,9 @@
 .options-list li {
   padding: 8px;
   padding-right: 5px;
-  cursor: pointer;
 }
 
 .options-list li:hover {
   background-color: #f0f0f0;
+  cursor: pointer;
 }
