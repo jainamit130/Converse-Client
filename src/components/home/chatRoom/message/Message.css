@@ -9,8 +9,9 @@
     background-color: rgb(210, 255, 160);
 }
 
-  .message:hover .optionsIcon{
+  .message:hover .messageOptionsIcon{
       display: flex; 
+    background-color: rgb(210, 255, 160);
   }
 
   .messageHeader{

@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import "./ChatDetails.css";
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 import TypingIndicator from "../../../sideComponents/TypingIndicator";
-import ChatHeaderOptionsIcon from "../../../../assets/chatHeaderOptionsIcon.png";
+import ChatHeaderOptionsIcon from "../../../../assets/groupOptionsIcon.png";
 import Options from "../../../reusableComponents/OptionsDropdown/Options";
 
-const ChatDetails = () => {
+const ChatDetails = ({ handleClearChat }) => {
   const [chatRoomName, setChatRoomName] = useState(
     localStorage.getItem("activeChatRoomName")
   );
@@ -17,7 +17,9 @@ const ChatDetails = () => {
   const [options, setOptions] = useState(["Clear Chat"]);
 
   const handleSelectOption = async (option) => {
-    console.log(option);
+    if (option == "Clear Chat") {
+      handleClearChat();
+    }
     setIsOptionsOpen(null);
   };
 
@@ -35,16 +37,15 @@ const ChatDetails = () => {
         {chatRoomName}
         <TypingIndicator typingUsers={typing}></TypingIndicator>
       </div>
-      {
-        <Options
-          id={chatRoomId}
-          isOpen={isOptionsOpen}
-          optionsIcon={ChatHeaderOptionsIcon}
-          options={options}
-          toggleDropdown={toggleDropdown}
-          onSelect={handleSelectOption}
-        ></Options>
-      }
+      <Options
+        id={chatRoomId}
+        isOpen={isOptionsOpen}
+        optionsIcon={ChatHeaderOptionsIcon}
+        options={options}
+        toggleDropdown={toggleDropdown}
+        onSelect={handleSelectOption}
+        handleClearChat={handleClearChat}
+      ></Options>
     </div>
   );
 };

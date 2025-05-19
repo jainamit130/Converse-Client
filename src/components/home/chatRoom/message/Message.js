@@ -6,7 +6,8 @@ import { toggleDropdown } from "./util/MessageUtil";
 import Options from "../../../reusableComponents/OptionsDropdown/Options";
 import messageOptionsIcon from "../../../../assets/MessageOptions.png";
 import DeletedMessageStyle from "./util/DeletedMessageStyle/DeletedMessageStyle";
-import useDelete from "./hook/useDelete";
+import useDelete from "../hook/useDelete";
+import MessageOptions from "../../../reusableComponents/OptionsDropdown/MessageOptions";
 
 const Message = ({ message, handleDeleteMessages }) => {
   const [userId] = useState(localStorage.getItem("userId"));
@@ -54,7 +55,7 @@ const Message = ({ message, handleDeleteMessages }) => {
         )}
         <div>
           {
-            <Options
+            <MessageOptions
               id={id}
               isOpen={isOptionsOpen}
               optionsIcon={messageOptionsIcon}
@@ -70,7 +71,7 @@ const Message = ({ message, handleDeleteMessages }) => {
                 )
               }
               onSelect={handleSelectOption}
-            ></Options>
+            ></MessageOptions>
           }
         </div>
       </div>

@@ -1,19 +1,12 @@
-  .optionsIcon {
+.optionsIcon{
+    height: 25px;
+    width: 5px;
+    padding:20px;
+    padding-bottom: 10px;
     position: relative;
-    align-items: center;
-    justify-self: end;
     cursor: pointer;
-    box-shadow: 20px 20px 20px rgba(210, 255, 160, 0.2); 
-    padding: 8px;
-    border-radius: 8px;
-    right: 0px;
-    top: 3px;
-    height: 8px; 
-    width: 15px; 
-    display: none; 
+}
 
-  }
-
-  .optionsIcon.visible {
-  display: block !important;
+.optionsIcon:hover {
+    opacity: 0.8;
 }

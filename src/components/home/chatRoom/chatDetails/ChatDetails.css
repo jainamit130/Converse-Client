@@ -16,8 +16,3 @@
     font-size: larger;
     color: white;
 }
-
-.chatHeaderOptions{
-    position: relative;
-    z-index: 9999;
-}

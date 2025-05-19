@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import axios from "axios";
-import config from "../../../../../config/environment";
+import config from "../../../../config/environment";
 
 const useDelete = () => {
   const baseUrl = config.CHAT_BASE_URL + config.CHAT_SUBBASE_URL;

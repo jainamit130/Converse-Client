@@ -7,8 +7,9 @@ import Message from "./message/Message";
 import ChatInput from "./chatInput/ChatInput";
 import { useChatRoomContext } from "../../../context/ChatRoomContext";
 import { readChatRoom } from "./util/ChatRoomUtil";
-import useDelete from "./message/hook/useDelete";
+import { handleClearChat } from "../chatRooms/util/HandleClearChat";
 import { handleDeleteMessages } from "../chatRooms/util/HandleDeleteMessages";
+import useClear from "./hook/useClear";
 
 const ChatRoom = ({ activeChatRoomId }) => {
   const { messages, setMessages, setChatRooms } = useChatRoomContext();
@@ -17,6 +18,24 @@ const ChatRoom = ({ activeChatRoomId }) => {
     skip: !activeChatRoomId,
     fetchPolicy: "network-only",
   });
+
+  const { clearChat } = useClear();
+
+  const clearChatMessageHanlder = async () => {
+    try {
+      const response = await clearChat({ chatRoomId: activeChatRoomId });
+
+      if (response && !response.error) {
+        handleClearChat({
+          chatRoomId: activeChatRoomId,
+          setMessages,
+          setChatRooms,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to clear messages:", error);
+    }
+  };
 
   const deleteMessageHandler = async ({ messageIds, deleteMessages }) => {
     try {
@@ -73,7 +92,7 @@ const ChatRoom = ({ activeChatRoomId }) => {
 
   return (
     <div className="chatRoom">
-      <ChatDetails />
+      <ChatDetails handleClearChat={clearChatMessageHanlder} />
       <div className="chatContainer">
         <div className="messagesContainer">
           {chatRoomMessages.map((message) => (
