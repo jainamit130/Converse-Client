@@ -9,7 +9,7 @@ import DeletedMessageStyle from "./util/DeletedMessageStyle/DeletedMessageStyle"
 import useDelete from "../hook/useDelete";
 import MessageOptions from "../../../reusableComponents/OptionsDropdown/MessageOptions";
 
-const Message = ({ message, handleDeleteMessages }) => {
+const Message = ({ message, handleDeleteMessages, chatRooms }) => {
   const [userId] = useState(localStorage.getItem("userId"));
   const [chatRoomId] = useState(localStorage.getItem("activeChatRoomId"));
   const [chatRoomType] = useState(localStorage.getItem("activeChatRoomType"));
@@ -31,6 +31,7 @@ const Message = ({ message, handleDeleteMessages }) => {
         deleteMessages,
       });
     } else if (option === "Delete for everyone") {
+      console.log(chatRooms);
       await deleteMessages({
         chatRoomId,
         messageIds: [messageId],

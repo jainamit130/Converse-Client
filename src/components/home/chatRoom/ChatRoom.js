@@ -12,7 +12,8 @@ import { handleDeleteMessages } from "../chatRooms/util/HandleDeleteMessages";
 import useClear from "./hook/useClear";
 
 const ChatRoom = ({ activeChatRoomId }) => {
-  const { messages, setMessages, setChatRooms } = useChatRoomContext();
+  const { messages, setMessages, chatRooms, setChatRooms } =
+    useChatRoomContext();
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
     skip: !activeChatRoomId,
@@ -97,6 +98,7 @@ const ChatRoom = ({ activeChatRoomId }) => {
         <div className="messagesContainer">
           {chatRoomMessages.map((message) => (
             <Message
+              chatRooms={chatRooms}
               message={message}
               key={message.id}
               handleDeleteMessages={deleteMessageHandler}

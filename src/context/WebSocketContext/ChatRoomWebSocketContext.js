@@ -24,7 +24,6 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   const [baseTopic] = useState("/app/chat/");
   const { messages, setMessages, chatRooms, setChatRooms, setTyping } =
     useChatRoomContext();
-  const [webSockets, setWebSockets] = useState(new Map());
   const { initWebSocket, closeWebSocket, sendMessage } = useWebSocket();
 
   const send = (subTopic, message) => {
@@ -43,12 +42,7 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   const onMessage = (messageData) => {
     switch (messageData.notificationType) {
       case NotificationType.MESSAGE:
-        handleMessageNotification(
-          messageData,
-          chatRooms,
-          setChatRooms,
-          setMessages
-        );
+        handleMessageNotification(messageData, setChatRooms, setMessages);
         break;
       case NotificationType.STATUS:
         handleUserStatusNotification(messageData);
@@ -59,7 +53,6 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
       case NotificationType.MESSAGE_DELETED:
         handleMessageDeletedNotification(
           messageData,
-          chatRooms,
           setChatRooms,
           setMessages
         );
