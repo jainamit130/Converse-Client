@@ -6,14 +6,24 @@ import ChatDetails from "./chatDetails/ChatDetails";
 import Message from "./message/Message";
 import ChatInput from "./chatInput/ChatInput";
 import { useChatRoomContext } from "../../../context/ChatRoomContext";
-import { readChatRoom } from "./util/ChatRoomUtil";
+import { readChatRoom } from "./../chatRoom/util/ReadChatRoom";
 import { handleClearChat } from "../chatRooms/util/HandleClearChat";
 import { handleDeleteMessages } from "../chatRooms/util/HandleDeleteMessages";
 import useClear from "./hook/useClear";
+import { normalizeOnlineStatus } from "./util/OnlineUsersTransformation";
 
 const ChatRoom = ({ activeChatRoomId }) => {
-  const { messages, setMessages, chatRooms, setChatRooms } =
-    useChatRoomContext();
+  const {
+    messages,
+    setMessages,
+    chatRooms,
+    setChatRooms,
+    lastSeen,
+    setLastSeen,
+    onlineUsers,
+    setOnlineUsers,
+  } = useChatRoomContext();
+  const chatRoom = chatRooms.get(activeChatRoomId);
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
     skip: !activeChatRoomId,
@@ -74,9 +84,18 @@ const ChatRoom = ({ activeChatRoomId }) => {
         const updatedMap = new Map(prevMap);
         const newMessagesArray = data.getChatRoomData.messages || [];
         updatedMap.set(activeChatRoomId, newMessagesArray);
-        readChatRoom(setChatRooms, activeChatRoomId);
         return updatedMap;
       });
+      readChatRoom(setChatRooms, activeChatRoomId);
+      const chatRoom = chatRooms.get(activeChatRoomId);
+      if (chatRoom && data) {
+        normalizeOnlineStatus({
+          chatRoomName: chatRoom.chatRoomName,
+          onlineUsersDTO: data.getChatRoomData.onlineUsersDTO,
+          setOnlineUsers,
+          setLastSeen,
+        });
+      }
     }
   }, [data, activeChatRoomId]);
 
@@ -93,7 +112,10 @@ const ChatRoom = ({ activeChatRoomId }) => {
 
   return (
     <div className="chatRoom">
-      <ChatDetails handleClearChat={clearChatMessageHanlder} />
+      <ChatDetails
+        chatRoomType={chatRoom.chatRoomType}
+        handleClearChat={clearChatMessageHanlder}
+      />
       <div className="chatContainer">
         <div className="messagesContainer">
           {chatRoomMessages.map((message) => (

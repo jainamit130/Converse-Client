@@ -3,7 +3,7 @@ const ENVIRONMENT = {
     USER_BASE_URL: "http://localhost:8081",
     CHAT_BASE_URL: "http://localhost:8080",
     CHAT_SUBBASE_URL: "/converse/chat",
-    USER_SUBBASE_URL: "/converse/user",
+    USER_SUBBASE_URL: "/converse/users",
   },
   production: {
     USER_BASE_URL: "",

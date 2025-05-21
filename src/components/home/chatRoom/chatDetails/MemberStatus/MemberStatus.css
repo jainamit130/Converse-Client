@@ -1,0 +1,10 @@
+.member-status {
+  font-size: 12px;
+    font-weight: 500;
+}
+
+.member-status__last-seen,
+.member-status__online,
+.member-status__group-online {
+  display: inline-block;
+}

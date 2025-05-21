@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./ChatDetails.css";
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
-import TypingIndicator from "../../../sideComponents/TypingIndicator";
 import ChatHeaderOptionsIcon from "../../../../assets/groupOptionsIcon.png";
 import Options from "../../../reusableComponents/OptionsDropdown/Options";
+import MemberStatus from "./MemberStatus/MemberStatus";
 
-const ChatDetails = ({ handleClearChat }) => {
+const ChatDetails = ({ handleClearChat, chatRoomType }) => {
   const [chatRoomName, setChatRoomName] = useState(
     localStorage.getItem("activeChatRoomName")
   );
@@ -13,7 +13,7 @@ const ChatDetails = ({ handleClearChat }) => {
     localStorage.getItem("activeChatRoomId")
   );
   const [isOptionsOpen, setIsOptionsOpen] = useState(null);
-  const { typing } = useChatRoomContext();
+  const { typing, onlineUsers, lastSeen } = useChatRoomContext();
   const [options, setOptions] = useState(["Clear Chat"]);
 
   const handleSelectOption = async (option) => {
@@ -35,7 +35,7 @@ const ChatDetails = ({ handleClearChat }) => {
     <div className="chatDetails">
       <div className="chatRoomName">
         {chatRoomName}
-        <TypingIndicator typingUsers={typing}></TypingIndicator>
+        <MemberStatus chatRoomType={chatRoomType}></MemberStatus>
       </div>
       <Options
         id={chatRoomId}

@@ -3,6 +3,7 @@ import ChatRoom from "./chatRoom/ChatRoom";
 import ChatRooms from "./chatRooms/ChatRooms";
 import backgroundImage from "../../assets/LoginBackground.png";
 import "./Home.css";
+import AddUser from "./Users/AddUser";
 
 const Home = () => {
   const [activeChatRoomId, setActiveChatRoomId] = useState(null);
@@ -26,8 +27,11 @@ const Home = () => {
 
   return (
     <div className="homePage">
-      <div className="chatRooms">
+      {/* <div className="chatRooms">
         <ChatRooms onChatRoomSelect={handleChatRoomSelect} />
+      </div> */}
+      <div className="chatRooms">
+        <AddUser></AddUser>
       </div>
       <div className="chatRoom">
         {activeChatRoomId ? (

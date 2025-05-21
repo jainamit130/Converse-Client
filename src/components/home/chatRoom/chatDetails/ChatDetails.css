@@ -10,9 +10,13 @@
     z-index: 999;
 }
 
-.chatRoomName{
-    font-weight: 600;
-    padding: 15px;
-    font-size: larger;
-    color: white;
+.chatRoomName {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: larger;
+  gap: 2px;
+  padding-left: 20px;
 }

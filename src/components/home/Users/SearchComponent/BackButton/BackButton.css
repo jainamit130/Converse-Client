@@ -1,0 +1,13 @@
+  .back-btn {
+    height: 20px;
+    width: 26px;
+    float: left;
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .newChatHeader {
+    margin-left: "20px";
+  }

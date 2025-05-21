@@ -7,6 +7,7 @@ import { iconType } from "../../MappingTypes/iconFactory";
 import Tile from "../../reusableComponents/Tile/Tile";
 import { useUserWebSocket } from "../../../context/WebSocketContext/UserWebSocketContext";
 import { useChatRoomContext } from "../../../context/ChatRoomContext";
+import newChatIcon from "../../../assets/newChat.png";
 
 const ChatRooms = ({ onChatRoomSelect }) => {
   const { userId, setUserId } = useUserWebSocket();
@@ -50,9 +51,11 @@ const ChatRooms = ({ onChatRoomSelect }) => {
 
   return (
     <div className="chatRooms">
-      <h2>Chats</h2>
+      <div className="chatRoomsHeader">
+        <h2>Chats</h2>
+        <img src={newChatIcon} className="newChatIcon" />
+      </div>
       {chatRooms.size > 0 ? (
-        // Convert the Map to an array to use map()
         Array.from(chatRooms.values()).map((room) => (
           <Tile
             key={room.id}
@@ -64,7 +67,7 @@ const ChatRooms = ({ onChatRoomSelect }) => {
             type={room.chatRoomType}
             userId={userId}
             message={room.latestMessage}
-            titleSubInfo={room.latestMessage.name}
+            titleSubInfo={room.latestMessage?.name}
             primarySubInfo={room.latestMessage.content}
             unreadMessageCount={room.unreadMessageCount}
             timestamp={room.latestMessage.timestamp}

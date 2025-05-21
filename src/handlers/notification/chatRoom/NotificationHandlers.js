@@ -116,7 +116,33 @@ export const handleTypingNotification = (data, setTyping) => {
   }
 };
 
-export const handleUserStatusNotification = (data) => {
-  console.log("User Status Changed:", data.username, data.status, data);
-  // Handle user status change (e.g., show them as online or offline)
+export const handleUserStatusNotification = (
+  data,
+  setOnlineUsers,
+  setLastSeen
+) => {
+  const { username, status } = data;
+
+  console.log("User Status Changed:", username, status);
+
+  if (!username || !status) return;
+
+  if (status === "ACTIVE") {
+    setOnlineUsers((prev) => {
+      if (!Array.isArray(prev)) return [username];
+      if (!prev.includes(username)) {
+        return [...prev, username];
+      }
+      return prev;
+    });
+  } else if (status === "INACTIVE") {
+    setOnlineUsers((prev) => {
+      if (!Array.isArray(prev)) return [];
+      const updated = prev.filter((user) => user !== username);
+      return updated;
+    });
+
+    const now = new Date().toISOString();
+    setLastSeen(now);
+  }
 };

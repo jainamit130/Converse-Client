@@ -4,9 +4,13 @@ const ChatRoomContext = createContext({
   chatRooms: new Map(),
   messages: new Map(),
   typing: [],
+  onlineUsers: [],
+  lastSeen: null,
   setChatRooms: () => {},
   setMessages: () => {},
   setTyping: () => {},
+  setOnlineUsers: () => {},
+  setLastSeen: () => {},
 });
 
 export const useChatRoomContext = () => useContext(ChatRoomContext);
@@ -28,9 +32,17 @@ export const ChatRoomContextProvider = ({ children }) => {
     <ChatRoomContext.Provider
       value={{
         typing,
+        setTyping,
+
         chatRooms,
         setChatRooms,
-        setTyping,
+
+        onlineUsers,
+        setOnlineUsers,
+
+        lastSeen,
+        setLastSeen,
+
         messages,
         setMessages,
       }}

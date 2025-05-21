@@ -26,7 +26,15 @@
   }
 
   .chat-room-tile:hover .messageOptionsIcon{
-      display: flex; 
+      display: flex;
+  }
+
+  .chat-room-tile:hover{
+    opacity: 0.6;
+  }
+
+  .chat-room-tile:active {
+    opacity: 0.3;
   }
 
   .latestMessageContainer{

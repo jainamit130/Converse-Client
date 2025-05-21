@@ -40,6 +40,18 @@ export const GET_CHAT_ROOM_DATA = gql`
         status
         deletedForEveryone
       }
+      onlineUsersDTO {
+        ... on DirectChatOnlineUsersDTO {
+          lastSeenTimestamp
+        }
+        ... on SelfChatOnlineUsersDTO {
+          lastSeenTimestamp
+        }
+        ... on GroupChatOnlineUsersDTO {
+          lastSeenTimestamp
+          onlineUsers
+        }
+      }
     }
   }
 `;
