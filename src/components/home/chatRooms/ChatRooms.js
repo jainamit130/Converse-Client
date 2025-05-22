@@ -9,7 +9,7 @@ import { useUserWebSocket } from "../../../context/WebSocketContext/UserWebSocke
 import { useChatRoomContext } from "../../../context/ChatRoomContext";
 import newChatIcon from "../../../assets/newChat.png";
 
-const ChatRooms = ({ onChatRoomSelect }) => {
+const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
   const { userId, setUserId } = useUserWebSocket();
   const { chatRooms, setChatRooms } = useChatRoomContext();
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ const ChatRooms = ({ onChatRoomSelect }) => {
     <div className="chatRooms">
       <div className="chatRoomsHeader">
         <h2>Chats</h2>
-        <img src={newChatIcon} className="newChatIcon" />
+        <img src={newChatIcon} className="newChatIcon" onClick={openNewChat} />
       </div>
       {chatRooms.size > 0 ? (
         Array.from(chatRooms.values()).map((room) => (

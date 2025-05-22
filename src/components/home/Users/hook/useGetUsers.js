@@ -16,7 +16,7 @@ const useGetUsers = () => {
         },
       });
 
-      return response.data;
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       console.error("Failed to get contacts:", error);
       return { error: "Failed to get users" };

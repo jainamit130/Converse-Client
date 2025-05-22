@@ -9,6 +9,7 @@ const Home = () => {
   const [activeChatRoomId, setActiveChatRoomId] = useState(null);
   const [activeChatRoomName, setActiveChatRoomName] = useState(null);
   const [activeChatRoomType, setActiveChatRoomType] = useState(null);
+  const [newChatMode, setNewChatMode] = useState(false);
 
   const handleChatRoomSelect = (chatRoomId, chatRoomName, chatRoomType) => {
     localStorage.setItem("activeChatRoomId", chatRoomId);
@@ -16,6 +17,14 @@ const Home = () => {
     localStorage.setItem("activeChatRoomType", chatRoomType);
     setActiveChatRoomId(chatRoomId);
     setActiveChatRoomName(chatRoomName);
+  };
+
+  const closeNewChat = () => {
+    setNewChatMode(false);
+  };
+
+  const openNewChat = () => {
+    setNewChatMode(true);
   };
 
   useEffect(() => {
@@ -27,12 +36,18 @@ const Home = () => {
 
   return (
     <div className="homePage">
-      {/* <div className="chatRooms">
-        <ChatRooms onChatRoomSelect={handleChatRoomSelect} />
-      </div> */}
-      <div className="chatRooms">
-        <AddUser></AddUser>
-      </div>
+      {!newChatMode ? (
+        <div className="chatRooms">
+          <ChatRooms
+            openNewChat={openNewChat}
+            onChatRoomSelect={handleChatRoomSelect}
+          />
+        </div>
+      ) : (
+        <div className="chatRooms">
+          <AddUser toggle={closeNewChat}></AddUser>
+        </div>
+      )}
       <div className="chatRoom">
         {activeChatRoomId ? (
           <ChatRoom
