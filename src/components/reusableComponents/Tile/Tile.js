@@ -2,6 +2,7 @@ import TypingIndicator from "../../sideComponents/TypingIndicator";
 import { formatTime, parseDate } from "../../../util/dateUtil";
 import "../Tile/Tile.css";
 import Options from "../OptionsDropdown/Options";
+import optionsIcon from "../../../assets/MessageOptions.png";
 import MessageStatusIcon from "../../home/chatRoom/message/messageStatus/MessageStatus";
 
 const Tile = ({
@@ -28,12 +29,12 @@ const Tile = ({
     event.stopPropagation();
   };
 
-  const handleChatRoomClick = () => {
+  const handleTileClick = () => {
     if (!isOpen && tileClick) {
       tileClick({
-        chatRoomId: id,
-        chatRoomName: name,
-        chatRoomType: type,
+        id,
+        name,
+        type,
       });
     }
   };
@@ -48,7 +49,7 @@ const Tile = ({
       style={{
         zIndex: isOpen ? 1000 : 1,
       }}
-      onClick={handleChatRoomClick}
+      onClick={handleTileClick}
     >
       <div
         style={{
@@ -74,6 +75,7 @@ const Tile = ({
                 options={options}
                 toggleDropdown={toggleDropdown}
                 onSelect={handleSelectOption}
+                optionsIcon={optionsIcon}
               ></Options>
             )}
           </div>

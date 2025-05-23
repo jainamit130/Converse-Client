@@ -17,12 +17,17 @@ export const useUserWebSocket = () => useContext(UserWebSocketContext);
 export const UserWebSocketProvider = ({ children }) => {
   const [userId, setUserId] = useState();
   const { initWebSocket, closeWebSocket } = useWebSocket();
-  const { messages, setMessages, setChatRooms } = useChatRoomContext();
+  const { messages, setMessages, setChatRooms, setDirectSelfChats } =
+    useChatRoomContext();
 
   const onMessage = (messageData) => {
     switch (messageData.notificationType) {
       case NotificationType.NEW_CHAT:
-        handleNewChatNotification(messageData);
+        handleNewChatNotification(
+          messageData,
+          setChatRooms,
+          setDirectSelfChats
+        );
         break;
       case NotificationType.MESSAGE_DELIVERED:
       case NotificationType.MESSAGE_READ:

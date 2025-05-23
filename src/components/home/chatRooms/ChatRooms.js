@@ -11,7 +11,7 @@ import newChatIcon from "../../../assets/newChat.png";
 
 const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
   const { userId, setUserId } = useUserWebSocket();
-  const { chatRooms, setChatRooms } = useChatRoomContext();
+  const { chatRooms, setChatRooms, setDirectSelfChats } = useChatRoomContext();
   const navigate = useNavigate();
 
   const openChatRoom = ({ chatRoomId, chatRoomName, chatRoomType }) => {
@@ -38,11 +38,21 @@ const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
   useEffect(() => {
     if (data && userId) {
       const newChatRooms = new Map();
+      const newDirectSelfChats = new Map();
+
       (data.getChatRoomsOfUser || []).forEach((chatRoom) => {
         newChatRooms.set(chatRoom.id, chatRoom);
+
+        if (
+          chatRoom.chatRoomType === "DIRECT" ||
+          chatRoom.chatRoomType === "SELF"
+        ) {
+          newDirectSelfChats.set(chatRoom.chatRoomName, chatRoom.id);
+        }
       });
 
       setChatRooms(newChatRooms);
+      setDirectSelfChats(newDirectSelfChats);
     }
   }, [data, userId]);
 
@@ -59,9 +69,7 @@ const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
         Array.from(chatRooms.values()).map((room) => (
           <Tile
             key={room.id}
-            tileClick={() =>
-              onChatRoomSelect(room.id, room.chatRoomName, room.chatRoomType)
-            }
+            tileClick={onChatRoomSelect}
             id={room.id}
             name={room.chatRoomName}
             type={room.chatRoomType}

@@ -11,8 +11,10 @@ import { handleClearChat } from "../chatRooms/util/HandleClearChat";
 import { handleDeleteMessages } from "../chatRooms/util/HandleDeleteMessages";
 import useClear from "./hook/useClear";
 import { normalizeOnlineStatus } from "./util/OnlineUsersTransformation";
+import useDeleteChat from "../chatRooms/hook/useDeleteChat";
+import { handleDeleteChat } from "../chatRooms/util/HandleDeleteChat";
 
-const ChatRoom = ({ activeChatRoomId }) => {
+const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
   const {
     messages,
     setMessages,
@@ -31,6 +33,7 @@ const ChatRoom = ({ activeChatRoomId }) => {
   });
 
   const { clearChat } = useClear();
+  const { deleteChat } = useDeleteChat();
 
   const clearChatMessageHanlder = async () => {
     try {
@@ -45,6 +48,22 @@ const ChatRoom = ({ activeChatRoomId }) => {
       }
     } catch (error) {
       console.error("Failed to clear messages:", error);
+    }
+  };
+
+  const deleteChatHandler = async () => {
+    try {
+      const response = await deleteChat({ chatRoomId: activeChatRoomId });
+
+      if (response && !response.error) {
+        handleDeleteChat({
+          chatRoomId: activeChatRoomId,
+          setChatRooms,
+          setActiveChatRoomId,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
     }
   };
 
@@ -113,8 +132,9 @@ const ChatRoom = ({ activeChatRoomId }) => {
   return (
     <div className="chatRoom">
       <ChatDetails
-        chatRoomType={chatRoom.chatRoomType}
+        chatRoomType={chatRoom?.chatRoomType}
         handleClearChat={clearChatMessageHanlder}
+        handleDeleteChat={deleteChatHandler}
       />
       <div className="chatContainer">
         <div className="messagesContainer">

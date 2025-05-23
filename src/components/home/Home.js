@@ -3,28 +3,22 @@ import ChatRoom from "./chatRoom/ChatRoom";
 import ChatRooms from "./chatRooms/ChatRooms";
 import backgroundImage from "../../assets/LoginBackground.png";
 import "./Home.css";
-import AddUser from "./Users/AddUser";
+import NewGroup from "./Users/NewGroup/NewGroup";
+import NewChat from "./Users/NewChat/NewChat";
 
 const Home = () => {
   const [activeChatRoomId, setActiveChatRoomId] = useState(null);
   const [activeChatRoomName, setActiveChatRoomName] = useState(null);
   const [activeChatRoomType, setActiveChatRoomType] = useState(null);
-  const [newChatMode, setNewChatMode] = useState(false);
+  const [view, setView] = useState("chatRooms");
 
-  const handleChatRoomSelect = (chatRoomId, chatRoomName, chatRoomType) => {
-    localStorage.setItem("activeChatRoomId", chatRoomId);
-    localStorage.setItem("activeChatRoomName", chatRoomName);
-    localStorage.setItem("activeChatRoomType", chatRoomType);
-    setActiveChatRoomId(chatRoomId);
-    setActiveChatRoomName(chatRoomName);
-  };
-
-  const closeNewChat = () => {
-    setNewChatMode(false);
-  };
-
-  const openNewChat = () => {
-    setNewChatMode(true);
+  const handleChatRoomSelect = ({ id, name, type }) => {
+    localStorage.setItem("activeChatRoomId", id);
+    localStorage.setItem("activeChatRoomName", name);
+    localStorage.setItem("activeChatRoomType", type);
+    setActiveChatRoomId(id);
+    setActiveChatRoomName(name);
+    setActiveChatRoomType(type);
   };
 
   useEffect(() => {
@@ -36,24 +30,36 @@ const Home = () => {
 
   return (
     <div className="homePage">
-      {!newChatMode ? (
-        <div className="chatRooms">
+      <div className="chatRooms">
+        {view === "chatRooms" && (
           <ChatRooms
-            openNewChat={openNewChat}
+            openNewChat={() => setView("newChat")}
             onChatRoomSelect={handleChatRoomSelect}
           />
-        </div>
-      ) : (
-        <div className="chatRooms">
-          <AddUser toggle={closeNewChat}></AddUser>
-        </div>
-      )}
+        )}
+        {view === "newChat" && (
+          <NewChat
+            handleNewChat={handleChatRoomSelect}
+            goBack={() => setView("chatRooms")}
+            openNewGroup={() => setView("newGroup")}
+          />
+        )}
+        {view === "newGroup" && (
+          <NewGroup
+            goBack={() => setView("newChat")}
+            handleNewGroup={handleChatRoomSelect}
+          />
+        )}
+      </div>
       <div className="chatRoom">
         {activeChatRoomId ? (
           <ChatRoom
             activeChatRoomId={activeChatRoomId}
             activeChatRoomName={activeChatRoomName}
             activeChatRoomType={activeChatRoomType}
+            setActiveChatRoomId={setActiveChatRoomId}
+            setActiveChatRoomName={setActiveChatRoomName}
+            setActiveChatRoomType={setActiveChatRoomType}
           />
         ) : (
           <div

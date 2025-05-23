@@ -1,4 +1,9 @@
-.add-user-panel {
+  .newGroup{
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .add-user-panel {
     position: fixed;
     top: 0;
     left: 0;
@@ -17,9 +22,4 @@
   
   .add-user-panel.closed {
     transform: translateX(-100%);
-  }
-
-  .newGroup{
-    margin-top: 10px;
-    margin-bottom: 10px;
   }

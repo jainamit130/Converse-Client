@@ -6,11 +6,13 @@ const ChatRoomContext = createContext({
   typing: [],
   onlineUsers: [],
   lastSeen: null,
+  directSelfChats: () => {},
   setChatRooms: () => {},
   setMessages: () => {},
   setTyping: () => {},
   setOnlineUsers: () => {},
   setLastSeen: () => {},
+  setDirectSelfChats: () => {},
 });
 
 export const useChatRoomContext = () => useContext(ChatRoomContext);
@@ -27,6 +29,9 @@ export const ChatRoomContextProvider = ({ children }) => {
 
   // typing - name or count
   const [typing, setTyping] = useState([]);
+
+  // direct/self chats => name to direct and self chat mappings
+  const [directSelfChats, setDirectSelfChats] = useState(new Map());
 
   return (
     <ChatRoomContext.Provider
@@ -45,6 +50,9 @@ export const ChatRoomContextProvider = ({ children }) => {
 
         messages,
         setMessages,
+
+        directSelfChats,
+        setDirectSelfChats,
       }}
     >
       {children}

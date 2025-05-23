@@ -1,5 +1,24 @@
-export const handleNewChatNotification = (data) => {
-  console.log("New Chat Received:", data.message);
+export const handleNewChatNotification = (
+  data,
+  setChatRooms,
+  setDirectSelfChats
+) => {
+  const chatRoom = data.chatRoom;
+  if (!chatRoom || !chatRoom.id) return;
+
+  setChatRooms((prev) => {
+    const updated = new Map(prev);
+    updated.set(chatRoom.id, chatRoom);
+    return updated;
+  });
+
+  if (chatRoom.chatRoomType === "DIRECT" || chatRoom.chatRoomType === "SELF") {
+    setDirectSelfChats((prev) => {
+      const updated = new Map(prev);
+      updated.set(chatRoom.chatRoomName, chatRoom.id);
+      return updated;
+    });
+  }
 };
 
 export const handleMessageMarkedNotification = (

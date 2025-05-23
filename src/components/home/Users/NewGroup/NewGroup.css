@@ -5,3 +5,30 @@
 .group-name-input input {
   width: 82%;
 }
+
+.selected-users-floating {
+  margin-top: 20px;
+  padding: 10px;
+  background: #f0f0f0;
+  border-top: 1px solid #ccc;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.selected-user-tile {
+  background: #d1e7dd;
+  padding: 5px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.selected-user-tile button {
+  background: transparent;
+  border: none;
+  color: red;
+  font-weight: bold;
+  cursor: pointer;
+}
