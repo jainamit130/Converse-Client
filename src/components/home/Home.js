@@ -5,8 +5,10 @@ import backgroundImage from "../../assets/LoginBackground.png";
 import "./Home.css";
 import NewGroup from "./Users/NewGroup/NewGroup";
 import NewChat from "./Users/NewChat/NewChat";
+import { useChatRoomContext } from "../../context/ChatRoomContext";
 
 const Home = () => {
+  const { setNewDirectChat } = useChatRoomContext();
   const [activeChatRoomId, setActiveChatRoomId] = useState(null);
   const [activeChatRoomName, setActiveChatRoomName] = useState(null);
   const [activeChatRoomType, setActiveChatRoomType] = useState(null);
@@ -20,6 +22,8 @@ const Home = () => {
     setActiveChatRoomName(name);
     setActiveChatRoomType(type);
   };
+
+  const handleNewDirectChat = () => {};
 
   useEffect(() => {
     const storedChatRoomId = localStorage.getItem("activeChatRoomId");
@@ -47,6 +51,7 @@ const Home = () => {
         {view === "newGroup" && (
           <NewGroup
             goBack={() => setView("newChat")}
+            goBackTwice={() => setView("chatRooms")}
             handleNewGroup={handleChatRoomSelect}
           />
         )}

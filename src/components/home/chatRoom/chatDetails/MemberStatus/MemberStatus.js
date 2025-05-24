@@ -1,4 +1,5 @@
 import { useChatRoomContext } from "../../../../../context/ChatRoomContext";
+import { formatLastSeen } from "../../../../../util/dateUtil";
 import TypingIndicator from "../../../../sideComponents/TypingIndicator";
 import "./MemberStatus.css";
 
@@ -8,7 +9,11 @@ const MemberStatus = ({ chatRoomType }) => {
   const renderStatus = () => {
     if (chatRoomType === "SELF" || chatRoomType === "DIRECT") {
       if (lastSeen) {
-        return <span className="member-status__last-seen">{lastSeen}</span>;
+        return (
+          <span className="member-status__last-seen">
+            {formatLastSeen(lastSeen)}
+          </span>
+        );
       } else if (onlineUsers.length === 1) {
         return <span className="member-status__online">online</span>;
       }

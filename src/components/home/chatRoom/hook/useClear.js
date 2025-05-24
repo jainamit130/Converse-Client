@@ -10,7 +10,7 @@ const useClear = () => {
     async ({ chatRoomId }) => {
       if (!chatRoomId) {
         console.error("Invalid clear request: Missing chatRoomId");
-        return { error: "chatRoomId is required" }; // Returning an error object
+        return { error: "chatRoomId is required" };
       }
 
       const endpoint = `/clearChat/${chatRoomId}`;
@@ -18,7 +18,7 @@ const useClear = () => {
       try {
         const response = await axios.post(
           `${baseUrl}${endpoint}`,
-          {}, // Empty payload
+          {},
           {
             headers: {
               Authorization: `Bearer ${token}`,

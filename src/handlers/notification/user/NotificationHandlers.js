@@ -7,8 +7,15 @@ export const handleNewChatNotification = (
   if (!chatRoom || !chatRoom.id) return;
 
   setChatRooms((prev) => {
-    const updated = new Map(prev);
+    const updated = new Map();
     updated.set(chatRoom.id, chatRoom);
+
+    for (const [key, value] of prev.entries()) {
+      if (key !== chatRoom.id) {
+        updated.set(key, value);
+      }
+    }
+
     return updated;
   });
 

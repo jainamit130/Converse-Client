@@ -8,8 +8,8 @@ import BackButton from "../SearchComponent/BackButton/BackButton";
 import Search from "../SearchComponent/Search";
 import useCreateChat from "../hook/useCreateChat";
 
-const NewChat = ({ handleNewChat, goBack, openNewGroup }) => {
-  const { directSelfChats } = useChatRoomContext();
+const NewChat = ({ goBack, openNewGroup, handleNewChat }) => {
+  const { directSelfChats, setNewDirectChat } = useChatRoomContext();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -36,8 +36,19 @@ const NewChat = ({ handleNewChat, goBack, openNewGroup }) => {
   }, []);
 
   const newChatHandler = ({ id, name, type }) => {
-    if (id && directSelfChats.has(name)) {
+    if (!id || !name) return;
+
+    if (directSelfChats.has(name)) {
       handleNewChat({ id: directSelfChats.get(name), name, type });
+    } else {
+      const tempChatRoom = {
+        id: `temp-${id}`,
+        chatRoomName: name,
+        chatRoomType: type,
+      };
+
+      setNewDirectChat(tempChatRoom);
+      goBack();
     }
   };
 

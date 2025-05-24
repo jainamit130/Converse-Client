@@ -17,7 +17,6 @@ export const handleMessageDeletedNotification = (
 
   const messageIdsToUpdate = new Set(messageIds);
 
-  // ✅ Update messages
   setMessages((prevMessages) => {
     const updatedMessages = new Map(prevMessages);
     const messagesForRoom = updatedMessages.get(chatRoomId) || [];
@@ -41,7 +40,6 @@ export const handleMessageDeletedNotification = (
     return updatedMessages;
   });
 
-  // ✅ Update chatRoom using setChatRooms functionally
   setChatRooms((prevChatRooms) => {
     const updatedChatRooms = new Map(prevChatRooms);
     const chatRoom = updatedChatRooms.get(chatRoomId);
@@ -76,7 +74,6 @@ export const handleMessageNotification = (data, setChatRooms, setMessages) => {
   const chatRoomId = message.chatRoomId;
   const activeChatRoomId = localStorage.getItem("activeChatRoomId");
 
-  // ✅ Update messages for active room
   if (activeChatRoomId === chatRoomId) {
     setMessages((prevMap) => {
       const prevMessages = prevMap.get(chatRoomId) || [];
@@ -88,10 +85,12 @@ export const handleMessageNotification = (data, setChatRooms, setMessages) => {
     });
   }
 
-  // ✅ Update chatRooms state safely using the functional form
   setChatRooms((prevChatRooms) => {
     const chatRoom = prevChatRooms.get(chatRoomId);
     if (!chatRoom) return prevChatRooms;
+
+    // Avoid double-counting if this message is already the latest
+    const isAlreadyLatest = chatRoom.latestMessage?.id === message.id;
 
     const updatedChatRoom = {
       ...chatRoom,
@@ -99,11 +98,20 @@ export const handleMessageNotification = (data, setChatRooms, setMessages) => {
       unreadMessageCount:
         activeChatRoomId === chatRoomId
           ? 0
+          : isAlreadyLatest
+          ? chatRoom.unreadMessageCount || 0
           : (chatRoom.unreadMessageCount || 0) + 1,
     };
 
-    const updatedMap = new Map(prevChatRooms);
+    const updatedMap = new Map();
     updatedMap.set(chatRoomId, updatedChatRoom);
+
+    for (const [key, value] of prevChatRooms.entries()) {
+      if (key !== chatRoomId) {
+        updatedMap.set(key, value);
+      }
+    }
+
     return updatedMap;
   });
 };

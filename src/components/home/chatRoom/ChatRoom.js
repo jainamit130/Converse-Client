@@ -24,6 +24,8 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
     setLastSeen,
     onlineUsers,
     setOnlineUsers,
+    newDirectChat,
+    setNewDirectChat,
   } = useChatRoomContext();
   const chatRoom = chatRooms.get(activeChatRoomId);
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
@@ -99,6 +101,7 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
 
   useEffect(() => {
     if (data && activeChatRoomId) {
+      setNewDirectChat(null);
       setMessages((prevMap) => {
         const updatedMap = new Map(prevMap);
         const newMessagesArray = data.getChatRoomData.messages || [];

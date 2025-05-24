@@ -8,7 +8,7 @@ import Tile from "../../../reusableComponents/Tile/Tile";
 import useCreateChat from "../hook/useCreateChat";
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 
-const NewGroup = ({ goBack, handleNewGroup }) => {
+const NewGroup = ({ goBack, goBackTwice, handleNewGroup }) => {
   const [groupName, setGroupName] = useState("");
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,7 +57,7 @@ const NewGroup = ({ goBack, handleNewGroup }) => {
         alert("Failed to create group.");
       } else if (result) {
         handleNewGroup({ id: result, name: groupName, type: "GROUP" });
-        goBack();
+        goBackTwice();
       }
     } catch (err) {
       console.error("Group creation failed:", err);
