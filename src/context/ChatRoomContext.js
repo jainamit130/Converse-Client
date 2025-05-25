@@ -6,7 +6,6 @@ const ChatRoomContext = createContext({
   typing: [],
   onlineUsers: [],
   lastSeen: null,
-  newDirectChat: null,
   directSelfChats: () => {},
   setChatRooms: () => {},
   setMessages: () => {},
@@ -14,7 +13,6 @@ const ChatRoomContext = createContext({
   setOnlineUsers: () => {},
   setLastSeen: () => {},
   setDirectSelfChats: () => {},
-  setNewDirectChat: () => {},
 });
 
 export const useChatRoomContext = () => useContext(ChatRoomContext);
@@ -34,9 +32,6 @@ export const ChatRoomContextProvider = ({ children }) => {
 
   // direct/self chats => name to direct and self chat mappings
   const [directSelfChats, setDirectSelfChats] = useState(new Map());
-
-  // New Direct Chat for acting as temp chatRooms
-  const [newDirectChat, setNewDirectChat] = useState(null);
 
   return (
     <ChatRoomContext.Provider
@@ -58,9 +53,6 @@ export const ChatRoomContextProvider = ({ children }) => {
 
         directSelfChats,
         setDirectSelfChats,
-
-        newDirectChat,
-        setNewDirectChat,
       }}
     >
       {children}

@@ -11,15 +11,11 @@ import newChatIcon from "../../../assets/newChat.png";
 
 const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
   const { userId, setUserId } = useUserWebSocket();
-  const { chatRooms, setChatRooms, setDirectSelfChats, newDirectChat } =
-    useChatRoomContext();
+  const { chatRooms, setChatRooms, setDirectSelfChats } = useChatRoomContext();
   const navigate = useNavigate();
-
-  const openChatRoom = ({ chatRoomId, chatRoomName, chatRoomType }) => {
-    localStorage.setItem("activeChatRoomId", chatRoomId);
-    localStorage.setItem("activeChatRoomName", chatRoomName);
-    localStorage.setItem("activeChatRoomType", chatRoomType);
-  };
+  const chatRoomId = localStorage.getItem("activeChatRoomId");
+  const chatRoomName = localStorage.getItem("activeChatRoomName");
+  const chatRoomType = localStorage.getItem("activeChatRoomType");
 
   useEffect(() => {
     if (!userId) {
@@ -66,13 +62,11 @@ const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
         <h2>Chats</h2>
         <img src={newChatIcon} className="newChatIcon" onClick={openNewChat} />
       </div>
-      {newDirectChat && (
+      {chatRoomId === "temp" && (
         <Tile
-          key={newDirectChat.id}
-          id={newDirectChat.id}
-          name={newDirectChat.chatRoomName}
-          type={newDirectChat.chatRoomType}
-          icon={iconType(newDirectChat.chatRoomType)}
+          name={chatRoomName}
+          type={chatRoomType}
+          icon={iconType(chatRoomType)}
         ></Tile>
       )}
       {chatRooms.size > 0 ? (

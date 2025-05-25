@@ -24,13 +24,17 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
     setLastSeen,
     onlineUsers,
     setOnlineUsers,
-    newDirectChat,
-    setNewDirectChat,
   } = useChatRoomContext();
-  const chatRoom = chatRooms.get(activeChatRoomId);
+  const chatRoom =
+    activeChatRoomId === "temp"
+      ? {
+          chatRoomName: localStorage.getItem("activeChatRoomName"),
+          chatRoomType: localStorage.getItem("activeChatRoomType"),
+        }
+      : chatRooms.get(activeChatRoomId);
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
-    skip: !activeChatRoomId,
+    skip: !activeChatRoomId || activeChatRoomId === "temp",
     fetchPolicy: "network-only",
   });
 
@@ -100,8 +104,7 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
   }, [messages]);
 
   useEffect(() => {
-    if (data && activeChatRoomId) {
-      setNewDirectChat(null);
+    if (data && activeChatRoomId && activeChatRoomId !== "temp") {
       setMessages((prevMap) => {
         const updatedMap = new Map(prevMap);
         const newMessagesArray = data.getChatRoomData.messages || [];
@@ -136,6 +139,8 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
     <div className="chatRoom">
       <ChatDetails
         chatRoomType={chatRoom?.chatRoomType}
+        chatRoomName={chatRoom?.chatRoomName}
+        chatRoomId={activeChatRoomId}
         handleClearChat={clearChatMessageHanlder}
         handleDeleteChat={deleteChatHandler}
       />
@@ -151,7 +156,10 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
           ))}
           <div ref={bottomRef} />
         </div>
-        <ChatInput />
+        <ChatInput
+          chatRoomId={activeChatRoomId}
+          setActiveChatRoomId={setActiveChatRoomId}
+        />
       </div>
     </div>
   );

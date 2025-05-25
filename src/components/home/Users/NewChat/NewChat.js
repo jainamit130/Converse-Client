@@ -9,7 +9,7 @@ import Search from "../SearchComponent/Search";
 import useCreateChat from "../hook/useCreateChat";
 
 const NewChat = ({ goBack, openNewGroup, handleNewChat }) => {
-  const { directSelfChats, setNewDirectChat } = useChatRoomContext();
+  const { directSelfChats } = useChatRoomContext();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -41,15 +41,10 @@ const NewChat = ({ goBack, openNewGroup, handleNewChat }) => {
     if (directSelfChats.has(name)) {
       handleNewChat({ id: directSelfChats.get(name), name, type });
     } else {
-      const tempChatRoom = {
-        id: `temp-${id}`,
-        chatRoomName: name,
-        chatRoomType: type,
-      };
-
-      setNewDirectChat(tempChatRoom);
-      goBack();
+      localStorage.setItem("newDirectChatUserId", id);
+      handleNewChat({ id: "temp", name, type });
     }
+    goBack();
   };
 
   return (

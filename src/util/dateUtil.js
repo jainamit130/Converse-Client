@@ -81,7 +81,7 @@ export const isMessageOlderThan15Minutes = (message) => {
 };
 
 export const formatLastSeen = (timestamp) => {
-  const date = parseDate(timestamp * 1000);
+  const date = new Date(timestamp);
   const now = new Date();
   const timeDifference = now - date;
   const minutesAgo = Math.floor(timeDifference / (1000 * 60));

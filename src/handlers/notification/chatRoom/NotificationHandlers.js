@@ -136,6 +136,7 @@ export const handleUserStatusNotification = (
   if (!username || !status) return;
 
   if (status === "ACTIVE") {
+    setLastSeen(null);
     setOnlineUsers((prev) => {
       if (!Array.isArray(prev)) return [username];
       if (!prev.includes(username)) {
@@ -144,13 +145,12 @@ export const handleUserStatusNotification = (
       return prev;
     });
   } else if (status === "INACTIVE") {
+    const now = new Date().toISOString();
+    setLastSeen(now);
     setOnlineUsers((prev) => {
       if (!Array.isArray(prev)) return [];
       const updated = prev.filter((user) => user !== username);
       return updated;
     });
-
-    const now = new Date().toISOString();
-    setLastSeen(now);
   }
 };

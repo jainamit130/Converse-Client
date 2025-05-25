@@ -3,11 +3,12 @@ import sendButtonIcon from "../../../../assets/SendButton.png";
 import "./ChatInput.css";
 import { useChatRoomWebSocket } from "../../../../context/WebSocketContext/ChatRoomWebSocketContext";
 import { TypingHandlerService } from "./service/TypingHandlerService";
+import useCreateChat from "../../Users/hook/useCreateChat";
 
-const ChatInput = ({ chatRoomId }) => {
+const ChatInput = ({ chatRoomId, setActiveChatRoomId }) => {
   const { send } = useChatRoomWebSocket();
   const [message, setMessage] = useState("");
-
+  const { createChat } = useCreateChat();
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
   const { handleTyping, handleStopTyping } = TypingHandlerService({
@@ -19,11 +20,23 @@ const ChatInput = ({ chatRoomId }) => {
     setMessage(event.target.value);
   };
 
-  const handleSendMessage = (messageContent) => {
+  const handleSendMessage = async (messageContent) => {
     const newMessage = {
       content: messageContent,
     };
-    send("send/message/", newMessage);
+    if (chatRoomId !== "temp") {
+      send("send/message/", newMessage);
+    } else {
+      const userId = localStorage.getItem("newDirectChatUserId");
+      const result = await createChat(userId, newMessage);
+
+      if (result.error) {
+        console.log("Failed to create new direct chat!");
+      } else if (result) {
+        setActiveChatRoomId(result);
+        localStorage.removeItem("newDirectChatUserId");
+      }
+    }
     setMessage("");
   };
 

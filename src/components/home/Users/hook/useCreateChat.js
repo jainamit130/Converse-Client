@@ -19,7 +19,6 @@ const useCreateChat = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          params: { userId },
         });
 
         return response.data;
