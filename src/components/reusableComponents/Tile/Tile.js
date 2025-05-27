@@ -15,6 +15,7 @@ const Tile = ({
   userId, // Nullable or present
   titleSubInfo, // Nullable
   primarySubInfo, // Nullable
+  smallerInfo,
   typingUsers, // Nullable Ex: user types then the primary info gets replaced by secondary subinfo
   unreadMessageCount, // Nullable/0 then dont show
   tileClick,
@@ -103,6 +104,7 @@ const Tile = ({
                 </div>
               )
             )}
+            {smallerInfo}
             {unreadMessageCount > 0 && (
               <div className="unreadMessages">{unreadMessageCount}</div>
             )}

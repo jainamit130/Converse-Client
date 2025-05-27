@@ -13,6 +13,7 @@ import useClear from "./hook/useClear";
 import { normalizeOnlineStatus } from "./util/OnlineUsersTransformation";
 import useDeleteChat from "../chatRooms/hook/useDeleteChat";
 import { handleDeleteChat } from "../chatRooms/util/HandleDeleteChat";
+import MessageInfoPanel from "./message/MessageInfo/MessageInfoPanel";
 
 const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
   const {
@@ -40,6 +41,18 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
 
   const { clearChat } = useClear();
   const { deleteChat } = useDeleteChat();
+  const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
+  const [infoPanelMessage, setInfoPanelMessage] = useState(null);
+
+  const hanldeCloseInfoPanel = () => {
+    setIsInfoPanelOpen(false);
+    setInfoPanelMessage(null);
+  };
+
+  const handleInfoPanelOpen = (message) => {
+    setIsInfoPanelOpen(true);
+    setInfoPanelMessage(message);
+  };
 
   const clearChatMessageHanlder = async () => {
     try {
@@ -145,17 +158,26 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
         handleDeleteChat={deleteChatHandler}
       />
       <div className="chatContainer">
-        <div className="messagesContainer">
-          {chatRoomMessages.map((message) => (
-            <Message
-              chatRooms={chatRooms}
-              message={message}
-              key={message.id}
-              handleDeleteMessages={deleteMessageHandler}
-            />
-          ))}
-          <div ref={bottomRef} />
+        <div className="messagePlusInfoContainer">
+          <div className="messagesContainer">
+            {chatRoomMessages.map((message) => (
+              <Message
+                onOpenInfoPanel={handleInfoPanelOpen}
+                chatRooms={chatRooms}
+                message={message}
+                key={message.id}
+                handleDeleteMessages={deleteMessageHandler}
+              />
+            ))}
+          </div>
+          {isInfoPanelOpen && (
+            <MessageInfoPanel
+              message={infoPanelMessage}
+              onClose={hanldeCloseInfoPanel}
+            ></MessageInfoPanel>
+          )}
         </div>
+        <div ref={bottomRef} />
         <ChatInput
           chatRoomId={activeChatRoomId}
           setActiveChatRoomId={setActiveChatRoomId}

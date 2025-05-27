@@ -9,7 +9,12 @@ import DeletedMessageStyle from "./util/DeletedMessageStyle/DeletedMessageStyle"
 import useDelete from "../hook/useDelete";
 import MessageOptions from "../../../reusableComponents/OptionsDropdown/MessageOptions";
 
-const Message = ({ message, handleDeleteMessages, chatRooms }) => {
+const Message = ({
+  message,
+  handleDeleteMessages,
+  chatRooms,
+  onOpenInfoPanel,
+}) => {
   const [userId] = useState(localStorage.getItem("userId"));
   const [chatRoomId] = useState(localStorage.getItem("activeChatRoomId"));
   const [chatRoomType] = useState(localStorage.getItem("activeChatRoomType"));
@@ -23,20 +28,20 @@ const Message = ({ message, handleDeleteMessages, chatRooms }) => {
   const [options, setOptions] = useState(["Delete for me", "Message info"]);
   const formattedTime = formatTime(messageDate);
 
-  const handleSelectOption = async (option, messageId) => {
-    console.log(option + " -> " + message);
+  const handleSelectOption = async (option, message) => {
     if (option === "Delete for me") {
       handleDeleteMessages({
-        messageIds: [messageId],
+        messageIds: [message.id],
         deleteMessages,
       });
     } else if (option === "Delete for everyone") {
-      console.log(chatRooms);
       await deleteMessages({
         chatRoomId,
-        messageIds: [messageId],
+        messageIds: [message.id],
         forEveryone: true,
       });
+    } else if (option === "Message info") {
+      onOpenInfoPanel(message);
     }
     setIsOptionsOpen(null);
   };
@@ -60,6 +65,7 @@ const Message = ({ message, handleDeleteMessages, chatRooms }) => {
               id={id}
               isOpen={isOptionsOpen}
               optionsIcon={messageOptionsIcon}
+              isUserMessage={isUserMessage}
               options={options}
               toggleDropdown={() =>
                 toggleDropdown(
@@ -71,7 +77,7 @@ const Message = ({ message, handleDeleteMessages, chatRooms }) => {
                   isUserMessage
                 )
               }
-              onSelect={handleSelectOption}
+              onSelect={(option) => handleSelectOption(option, message)}
             ></MessageOptions>
           }
         </div>

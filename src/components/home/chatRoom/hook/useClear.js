@@ -28,11 +28,11 @@ const useClear = () => {
         );
 
         return response.status === 204
-          ? { success: true } // A successful response
-          : { error: "Failed to clear chat" }; // If the status isn't 204
+          ? { success: true }
+          : { error: "Failed to clear chat" };
       } catch (error) {
         console.error("Failed to clear chat:", error);
-        return { error: "Failed to clear chat" }; // Handle error
+        return { error: "Failed to clear chat" };
       }
     },
     [token]

@@ -1,0 +1,69 @@
+.messageInfoPanel {
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 30%;
+  overflow-y: hidden;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+  transition: right 0.3s ease;
+  z-index: 1;
+  font-family: Arial, sans-serif;
+}
+
+.messageInfoHeader {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 20px;
+}
+
+.close-button {
+  margin-right: 12px;
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+}
+
+.messageReceipts {
+  padding: 20px;
+}
+
+.infoTitle{
+    margin: 5px;
+    font-size: large
+}
+
+.infoIcon {
+    margin: 5px;
+    height: 14px;
+    width: 20px;
+}
+
+.messageReceipts h4 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.receipt {
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #444;
+}
+
+.message-content {
+    min-height: 80px;
+    background-image: url('../../../../../assets/ChatBackground.png');
+    justify-content: right;
+    display: flex;
+    font-family: Arial, sans-serif; 
+}
+
+.message-right {
+    padding: 10px;
+    height: max-content;
+}
+

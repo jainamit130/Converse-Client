@@ -35,10 +35,6 @@ const ChatDetails = ({
     }
   };
 
-  useEffect(() => {
-    console.log("Important" + chatRoomId);
-  });
-
   return (
     <div className="chatDetails">
       <div className="chatRoomName">

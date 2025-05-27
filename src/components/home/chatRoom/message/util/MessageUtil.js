@@ -9,10 +9,12 @@ export const toggleDropdown = (
   if (isOpen) {
     setIsOpen(null);
   } else {
-    if (isUserMessage && !message.deletedForEveryone && isWithinDeleteWindow) {
-      setOptions(["Delete for everyone", "Delete for me", "Message info"]);
+    if (isUserMessage && !message.deletedForEveryone) {
+      if (isWithinDeleteWindow)
+        setOptions(["Delete for everyone", "Delete for me", "Message info"]);
+      else setOptions(["Delete for me", "Message info"]);
     } else {
-      setOptions(["Delete for me", "Message info"]);
+      setOptions(["Delete for me"]);
     }
     setIsOpen(message.id);
   }
