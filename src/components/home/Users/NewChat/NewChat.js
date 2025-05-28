@@ -6,14 +6,12 @@ import { iconType } from "../../../MappingTypes/iconFactory";
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 import BackButton from "../SearchComponent/BackButton/BackButton";
 import Search from "../SearchComponent/Search";
-import useCreateChat from "../hook/useCreateChat";
 
 const NewChat = ({ goBack, openNewGroup, handleNewChat }) => {
   const { directSelfChats } = useChatRoomContext();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const { createChat } = useCreateChat();
   const { getUsers } = useGetUsers();
   const userId = localStorage.getItem("userId");
 

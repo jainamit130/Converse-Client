@@ -4,11 +4,13 @@ import config from "../../../../config/environment";
 
 const useCreateChat = () => {
   const baseUrl = config.CHAT_BASE_URL + config.CHAT_SUBBASE_URL;
+  const storedUserId = localStorage.getItem("userId");
   const token = localStorage.getItem("authenticationToken");
 
   const createChat = useCallback(
     async (userId, message) => {
-      const endpoint = `/create/direct/${userId}`;
+      const endpoint =
+        storedUserId == userId ? `/create/self/` : `/create/direct/${userId}`;
       const payload = {
         message,
       };

@@ -25,6 +25,8 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
     setLastSeen,
     onlineUsers,
     setOnlineUsers,
+    directSelfChats,
+    setDirectSelfChats,
   } = useChatRoomContext();
   const chatRoom =
     activeChatRoomId === "temp"
@@ -79,6 +81,7 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
           chatRoomId: activeChatRoomId,
           setChatRooms,
           setActiveChatRoomId,
+          setDirectSelfChats,
         });
       }
     } catch (error) {
