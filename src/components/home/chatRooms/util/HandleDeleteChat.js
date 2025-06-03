@@ -1,14 +1,10 @@
 export const handleDeleteChat = ({
   chatRoomId,
   setChatRooms,
-  setActiveChatRoomId,
   setDirectSelfChats,
+  handleChatRoomSelect,
 }) => {
-  localStorage.removeItem("activeChatRoomName");
-  localStorage.removeItem("activeChatRoomType");
-  localStorage.removeItem("activeChatRoomId");
-  setActiveChatRoomId(null);
-
+  handleChatRoomSelect({ id: null, name: null, type: null });
   setChatRooms((prevChatRooms) => {
     const updatedChatRooms = new Map(prevChatRooms);
 

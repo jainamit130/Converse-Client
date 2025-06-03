@@ -5,18 +5,13 @@ import ChatHeaderOptionsIcon from "../../../../assets/groupOptionsIcon.png";
 import Options from "../../../reusableComponents/OptionsDropdown/Options";
 import MemberStatus from "./MemberStatus/MemberStatus";
 
-const ChatDetails = ({
-  handleClearChat,
-  handleDeleteChat,
-  chatRoomType,
-  chatRoomId,
-  chatRoomName,
-}) => {
+const ChatDetails = ({ handleClearChat, handleDeleteChat }) => {
   const [isOptionsOpen, setIsOptionsOpen] = useState(null);
-  const { typing, onlineUsers, lastSeen } = useChatRoomContext();
+  const { activeChatRoomId, activeChatRoomName, activeChatRoomType } =
+    useChatRoomContext();
   const [options, setOptions] = useState(["Clear Chat", "Delete Chat"]);
 
-  const isTempChat = chatRoomId === "temp";
+  const isTempChat = activeChatRoomId === "temp";
 
   const handleSelectOption = async (option) => {
     if (option == "Clear Chat") {
@@ -38,13 +33,13 @@ const ChatDetails = ({
   return (
     <div className="chatDetails">
       <div className="chatRoomName">
-        {chatRoomName}
+        {activeChatRoomName}
         {!isTempChat && (
-          <MemberStatus chatRoomType={chatRoomType}></MemberStatus>
+          <MemberStatus chatRoomType={activeChatRoomType}></MemberStatus>
         )}
       </div>
       <Options
-        id={chatRoomId}
+        id={activeChatRoomId}
         isOpen={isOptionsOpen}
         optionsIcon={ChatHeaderOptionsIcon}
         options={options}

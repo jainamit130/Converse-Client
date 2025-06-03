@@ -30,11 +30,17 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
     setTyping,
     setOnlineUsers,
     setLastSeen,
+    activeChatRoomId,
   } = useChatRoomContext();
   const { initWebSocket, closeWebSocket, sendMessage } = useWebSocket();
 
+  const activeChatRoomIdRef = useRef(activeChatRoomId);
+
+  useEffect(() => {
+    activeChatRoomIdRef.current = activeChatRoomId;
+  }, [activeChatRoomId]);
+
   const send = (subTopic, message) => {
-    const activeChatRoomId = localStorage.getItem("activeChatRoomId");
     if (activeChatRoomId) {
       const topic = baseTopic + subTopic + activeChatRoomId;
       sendMessage(topic, message);
@@ -47,9 +53,15 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   };
 
   const onMessage = (messageData) => {
+    const currentActiveId = activeChatRoomIdRef.current;
     switch (messageData.notificationType) {
       case NotificationType.MESSAGE:
-        handleMessageNotification(messageData, setChatRooms, setMessages);
+        handleMessageNotification(
+          messageData,
+          setChatRooms,
+          setMessages,
+          currentActiveId
+        );
         break;
       case NotificationType.STATUS:
         handleUserStatusNotification(messageData, setOnlineUsers, setLastSeen);

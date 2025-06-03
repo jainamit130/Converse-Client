@@ -5,29 +5,25 @@ import backgroundImage from "../../assets/LoginBackground.png";
 import "./Home.css";
 import NewGroup from "./Users/NewGroup/NewGroup";
 import NewChat from "./Users/NewChat/NewChat";
+import { useChatRoomContext } from "../../context/ChatRoomContext";
 
 const Home = () => {
-  const [activeChatRoomId, setActiveChatRoomId] = useState(null);
-  const [activeChatRoomName, setActiveChatRoomName] = useState(null);
-  const [activeChatRoomType, setActiveChatRoomType] = useState(null);
+  const {
+    activeChatRoomId,
+    activeChatRoomName,
+    activeChatRoomType,
+    setActiveChatRoomId,
+    setActiveChatRoomName,
+    setActiveChatRoomType,
+  } = useChatRoomContext();
   const [view, setView] = useState("chatRooms");
 
   const handleChatRoomSelect = ({ id, name, type }) => {
     if (id !== "temp") localStorage.removeItem("newDirectChatUserId");
-    localStorage.setItem("activeChatRoomId", id);
-    localStorage.setItem("activeChatRoomName", name);
-    localStorage.setItem("activeChatRoomType", type);
     setActiveChatRoomId(id);
     setActiveChatRoomName(name);
     setActiveChatRoomType(type);
   };
-
-  useEffect(() => {
-    const storedChatRoomId = localStorage.getItem("activeChatRoomId");
-    if (storedChatRoomId) {
-      setActiveChatRoomId(storedChatRoomId);
-    }
-  }, []);
 
   return (
     <div className="homePage">
@@ -55,14 +51,7 @@ const Home = () => {
       </div>
       <div className="chatRoom">
         {activeChatRoomId ? (
-          <ChatRoom
-            activeChatRoomId={activeChatRoomId}
-            activeChatRoomName={activeChatRoomName}
-            activeChatRoomType={activeChatRoomType}
-            setActiveChatRoomId={setActiveChatRoomId}
-            setActiveChatRoomName={setActiveChatRoomName}
-            setActiveChatRoomType={setActiveChatRoomType}
-          />
+          <ChatRoom handleChatRoomSelect={handleChatRoomSelect} />
         ) : (
           <div
             style={{

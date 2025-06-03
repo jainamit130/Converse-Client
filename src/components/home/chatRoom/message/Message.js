@@ -8,6 +8,7 @@ import messageOptionsIcon from "../../../../assets/MessageOptions.png";
 import DeletedMessageStyle from "./util/DeletedMessageStyle/DeletedMessageStyle";
 import useDelete from "../hook/useDelete";
 import MessageOptions from "../../../reusableComponents/OptionsDropdown/MessageOptions";
+import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 
 const Message = ({
   message,
@@ -16,8 +17,7 @@ const Message = ({
   onOpenInfoPanel,
 }) => {
   const [userId] = useState(localStorage.getItem("userId"));
-  const [chatRoomId] = useState(localStorage.getItem("activeChatRoomId"));
-  const [chatRoomType] = useState(localStorage.getItem("activeChatRoomType"));
+  const { activeChatRoomId, activeChatRoomType } = useChatRoomContext();
   const { name, content, deletedForEveryone, timestamp, id, senderId, status } =
     message;
   const [isUserMessage] = useState(senderId === userId);
@@ -36,7 +36,7 @@ const Message = ({
       });
     } else if (option === "Delete for everyone") {
       await deleteMessages({
-        chatRoomId,
+        chatRoomId: activeChatRoomId,
         messageIds: [message.id],
         forEveryone: true,
       });
@@ -54,7 +54,7 @@ const Message = ({
       }`}
     >
       <div className="messageHeader">
-        {chatRoomType === "GROUP" && !deletedForEveryone && (
+        {activeChatRoomType === "GROUP" && !deletedForEveryone && (
           <div className="messageSenderName">
             {isUserMessage ? "You" : name}
           </div>

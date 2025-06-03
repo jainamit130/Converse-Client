@@ -69,10 +69,14 @@ export const handleMessageDeletedNotification = (
   });
 };
 
-export const handleMessageNotification = (data, setChatRooms, setMessages) => {
+export const handleMessageNotification = (
+  data,
+  setChatRooms,
+  setMessages,
+  activeChatRoomId
+) => {
   const { message } = data;
   const chatRoomId = message.chatRoomId;
-  const activeChatRoomId = localStorage.getItem("activeChatRoomId");
 
   if (activeChatRoomId === chatRoomId) {
     setMessages((prevMap) => {

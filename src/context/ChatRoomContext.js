@@ -6,6 +6,12 @@ const ChatRoomContext = createContext({
   typing: [],
   onlineUsers: [],
   lastSeen: null,
+  activeChatRoomId: null,
+  activeChatRoomName: null,
+  activeChatRoomType: null,
+  setActiveChatRoomName: () => {},
+  setActiveChatRoomType: () => {},
+  setActiveChatRoomId: () => {},
   directSelfChats: () => {},
   setChatRooms: () => {},
   setMessages: () => {},
@@ -21,6 +27,10 @@ export const ChatRoomContextProvider = ({ children }) => {
   const [chatRooms, setChatRooms] = useState(new Map());
 
   const [messages, setMessages] = useState(new Map());
+
+  const [activeChatRoomId, setActiveChatRoomId] = useState(null);
+  const [activeChatRoomType, setActiveChatRoomType] = useState(null);
+  const [activeChatRoomName, setActiveChatRoomName] = useState(null);
 
   const [onlineUsers, setOnlineUsers] = useState([]);
 
@@ -53,6 +63,15 @@ export const ChatRoomContextProvider = ({ children }) => {
 
         directSelfChats,
         setDirectSelfChats,
+
+        activeChatRoomId,
+        setActiveChatRoomId,
+
+        activeChatRoomName,
+        setActiveChatRoomName,
+
+        activeChatRoomType,
+        setActiveChatRoomType,
       }}
     >
       {children}

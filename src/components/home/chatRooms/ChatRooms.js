@@ -11,11 +11,15 @@ import newChatIcon from "../../../assets/newChat.png";
 
 const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
   const { userId, setUserId } = useUserWebSocket();
-  const { chatRooms, setChatRooms, setDirectSelfChats } = useChatRoomContext();
+  const {
+    chatRooms,
+    setChatRooms,
+    setDirectSelfChats,
+    activeChatRoomId,
+    activeChatRoomName,
+    activeChatRoomType,
+  } = useChatRoomContext();
   const navigate = useNavigate();
-  const chatRoomId = localStorage.getItem("activeChatRoomId");
-  const chatRoomName = localStorage.getItem("activeChatRoomName");
-  const chatRoomType = localStorage.getItem("activeChatRoomType");
 
   useEffect(() => {
     if (!userId) {
@@ -62,11 +66,11 @@ const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
         <h2>Chats</h2>
         <img src={newChatIcon} className="newChatIcon" onClick={openNewChat} />
       </div>
-      {chatRoomId === "temp" && (
+      {activeChatRoomId === "temp" && (
         <Tile
-          name={chatRoomName}
-          type={chatRoomType}
-          icon={iconType(chatRoomType)}
+          name={activeChatRoomName}
+          type={activeChatRoomType}
+          icon={iconType(activeChatRoomType)}
         ></Tile>
       )}
       {chatRooms.size > 0 ? (

@@ -15,26 +15,17 @@ import useDeleteChat from "../chatRooms/hook/useDeleteChat";
 import { handleDeleteChat } from "../chatRooms/util/HandleDeleteChat";
 import MessageInfoPanel from "./message/MessageInfo/MessageInfoPanel";
 
-const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
+const ChatRoom = ({ handleChatRoomSelect }) => {
   const {
+    activeChatRoomId,
     messages,
     setMessages,
     chatRooms,
     setChatRooms,
-    lastSeen,
     setLastSeen,
-    onlineUsers,
     setOnlineUsers,
-    directSelfChats,
     setDirectSelfChats,
   } = useChatRoomContext();
-  const chatRoom =
-    activeChatRoomId === "temp"
-      ? {
-          chatRoomName: localStorage.getItem("activeChatRoomName"),
-          chatRoomType: localStorage.getItem("activeChatRoomType"),
-        }
-      : chatRooms.get(activeChatRoomId);
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
     skip: !activeChatRoomId || activeChatRoomId === "temp",
@@ -80,8 +71,8 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
         handleDeleteChat({
           chatRoomId: activeChatRoomId,
           setChatRooms,
-          setActiveChatRoomId,
           setDirectSelfChats,
+          handleChatRoomSelect,
         });
       }
     } catch (error) {
@@ -154,9 +145,6 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
   return (
     <div className="chatRoom">
       <ChatDetails
-        chatRoomType={chatRoom?.chatRoomType}
-        chatRoomName={chatRoom?.chatRoomName}
-        chatRoomId={activeChatRoomId}
         handleClearChat={clearChatMessageHanlder}
         handleDeleteChat={deleteChatHandler}
       />
@@ -172,6 +160,7 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
                 handleDeleteMessages={deleteMessageHandler}
               />
             ))}
+            <div ref={bottomRef} />
           </div>
           {isInfoPanelOpen && (
             <MessageInfoPanel
@@ -180,10 +169,9 @@ const ChatRoom = ({ activeChatRoomId, setActiveChatRoomId }) => {
             ></MessageInfoPanel>
           )}
         </div>
-        <div ref={bottomRef} />
         <ChatInput
           chatRoomId={activeChatRoomId}
-          setActiveChatRoomId={setActiveChatRoomId}
+          handleChatRoomSelect={handleChatRoomSelect}
         />
       </div>
     </div>

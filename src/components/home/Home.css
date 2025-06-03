@@ -13,4 +13,5 @@
 .chatRoom {
   flex-grow: 1;
   background-color: #ffffff; 
+  overflow-y: auto;
 }

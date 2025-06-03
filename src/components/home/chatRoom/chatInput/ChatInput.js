@@ -4,9 +4,11 @@ import "./ChatInput.css";
 import { useChatRoomWebSocket } from "../../../../context/WebSocketContext/ChatRoomWebSocketContext";
 import { TypingHandlerService } from "./service/TypingHandlerService";
 import useCreateChat from "../../Users/hook/useCreateChat";
+import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 
-const ChatInput = ({ chatRoomId, setActiveChatRoomId }) => {
+const ChatInput = () => {
   const { send } = useChatRoomWebSocket();
+  const { activeChatRoomId } = useChatRoomContext();
   const [message, setMessage] = useState("");
   const { createChat } = useCreateChat();
   const typingTimeoutRef = useRef(null);
@@ -24,7 +26,7 @@ const ChatInput = ({ chatRoomId, setActiveChatRoomId }) => {
     const newMessage = {
       content: messageContent,
     };
-    if (chatRoomId !== "temp") {
+    if (activeChatRoomId !== "temp") {
       send("send/message/", newMessage);
     } else {
       const userId = localStorage.getItem("newDirectChatUserId");
@@ -33,7 +35,6 @@ const ChatInput = ({ chatRoomId, setActiveChatRoomId }) => {
       if (result.error) {
         console.log("Failed to create new direct chat!");
       } else if (result) {
-        setActiveChatRoomId(result);
         localStorage.removeItem("newDirectChatUserId");
       }
     }
@@ -53,7 +54,9 @@ const ChatInput = ({ chatRoomId, setActiveChatRoomId }) => {
       <form
         className="chatInputForm"
         onSubmit={(e) => {
-          handleStopTyping(send);
+          if (activeChatRoomId !== "temp") {
+            handleStopTyping(send);
+          }
           e.preventDefault();
           const messageContent = e.target.elements.messageContent.value;
           handleSendMessage(messageContent);
@@ -62,7 +65,11 @@ const ChatInput = ({ chatRoomId, setActiveChatRoomId }) => {
       >
         <input
           className="chatInput"
-          onKeyDown={(event) => handleTyping(event, send)}
+          onKeyDown={(event) => {
+            if (activeChatRoomId !== "temp") {
+              handleTyping(event, send);
+            }
+          }}
           type="text"
           value={message}
           onChange={handleChange}
