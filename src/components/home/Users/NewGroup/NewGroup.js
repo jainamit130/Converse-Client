@@ -7,34 +7,18 @@ import { iconType } from "../../../MappingTypes/iconFactory";
 import Tile from "../../../reusableComponents/Tile/Tile";
 import useCreateChat from "../hook/useCreateChat";
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
+import UserTileList from "../util/UserTileList";
+import useSearchableUsers from "../util/useSearchableUsers";
 
 const NewGroup = ({ goBack, goBackTwice, handleNewGroup }) => {
   const [groupName, setGroupName] = useState("");
-  const [users, setUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const { setChatRooms } = useChatRoomContext();
-  const { getUsers } = useGetUsers();
   const { createGroupChat } = useCreateChat();
   const userId = localStorage.getItem("userId");
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.username.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !selectedUsers.find((u) => u.userId === user.userId)
+  const { searchTerm, setSearchTerm, filteredUsers } = useSearchableUsers(
+    selectedUsers.map((u) => u.userId)
   );
-
-  useEffect(() => {
-    const handleGetUsers = async () => {
-      try {
-        const fetchedUsers = await getUsers();
-        setUsers(fetchedUsers || []);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      }
-    };
-    handleGetUsers();
-  }, []);
 
   const handleSelectUser = (user) => {
     setSelectedUsers((prev) => [...prev, user]);
@@ -84,22 +68,11 @@ const NewGroup = ({ goBack, goBackTwice, handleNewGroup }) => {
         CONTACTS ON CONVERSE
       </div>
 
-      {filteredUsers.length > 0 ? (
-        filteredUsers.map((user) => (
-          <div key={user.userId} onClick={() => handleSelectUser(user)}>
-            <Tile
-              id={user.userId}
-              type={user.userId === userId ? "SELF" : "DIRECT"}
-              name={user.username}
-              icon={iconType("DIRECT")}
-            />
-          </div>
-        ))
-      ) : (
-        <p style={{ padding: "0 20px", color: "gray" }}>
-          No matching users found
-        </p>
-      )}
+      <UserTileList
+        users={filteredUsers}
+        userId={userId}
+        onGroupTagClick={handleSelectUser}
+      />
 
       {selectedUsers.length > 0 && (
         <div className="selected-users-floating">

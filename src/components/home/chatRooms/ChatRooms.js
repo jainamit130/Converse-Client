@@ -42,13 +42,27 @@ const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
       const newDirectSelfChats = new Map();
 
       (data.getChatRoomsOfUser || []).forEach((chatRoom) => {
-        newChatRooms.set(chatRoom.id, chatRoom);
+        const isSelfChat =
+          chatRoom.chatRoomType === "SELF" &&
+          chatRoom.chatRoomName === localStorage.getItem("username");
+
+        const modifiedChatRoom = {
+          ...chatRoom,
+          chatRoomName: isSelfChat
+            ? `${chatRoom.chatRoomName} (You)`
+            : chatRoom.chatRoomName,
+        };
+
+        newChatRooms.set(modifiedChatRoom.id, modifiedChatRoom);
 
         if (
-          chatRoom.chatRoomType === "DIRECT" ||
-          chatRoom.chatRoomType === "SELF"
+          modifiedChatRoom.chatRoomType === "DIRECT" ||
+          modifiedChatRoom.chatRoomType === "SELF"
         ) {
-          newDirectSelfChats.set(chatRoom.chatRoomName, chatRoom.id);
+          newDirectSelfChats.set(
+            modifiedChatRoom.chatRoomName,
+            modifiedChatRoom.id
+          );
         }
       });
 

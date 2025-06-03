@@ -81,8 +81,11 @@ export const handleMessageNotification = (
   if (activeChatRoomId === chatRoomId) {
     setMessages((prevMap) => {
       const prevMessages = prevMap.get(chatRoomId) || [];
-      const updatedMessages = [...prevMessages, message];
 
+      const exists = prevMessages.some((msg) => msg.id === message.id);
+      if (exists) return prevMap;
+
+      const updatedMessages = [...prevMessages, message];
       const updatedMap = new Map(prevMap);
       updatedMap.set(chatRoomId, updatedMessages);
       return updatedMap;

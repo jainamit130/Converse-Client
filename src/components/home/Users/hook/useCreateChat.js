@@ -10,7 +10,7 @@ const useCreateChat = () => {
   const createChat = useCallback(
     async (userId, message) => {
       const endpoint =
-        storedUserId == userId ? `/create/self/` : `/create/direct/${userId}`;
+        storedUserId == userId ? `/create/self` : `/create/direct/${userId}`;
       const payload = {
         message,
       };

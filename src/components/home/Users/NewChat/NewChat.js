@@ -1,37 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Tile from "../../../reusableComponents/Tile/Tile";
 import "./NewChat.css";
-import useGetUsers from "../hook/useGetUsers";
 import { iconType } from "../../../MappingTypes/iconFactory";
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 import BackButton from "../SearchComponent/BackButton/BackButton";
 import Search from "../SearchComponent/Search";
+import useSearchableUsers from "../util/useSearchableUsers";
+import UserTileList from "../util/UserTileList";
 
 const NewChat = ({ goBack, openNewGroup, handleNewChat }) => {
   const { directSelfChats } = useChatRoomContext();
-  const [users, setUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const { getUsers } = useGetUsers();
   const userId = localStorage.getItem("userId");
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.username.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !selectedUsers.find((u) => u.userId === user.userId)
+  const { searchTerm, setSearchTerm, filteredUsers } = useSearchableUsers(
+    selectedUsers.map((u) => u.userId)
   );
-
-  useEffect(() => {
-    const handleGetUsers = async () => {
-      try {
-        const fetchedUsers = await getUsers();
-        setUsers(fetchedUsers || []);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      }
-    };
-    handleGetUsers();
-  }, []);
 
   const newChatHandler = ({ id, name, type }) => {
     if (!id || !name) return;
@@ -58,23 +42,11 @@ const NewChat = ({ goBack, openNewGroup, handleNewChat }) => {
         CONTACTS ON CONVERSE
       </div>
 
-      {filteredUsers.length > 0 ? (
-        filteredUsers.map((user) => (
-          <Tile
-            key={user.userId}
-            id={user.userId}
-            isOpen={false}
-            type={user.userId === userId ? "SELF" : "DIRECT"}
-            name={user.username}
-            icon={iconType("DIRECT")}
-            tileClick={newChatHandler}
-          />
-        ))
-      ) : (
-        <p style={{ padding: "0 20px", color: "gray" }}>
-          No matching users found
-        </p>
-      )}
+      <UserTileList
+        users={filteredUsers}
+        userId={userId}
+        onTileClick={newChatHandler}
+      />
     </div>
   );
 };

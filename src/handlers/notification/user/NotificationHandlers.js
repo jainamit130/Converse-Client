@@ -9,6 +9,22 @@ export const handleNewChatNotification = (
   const chatRoom = data.chatRoom;
   if (!chatRoom || !chatRoom.id) return;
 
+  const newDirectChatUserId = localStorage.getItem("newDirectChatUserId");
+  if (newDirectChatUserId !== null) {
+    const userId = localStorage.getItem("userId");
+
+    const counterpartUserId = chatRoom.userIds.find(
+      (userIdInRoom) => userIdInRoom !== userId
+    );
+
+    if (newDirectChatUserId === counterpartUserId) {
+      chatRoom.unreadMessageCount = 0;
+    }
+    setActiveChatRoomId(chatRoom.id);
+    setActiveChatRoomName(chatRoom.chatRoomName);
+    setActiveChatRoomType(chatRoom.chatRoomType);
+  }
+
   setChatRooms((prev) => {
     const updated = new Map();
     updated.set(chatRoom.id, chatRoom);
@@ -21,12 +37,7 @@ export const handleNewChatNotification = (
 
     return updated;
   });
-  const newDirectChatUserId = localStorage.getItem("newDirectChatUserId");
-  if (newDirectChatUserId !== null) {
-    setActiveChatRoomId(chatRoom.id);
-    setActiveChatRoomName(chatRoom.chatRoomName);
-    setActiveChatRoomType(chatRoom.chatRoomType);
-  }
+
   if (chatRoom.chatRoomType === "DIRECT" || chatRoom.chatRoomType === "SELF") {
     setDirectSelfChats((prev) => {
       const updated = new Map(prev);

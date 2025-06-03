@@ -14,6 +14,7 @@ import { normalizeOnlineStatus } from "./util/OnlineUsersTransformation";
 import useDeleteChat from "../chatRooms/hook/useDeleteChat";
 import { handleDeleteChat } from "../chatRooms/util/HandleDeleteChat";
 import MessageInfoPanel from "./message/MessageInfo/MessageInfoPanel";
+import MessageSkeleton from "./message/util/MessageLoading/MessageSkeleton";
 
 const ChatRoom = ({ handleChatRoomSelect }) => {
   const {
@@ -139,7 +140,23 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
       ? messages.get(activeChatRoomId)
       : [];
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="chatRoom">
+        <ChatDetails />
+        <div className="chatContainer">
+          <div className="messagePlusInfoContainer">
+            <div className="messagesContainer">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <MessageSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (error) return <p>Error: {error.message}</p>;
 
   return (
