@@ -9,6 +9,7 @@ import DeletedMessageStyle from "./util/DeletedMessageStyle/DeletedMessageStyle"
 import useDelete from "../hook/useDelete";
 import MessageOptions from "../../../reusableComponents/OptionsDropdown/MessageOptions";
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
+import NotificationMessage from "./NotificationMessage/NotificationMessage";
 
 const Message = ({
   message,
@@ -45,6 +46,10 @@ const Message = ({
     }
     setIsOptionsOpen(null);
   };
+
+  if (message.__typename === "NotificationMessage") {
+    return <NotificationMessage content={content} />;
+  }
 
   return (
     <div

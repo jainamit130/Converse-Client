@@ -1,0 +1,17 @@
+.notification-content {
+    opacity: 0.7;
+    text-align: center;
+    width: max-content;
+    margin: 10px 0;
+    font-size: 15px;
+    color: #000000;
+    box-shadow: 0px 2px 1px rgb(175, 175, 175);
+    background-color: #dfdfdf;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.notification-message {
+      display: flex;
+  justify-content: center;
+}

@@ -5,7 +5,10 @@ import { iconType } from "../../../MappingTypes/iconFactory";
 const UserTileList = ({ users, userId, onTileClick, onGroupTagClick }) => {
   return users.length > 0 ? (
     users.map((user) => (
-      <div key={user.userId} onClick={() => onGroupTagClick(user)}>
+      <div
+        key={user.userId}
+        onClick={onGroupTagClick ? () => onGroupTagClick(user) : undefined}
+      >
         <Tile
           key={user.userId}
           id={user.userId}

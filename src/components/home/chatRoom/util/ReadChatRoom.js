@@ -2,7 +2,6 @@ export const readChatRoom = (setChatRooms, openedChatRoomId) => {
   setChatRooms((prevMap) => {
     const updatedMap = new Map(prevMap);
     const oldChatRoom = prevMap.get(openedChatRoomId);
-
     if (!oldChatRoom) return prevMap;
 
     const newChatRoom = {

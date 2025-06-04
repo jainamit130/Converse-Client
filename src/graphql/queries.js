@@ -9,13 +9,20 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
       userIds
       unreadMessageCount
       latestMessage {
-        id
-        senderId
-        name
-        timestamp
-        content
-        status
-        deletedForEveryone
+        ... on ChatMessage {
+          id
+          senderId
+          name
+          timestamp
+          content
+          status
+          deletedForEveryone
+        }
+        ... on NotificationMessage {
+          id
+          timestamp
+          content
+        }
       }
     }
   }
@@ -32,13 +39,20 @@ export const GET_CHAT_ROOM_DATA = gql`
   query getChatRoomData($chatRoomId: String!) {
     getChatRoomData(chatRoomId: $chatRoomId) {
       messages {
-        id
-        senderId
-        name
-        timestamp
-        content
-        status
-        deletedForEveryone
+        ... on ChatMessage {
+          id
+          senderId
+          name
+          timestamp
+          content
+          status
+          deletedForEveryone
+        }
+        ... on NotificationMessage {
+          id
+          timestamp
+          content
+        }
       }
       onlineUsersDTO {
         ... on DirectChatOnlineUsersDTO {

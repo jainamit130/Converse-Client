@@ -15,6 +15,7 @@ import useDeleteChat from "../chatRooms/hook/useDeleteChat";
 import { handleDeleteChat } from "../chatRooms/util/HandleDeleteChat";
 import MessageInfoPanel from "./message/MessageInfo/MessageInfoPanel";
 import MessageSkeleton from "./message/util/MessageLoading/MessageSkeleton";
+import { insertDateSeparators } from "./message/util/DateSeperator/insertDateSeparators";
 
 const ChatRoom = ({ handleChatRoomSelect }) => {
   const {
@@ -37,6 +38,8 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
   const { deleteChat } = useDeleteChat();
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
   const [infoPanelMessage, setInfoPanelMessage] = useState(null);
+  const chatRoom = chatRooms.get(activeChatRoomId);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   const hanldeCloseInfoPanel = () => {
     setIsInfoPanelOpen(false);
@@ -112,6 +115,14 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
   }, [messages]);
 
   useEffect(() => {
+    if (chatRoom) {
+      setUnreadMessageCount(chatRoom.unreadMessageCount || 0);
+    } else {
+      setUnreadMessageCount(0);
+    }
+  }, [activeChatRoomId]);
+
+  useEffect(() => {
     if (data && activeChatRoomId && activeChatRoomId !== "temp") {
       setMessages((prevMap) => {
         const updatedMap = new Map(prevMap);
@@ -120,7 +131,7 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
         return updatedMap;
       });
       readChatRoom(setChatRooms, activeChatRoomId);
-      const chatRoom = chatRooms.get(activeChatRoomId);
+
       if (chatRoom && data) {
         normalizeOnlineStatus({
           chatRoomName: chatRoom.chatRoomName,
@@ -168,15 +179,20 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
       <div className="chatContainer">
         <div className="messagePlusInfoContainer">
           <div className="messagesContainer">
-            {chatRoomMessages.map((message) => (
-              <Message
-                onOpenInfoPanel={handleInfoPanelOpen}
-                chatRooms={chatRooms}
-                message={message}
-                key={message.id}
-                handleDeleteMessages={deleteMessageHandler}
-              />
-            ))}
+            {insertDateSeparators(
+              chatRoomMessages,
+              unreadMessageCount,
+              (message) => (
+                <Message
+                  onOpenInfoPanel={handleInfoPanelOpen}
+                  chatRooms={chatRooms}
+                  message={message}
+                  key={message.id}
+                  handleDeleteMessages={deleteMessageHandler}
+                />
+              )
+            )}
+
             <div ref={bottomRef} />
           </div>
           {isInfoPanelOpen && (
