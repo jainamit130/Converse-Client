@@ -43,6 +43,17 @@ export const ChatRoomContextProvider = ({ children }) => {
   // direct/self chats => name to direct and self chat mappings
   const [directSelfChats, setDirectSelfChats] = useState(new Map());
 
+  useEffect(() => {
+    if (activeChatRoomId && activeChatRoomId !== "temp") {
+      const chatRoom = chatRooms.get(activeChatRoomId);
+      if (chatRoom?.isExited) {
+        setTyping([]);
+        setOnlineUsers([]);
+        setLastSeen(null);
+      }
+    }
+  }, [chatRooms, activeChatRoomId]);
+
   return (
     <ChatRoomContext.Provider
       value={{

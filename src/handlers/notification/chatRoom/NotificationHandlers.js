@@ -1,5 +1,11 @@
-export const handleChatTransactionNotification = (data) => {
-  console.log("Group Transaction:", data.message);
+export const handleChatTransactionNotification = (
+  data,
+  handleIncomingMessage
+) => {
+  const { notifications } = data;
+  notifications.forEach((notification) => {
+    handleIncomingMessage(notification);
+  });
 };
 
 export const handleMessageDeletedNotification = (

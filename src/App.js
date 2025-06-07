@@ -12,14 +12,14 @@ function App() {
     <Router>
       <ApolloProviderWrapper>
         <ChatRoomContextProvider>
-          <UserWebSocketProvider>
-            <ChatRoomWebSocketProvider>
+          <ChatRoomWebSocketProvider>
+            <UserWebSocketProvider>
               <Routes>
                 <Route path="/" element={<LoginSignUpPage />} />
                 <Route path="/chat-rooms" element={<Home />} />
               </Routes>
-            </ChatRoomWebSocketProvider>
-          </UserWebSocketProvider>
+            </UserWebSocketProvider>
+          </ChatRoomWebSocketProvider>
         </ChatRoomContextProvider>
       </ApolloProviderWrapper>
     </Router>

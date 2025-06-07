@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import {
+  handleExitChatNotification,
   handleMessageMarkedNotification,
   handleNewChatNotification,
 } from "../../handlers/notification/user/NotificationHandlers";
 import { NotificationType } from "../../components/MappingTypes/NotificationTypes";
 import useWebSocket from "../../hooks/WebSocketHook";
 import { useChatRoomContext } from "../ChatRoomContext";
+import { useChatRoomWebSocket } from "./ChatRoomWebSocketContext";
 
 const UserWebSocketContext = createContext({
   userId: null,
@@ -16,6 +18,7 @@ export const useUserWebSocket = () => useContext(UserWebSocketContext);
 
 export const UserWebSocketProvider = ({ children }) => {
   const [userId, setUserId] = useState();
+  const { handleIncomingMessage } = useChatRoomWebSocket();
   const { initWebSocket, closeWebSocket } = useWebSocket();
   const {
     messages,
@@ -27,17 +30,25 @@ export const UserWebSocketProvider = ({ children }) => {
     setActiveChatRoomType,
   } = useChatRoomContext();
 
+  const handleNewChat = (messageData) => {
+    handleNewChatNotification(
+      messageData,
+      setChatRooms,
+      setDirectSelfChats,
+      setActiveChatRoomId,
+      setActiveChatRoomName,
+      setActiveChatRoomType,
+      handleIncomingMessage
+    );
+  };
+
   const onMessage = (messageData) => {
     switch (messageData.notificationType) {
       case NotificationType.NEW_CHAT:
-        handleNewChatNotification(
-          messageData,
-          setChatRooms,
-          setDirectSelfChats,
-          setActiveChatRoomId,
-          setActiveChatRoomName,
-          setActiveChatRoomType
-        );
+        handleNewChat(messageData);
+        break;
+      case NotificationType.EXITED_CHAT:
+        handleExitChatNotification(messageData, handleNewChat);
         break;
       case NotificationType.MESSAGE_DELIVERED:
       case NotificationType.MESSAGE_READ:

@@ -4,11 +4,16 @@ export const handleNewChatNotification = (
   setDirectSelfChats,
   setActiveChatRoomId,
   setActiveChatRoomName,
-  setActiveChatRoomType
+  setActiveChatRoomType,
+  handleIncomingMessage
 ) => {
-  const chatRoom = data.chatRoom;
+  const { chatRoom, notifications } = data;
+  if (notifications) {
+    notifications.forEach((notification) => {
+      handleIncomingMessage(notification);
+    });
+  }
   if (!chatRoom || !chatRoom.id) return;
-
   const newDirectChatUserId = localStorage.getItem("newDirectChatUserId");
   if (newDirectChatUserId !== null) {
     const userId = localStorage.getItem("userId");
@@ -101,4 +106,8 @@ export const handleMessageMarkedNotification = (
 
     return newMessagesMap;
   });
+};
+
+export const handleExitChatNotification = (data, handleNewChat) => {
+  handleNewChat(data);
 };

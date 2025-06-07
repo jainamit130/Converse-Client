@@ -36,6 +36,16 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
 
   const activeChatRoomIdRef = useRef(activeChatRoomId);
 
+  const handleIncomingMessage = (messageData) => {
+    const currentActiveId = activeChatRoomIdRef.current;
+    handleMessageNotification(
+      messageData,
+      setChatRooms,
+      setMessages,
+      currentActiveId
+    );
+  };
+
   useEffect(() => {
     activeChatRoomIdRef.current = activeChatRoomId;
   }, [activeChatRoomId]);
@@ -53,15 +63,9 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   };
 
   const onMessage = (messageData) => {
-    const currentActiveId = activeChatRoomIdRef.current;
     switch (messageData.notificationType) {
       case NotificationType.MESSAGE:
-        handleMessageNotification(
-          messageData,
-          setChatRooms,
-          setMessages,
-          currentActiveId
-        );
+        handleIncomingMessage(messageData);
         break;
       case NotificationType.STATUS:
         handleUserStatusNotification(messageData, setOnlineUsers, setLastSeen);
@@ -77,7 +81,7 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
         );
         break;
       case NotificationType.TRANSACTION:
-        handleChatTransactionNotification(messageData);
+        handleChatTransactionNotification(messageData, handleIncomingMessage);
         break;
       default:
         console.error("Unknown message type:", messageData);
@@ -88,7 +92,13 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   const prevChatRoomIds = useRef(new Set());
 
   useEffect(() => {
-    const currentIds = new Set(chatRooms.keys());
+    const filteredChatRooms = new Map(
+      [...chatRooms.entries()].filter(
+        ([id, room]) => !room.members?.some((member) => member.isExited)
+      )
+    );
+
+    const currentIds = new Set(filteredChatRooms.keys());
 
     const hasChanged =
       currentIds.size !== prevChatRoomIds.current.size ||
@@ -117,7 +127,7 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   }, [chatRooms]);
 
   return (
-    <ChatRoomWebSocketContext.Provider value={{ send }}>
+    <ChatRoomWebSocketContext.Provider value={{ send, handleIncomingMessage }}>
       {children}
     </ChatRoomWebSocketContext.Provider>
   );
