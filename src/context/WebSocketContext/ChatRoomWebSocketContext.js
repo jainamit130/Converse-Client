@@ -31,15 +31,16 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
     setOnlineUsers,
     setLastSeen,
     activeChatRoomId,
+    handleContextOnMemberTransaction,
   } = useChatRoomContext();
   const { initWebSocket, closeWebSocket, sendMessage } = useWebSocket();
 
   const activeChatRoomIdRef = useRef(activeChatRoomId);
 
-  const handleIncomingMessage = (messageData) => {
+  const handleIncomingMessage = (message) => {
     const currentActiveId = activeChatRoomIdRef.current;
     handleMessageNotification(
-      messageData,
+      message,
       setChatRooms,
       setMessages,
       currentActiveId
@@ -65,7 +66,7 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   const onMessage = (messageData) => {
     switch (messageData.notificationType) {
       case NotificationType.MESSAGE:
-        handleIncomingMessage(messageData);
+        handleIncomingMessage(messageData.message);
         break;
       case NotificationType.STATUS:
         handleUserStatusNotification(messageData, setOnlineUsers, setLastSeen);
@@ -81,7 +82,11 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
         );
         break;
       case NotificationType.TRANSACTION:
-        handleChatTransactionNotification(messageData, handleIncomingMessage);
+        handleChatTransactionNotification(
+          messageData,
+          handleIncomingMessage,
+          handleContextOnMemberTransaction
+        );
         break;
       default:
         console.error("Unknown message type:", messageData);

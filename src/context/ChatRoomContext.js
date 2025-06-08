@@ -43,6 +43,29 @@ export const ChatRoomContextProvider = ({ children }) => {
   // direct/self chats => name to direct and self chat mappings
   const [directSelfChats, setDirectSelfChats] = useState(new Map());
 
+  const handleContextOnMemberTransaction = (transaction) => {
+    if (!transaction || !transaction.username) return;
+
+    setOnlineUsers((prev) => {
+      const updated = new Set(prev);
+
+      if (transaction.type === "EXITED_CHAT") {
+        updated.delete(transaction.username);
+      } else if (
+        transaction.type === "NEW_CHAT" &&
+        transaction.onlineStatus === "ACTIVE"
+      ) {
+        updated.add(transaction.username);
+      }
+
+      return Array.from(updated);
+    });
+
+    if (transaction.type === "EXITED_CHAT") {
+      setTyping((prev) => prev.filter((user) => user !== transaction.username));
+    }
+  };
+
   useEffect(() => {
     if (activeChatRoomId && activeChatRoomId !== "temp") {
       const chatRoom = chatRooms.get(activeChatRoomId);
@@ -83,6 +106,8 @@ export const ChatRoomContextProvider = ({ children }) => {
 
         activeChatRoomType,
         setActiveChatRoomType,
+
+        handleContextOnMemberTransaction,
       }}
     >
       {children}

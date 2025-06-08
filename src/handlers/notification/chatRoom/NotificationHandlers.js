@@ -1,10 +1,12 @@
 export const handleChatTransactionNotification = (
   data,
-  handleIncomingMessage
+  handleIncomingMessage,
+  handleContextOnMemberTransaction
 ) => {
   const { notifications } = data;
   notifications.forEach((notification) => {
-    handleIncomingMessage(notification);
+    handleIncomingMessage(notification.message);
+    handleContextOnMemberTransaction(notification);
   });
 };
 
@@ -76,12 +78,11 @@ export const handleMessageDeletedNotification = (
 };
 
 export const handleMessageNotification = (
-  data,
+  message,
   setChatRooms,
   setMessages,
   activeChatRoomId
 ) => {
-  const { message } = data;
   const chatRoomId = message.chatRoomId;
 
   if (activeChatRoomId === chatRoomId) {

@@ -7,12 +7,9 @@ export const handleNewChatNotification = (
   setActiveChatRoomType,
   handleIncomingMessage
 ) => {
-  const { chatRoom, notifications } = data;
-  if (notifications) {
-    notifications.forEach((notification) => {
-      handleIncomingMessage(notification);
-    });
-  }
+  const { chatRoom, transactionNotification } = data;
+  if (transactionNotification)
+    handleIncomingMessage(transactionNotification.message);
   if (!chatRoom || !chatRoom.id) return;
   const newDirectChatUserId = localStorage.getItem("newDirectChatUserId");
   if (newDirectChatUserId !== null) {
