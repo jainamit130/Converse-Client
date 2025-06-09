@@ -5,11 +5,17 @@ export const handleNewChatNotification = (
   setActiveChatRoomId,
   setActiveChatRoomName,
   setActiveChatRoomType,
-  handleIncomingMessage
+  handleIncomingMessage,
+  handleNewChatStatus
 ) => {
   const { chatRoom, transactionNotification } = data;
-  if (transactionNotification)
+  if (transactionNotification) {
     handleIncomingMessage(transactionNotification.message);
+    // handleNewChatStatus(
+    //   chatRoom.chatRoomName,
+    //   transactionNotification.onlineUsersDTO
+    // );
+  }
   if (!chatRoom || !chatRoom.id) return;
   const newDirectChatUserId = localStorage.getItem("newDirectChatUserId");
   if (newDirectChatUserId !== null) {
