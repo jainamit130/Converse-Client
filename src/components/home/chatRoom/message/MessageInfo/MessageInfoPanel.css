@@ -1,12 +1,6 @@
 .messageInfoPanel {
-  right: 0;
-  top: 0;
-  height: 100%;
-  width: 30%;
-  overflow-y: hidden;
+  margin: 10px;
   background-color: white;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-  transition: right 0.3s ease;
   z-index: 1;
   font-family: Arial, sans-serif;
 }

@@ -16,6 +16,8 @@ import { handleDeleteChat } from "../chatRooms/util/HandleDeleteChat";
 import MessageInfoPanel from "./message/MessageInfo/MessageInfoPanel";
 import MessageSkeleton from "./message/util/MessageLoading/MessageSkeleton";
 import { insertDateSeparators } from "./message/util/DateSeperator/insertDateSeparators";
+import InfoPanel from "./util/infoPanel/InfoPanel";
+import GroupInfoPanel from "./GroupInfo/GroupInfoPanel";
 
 const ChatRoom = ({ handleChatRoomSelect }) => {
   const {
@@ -37,6 +39,7 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
   const { clearChat } = useClear();
   const { deleteChat } = useDeleteChat();
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
+  const [isChatInfoPanelOpen, setIsChatInfoPanelOpen] = useState(false);
   const [infoPanelMessage, setInfoPanelMessage] = useState(null);
   const chatRoom = chatRooms.get(activeChatRoomId);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
@@ -49,6 +52,16 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
   const handleInfoPanelOpen = (message) => {
     setIsInfoPanelOpen(true);
     setInfoPanelMessage(message);
+    handleChatInfoPanelClose();
+  };
+
+  const handleChatInfoPanelOpen = () => {
+    setIsChatInfoPanelOpen(true);
+    hanldeCloseInfoPanel();
+  };
+
+  const handleChatInfoPanelClose = () => {
+    setIsChatInfoPanelOpen(false);
   };
 
   const clearChatMessageHanlder = async () => {
@@ -173,6 +186,7 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
   return (
     <div className="chatRoom">
       <ChatDetails
+        handleChatDetailsPanel={handleChatInfoPanelOpen}
         handleClearChat={clearChatMessageHanlder}
         handleDeleteChat={deleteChatHandler}
       />
@@ -196,10 +210,21 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
             <div ref={bottomRef} />
           </div>
           {isInfoPanelOpen && (
-            <MessageInfoPanel
-              message={infoPanelMessage}
+            <InfoPanel
+              children={<MessageInfoPanel message={infoPanelMessage} />}
               onClose={hanldeCloseInfoPanel}
-            ></MessageInfoPanel>
+              panelName={"Message info"}
+            ></InfoPanel>
+          )}
+          {isChatInfoPanelOpen && (
+            <InfoPanel
+              panelName="Group info"
+              onClose={handleChatInfoPanelClose}
+            >
+              {chatRoom.chatRoomType === "GROUP" ? (
+                <GroupInfoPanel chatRoom={chatRoom} />
+              ) : null}
+            </InfoPanel>
           )}
         </div>
         <ChatInput

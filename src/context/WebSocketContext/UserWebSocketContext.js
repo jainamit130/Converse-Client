@@ -34,12 +34,12 @@ export const UserWebSocketProvider = ({ children }) => {
   } = useChatRoomContext();
 
   const handleNewChatStatus = (chatRoomName, onlineUsersDTO) => {
-    normalizeOnlineStatus(
+    normalizeOnlineStatus({
       chatRoomName,
       onlineUsersDTO,
       setOnlineUsers,
-      setLastSeen
-    );
+      setLastSeen,
+    });
   };
 
   const handleNewChat = (messageData) => {

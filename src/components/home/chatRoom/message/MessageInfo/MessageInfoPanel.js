@@ -13,14 +13,12 @@ import readStatusIcon from "./../../../../../assets/readStatus.png";
 import deliveredStatusIcon from "./../../../../../assets/deliveredStatus.png";
 import Message from "../Message";
 
-const MessageInfoPanel = ({ message, onClose }) => {
+const MessageInfoPanel = ({ message }) => {
   const { getMessageInfo } = useGetMessageInfo();
   const username = localStorage.getItem("username");
   const userId = localStorage.getItem("userId");
   const [messageInfo, setMessageInfo] = useState(null);
-  const panelRef = useRef(null);
   const messageDate = parseDate(message.timestamp);
-  const formattedTime = formatTime(messageDate);
 
   useEffect(() => {
     const fetchMessageInfo = async () => {
@@ -31,22 +29,6 @@ const MessageInfoPanel = ({ message, onClose }) => {
     };
     fetchMessageInfo();
   }, [message]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        panelRef.current &&
-        !panelRef.current.contains(event.target) &&
-        !event.target.classList.contains("close-button")
-      ) {
-        onClose();
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [onClose]);
 
   if (!messageInfo) return <div className="messageInfoPanel">Loading...</div>;
 
@@ -87,16 +69,7 @@ const MessageInfoPanel = ({ message, onClose }) => {
   );
 
   return (
-    <div className="messageInfoPanel" ref={panelRef}>
-      <div className="messageInfoHeader">
-        <img
-          src={closeButtonIcon}
-          className="close-button"
-          alt="close"
-          onClick={onClose}
-        />
-        <span>Message info</span>
-      </div>
+    <div>
       <div className="message-content">
         <Message message={message}></Message>
       </div>

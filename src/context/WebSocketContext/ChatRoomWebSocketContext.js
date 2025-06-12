@@ -47,6 +47,11 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
     );
   };
 
+  const handleTyping = (messageData) => {
+    const currentActiveId = activeChatRoomIdRef.current;
+    handleTypingNotification(messageData, setTyping, currentActiveId);
+  };
+
   useEffect(() => {
     activeChatRoomIdRef.current = activeChatRoomId;
   }, [activeChatRoomId]);
@@ -72,7 +77,7 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
         handleUserStatusNotification(messageData, setOnlineUsers, setLastSeen);
         break;
       case NotificationType.TYPING:
-        handleTypingNotification(messageData, setTyping);
+        handleTyping(messageData);
         break;
       case NotificationType.MESSAGE_DELETED:
         handleMessageDeletedNotification(
@@ -98,9 +103,7 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
 
   useEffect(() => {
     const filteredChatRooms = new Map(
-      [...chatRooms.entries()].filter(
-        ([id, room]) => !room.members?.some((member) => member.isExited)
-      )
+      [...chatRooms.entries()].filter(([id, room]) => !room.isExited)
     );
 
     const currentIds = new Set(filteredChatRooms.keys());

@@ -5,7 +5,11 @@ import ChatHeaderOptionsIcon from "../../../../assets/groupOptionsIcon.png";
 import Options from "../../../reusableComponents/OptionsDropdown/Options";
 import MemberStatus from "./MemberStatus/MemberStatus";
 
-const ChatDetails = ({ handleClearChat, handleDeleteChat }) => {
+const ChatDetails = ({
+  handleClearChat,
+  handleDeleteChat,
+  handleChatDetailsPanel,
+}) => {
   const [isOptionsOpen, setIsOptionsOpen] = useState(null);
   const { activeChatRoomId, activeChatRoomName, activeChatRoomType } =
     useChatRoomContext();
@@ -32,7 +36,7 @@ const ChatDetails = ({ handleClearChat, handleDeleteChat }) => {
 
   return (
     <div className="chatDetails">
-      <div className="chatRoomName">
+      <div className="chatRoomName" onClick={handleChatDetailsPanel}>
         {activeChatRoomName}
         {!isTempChat && (
           <MemberStatus chatRoomType={activeChatRoomType}></MemberStatus>

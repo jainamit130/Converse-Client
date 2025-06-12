@@ -104,7 +104,9 @@ export const handleMessageNotification = (
     if (!chatRoom) return prevChatRooms;
 
     // Avoid double-counting if this message is already the latest
-    const isAlreadyLatest = chatRoom.latestMessage?.id === message.id;
+    const shouldStayUnaffected =
+      chatRoom.latestMessage?.id === message.id ||
+      message.__typename === "NotificationMessage";
 
     const updatedChatRoom = {
       ...chatRoom,
@@ -112,7 +114,7 @@ export const handleMessageNotification = (
       unreadMessageCount:
         activeChatRoomId === chatRoomId
           ? 0
-          : isAlreadyLatest
+          : shouldStayUnaffected
           ? chatRoom.unreadMessageCount || 0
           : (chatRoom.unreadMessageCount || 0) + 1,
     };
@@ -130,9 +132,11 @@ export const handleMessageNotification = (
   });
 };
 
-export const handleTypingNotification = (data, setTyping) => {
-  if (data.typingUsernames && data.typingUsernames.length > 0) {
-    setTyping(data.typingUsernames);
+export const handleTypingNotification = (data, setTyping, activeChatRoomId) => {
+  const { chatRoomId, typingUsernames } = data;
+
+  if (chatRoomId === activeChatRoomId && typingUsernames?.length > 0) {
+    setTyping(typingUsernames);
   } else {
     setTyping([]);
   }

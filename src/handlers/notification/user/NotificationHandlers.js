@@ -11,10 +11,10 @@ export const handleNewChatNotification = (
   const { chatRoom, transactionNotification } = data;
   if (transactionNotification) {
     handleIncomingMessage(transactionNotification.message);
-    // handleNewChatStatus(
-    //   chatRoom.chatRoomName,
-    //   transactionNotification.onlineUsersDTO
-    // );
+    handleNewChatStatus(
+      chatRoom.chatRoomName,
+      transactionNotification.onlineUsersDTO
+    );
   }
   if (!chatRoom || !chatRoom.id) return;
   const newDirectChatUserId = localStorage.getItem("newDirectChatUserId");

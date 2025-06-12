@@ -1,0 +1,27 @@
+.InfoPanel {
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 30%;
+  overflow-y: hidden;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+  transition: right 0.3s ease;
+  z-index: 1;
+  font-family: Arial, sans-serif;
+}
+
+.InfoHeader {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 20px;
+}
+
+.close-button {
+  margin-right: 12px;
+  cursor: pointer;
+  height: 15px;
+  width: 15px;
+}

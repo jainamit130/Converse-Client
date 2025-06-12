@@ -4,6 +4,12 @@ import config from "../config/environment";
 let client = null;
 const clients = new Map(); // Tracks topic -> onMessage
 
+const extractChatRoomIdFromTopic = (topic) => {
+  const parts = topic.split("/");
+  const chatIndex = parts.indexOf("chat");
+  return chatIndex !== -1 ? parts[chatIndex + 1] : null;
+};
+
 const initWebSocket = (topic, onMessage) => {
   if (!client) {
     const token = localStorage.getItem("authenticationToken") || "";
@@ -13,13 +19,12 @@ const initWebSocket = (topic, onMessage) => {
       onConnect: () => {
         console.log("✅ WebSocket connected");
 
-        // Re-subscribe to all existing topics
-        clients.forEach((_, subscribedTopic) => {
+        clients.forEach((originalHandler, subscribedTopic) => {
           const subscription = client.subscribe(subscribedTopic, (message) => {
             const data = JSON.parse(message.body);
-            clients.get(subscribedTopic)(data);
+            const chatRoomId = extractChatRoomIdFromTopic(subscribedTopic);
+            originalHandler({ ...data, chatRoomId });
           });
-          clients.set(subscribedTopic, clients.get(subscribedTopic));
           console.log(`📩 Re-subscribed to topic: ${subscribedTopic}`);
         });
       },
@@ -42,11 +47,11 @@ const initWebSocket = (topic, onMessage) => {
   if (!clients.has(topic)) {
     clients.set(topic, onMessage);
 
-    // Subscribe immediately if already connected
     if (client.connected) {
       const subscription = client.subscribe(topic, (message) => {
         const data = JSON.parse(message.body);
-        onMessage(data);
+        const chatRoomId = extractChatRoomIdFromTopic(topic);
+        onMessage({ ...data, chatRoomId }); // ✅ Inject chatRoomId here too
       });
       console.log(`✅ Subscribed to topic: ${topic}`);
     }
