@@ -34,7 +34,9 @@ const OptionsDropdown = ({
           {options.map((option, index) => (
             <li
               key={index}
-              onClick={(event) => onSelect(event, option, parameter)}
+              onClick={(event) => {
+                onSelect(event, option, parameter);
+              }}
             >
               {option}
             </li>

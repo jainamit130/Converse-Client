@@ -25,9 +25,9 @@ const Tile = ({
   toggleDropdown,
 }) => {
   const handleSelectOption = async (event, option, id) => {
+    event.stopPropagation();
     optionsClicked(option, id);
     toggleDropdown(event, id);
-    event.stopPropagation();
   };
 
   const handleTileClick = () => {
@@ -65,6 +65,7 @@ const Tile = ({
             style={{
               display: "flex",
               alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
             <div className="chatRoomTitle primarySubInfo">{name}</div>
@@ -77,6 +78,7 @@ const Tile = ({
                 toggleDropdown={toggleDropdown}
                 onSelect={handleSelectOption}
                 optionsIcon={optionsIcon}
+                optionsIconClassName="optionsIconClassName"
               ></Options>
             )}
           </div>

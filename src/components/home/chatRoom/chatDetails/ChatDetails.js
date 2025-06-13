@@ -17,7 +17,7 @@ const ChatDetails = ({
 
   const isTempChat = activeChatRoomId === "temp";
 
-  const handleSelectOption = async (option) => {
+  const handleSelectOption = async (event, option) => {
     if (option == "Clear Chat") {
       handleClearChat();
     } else if (option == "Delete Chat") {
@@ -50,6 +50,8 @@ const ChatDetails = ({
         toggleDropdown={toggleDropdown}
         onSelect={handleSelectOption}
         handleClearChat={handleClearChat}
+        shouldStayVisible={true}
+        optionsIconClassName="optionsClassName"
       ></Options>
     </div>
   );

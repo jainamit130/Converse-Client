@@ -7,11 +7,19 @@ import "./GroupInfoPanel.css";
 import Tile from "../../../reusableComponents/Tile/Tile";
 import useGetGroupInfo from "../hook/useGetGroupInfo";
 import { iconType } from "../../../MappingTypes/iconFactory";
+import useGroupTransaction from "../hook/useGroupTransaction";
 
-const GroupInfoPanel = ({ chatRoom }) => {
+const GroupInfoPanel = ({
+  chatRoom,
+  handleDeletChat,
+  handleExitChat,
+  handleRemoveUsers,
+  handleAddUsers,
+}) => {
   const { fetchGroupInfo } = useGetGroupInfo();
   const [members, setMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [memberOptions, setMemberOptions] = useState(["Remove Member"]);
   const [openDropdownId, setOpenDropdownId] = useState(null);
 
   const chatRoomId = chatRoom?.id;
@@ -29,17 +37,29 @@ const GroupInfoPanel = ({ chatRoom }) => {
     getGroupInfo();
   }, [chatRoomId]);
 
-  const handleAddMember = (roomId) => {
-    console.log("Add member clicked for room:", roomId);
+  const handleAddMember = () => {
+    handleAddUsers();
   };
 
-  const removeMember = (memberId) => {
-    console.log("Remove member clicked:", memberId);
-    return true;
+  const removeMember = async (memberId) => {
+    try {
+      const response = await handleRemoveUsers([memberId]);
+      if (response && !response.error) {
+        setMembers((prev) => prev.filter((m) => m.userId !== memberId));
+      } else {
+        console.error("Failed to remove member:", response?.error);
+      }
+    } catch (err) {
+      console.error("Error removing member:", err);
+    }
   };
 
   const handleGroupAction = () => {
-    console.log(chatRoom.isExited ? "Delete group" : "Exit group");
+    if (chatRoom.isExited) {
+      handleDeletChat();
+    } else {
+      handleExitChat();
+    }
   };
 
   const openUserInfoPanel = (userId) => {
@@ -48,7 +68,6 @@ const GroupInfoPanel = ({ chatRoom }) => {
 
   const toggleDropdown = (event, id) => {
     setOpenDropdownId((prevId) => (prevId === id ? null : id));
-    event.stopPropagation();
   };
 
   const handleOptionsClick = (option, id) => {
@@ -93,11 +112,11 @@ const GroupInfoPanel = ({ chatRoom }) => {
         <h2>{chatRoom.name}</h2>
       </div>
 
-      <div style={{ marginTop: "30px", padding: "0 20px" }}>
+      <div style={{ padding: "0 20px" }}>
         <h3 style={{ fontSize: "18px", color: "#333", marginBottom: "10px" }}>
           Group Members
         </h3>
-        <div style={{ position: "relative", zIndex: "1" }}>
+        <div style={{ zIndex: "1" }}>
           <Tile
             name={"Add Member"}
             tileClick={() => handleAddMember(chatRoomId)}
@@ -110,7 +129,7 @@ const GroupInfoPanel = ({ chatRoom }) => {
                   key={`loading-${index}`}
                   name="Loading..."
                   icon={iconType("DIRECT")}
-                  isLoading={true} // You can conditionally style this in your Tile component
+                  isLoading={true}
                 />
               ))
             : members.map((member) => (
@@ -122,7 +141,7 @@ const GroupInfoPanel = ({ chatRoom }) => {
                   isOpen={openDropdownId === member.userId}
                   toggleDropdown={toggleDropdown}
                   tileClick={() => openUserInfoPanel(member.userId)}
-                  options={["Remove Member"]}
+                  options={memberOptions}
                   optionsClicked={handleOptionsClick}
                 />
               ))}

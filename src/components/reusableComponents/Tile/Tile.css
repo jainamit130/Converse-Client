@@ -1,7 +1,7 @@
 .chat-room-tile {
-  position: relative;
-    width: 92%;
+    width: 100%;
     align-items: center;
+    position: relative;
     opacity: 0.8;
     display: flex;
     color: #000000;
@@ -12,6 +12,15 @@
     padding: 10px;
     box-sizing: border-box;
   }
+
+  .chat-room-tile:hover .optionsIcon {
+    display: flex;
+  } 
+
+  .optionsIconClassName {
+   height: 10px;
+  width: 15px;
+}
 
   .icon{
     cursor: pointer;

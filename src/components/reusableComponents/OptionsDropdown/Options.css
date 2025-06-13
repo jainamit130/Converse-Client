@@ -1,12 +1,16 @@
-.optionsIcon{
-    height: 25px;
-    width: 5px;
-    padding:20px;
-    padding-bottom: 10px;
-    position: relative;
-    cursor: pointer;
+.optionsIcon {
+  margin-left: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  display: none;
 }
+
 
 .optionsIcon:hover {
     opacity: 0.8;
+}
+
+.options-wrapper.always-visible .optionsIcon {
+  display: flex;
 }

@@ -2,7 +2,7 @@ import { Client } from "@stomp/stompjs";
 import config from "../config/environment";
 
 let client = null;
-const clients = new Map(); // Tracks topic -> onMessage
+const clients = new Map();
 
 const extractChatRoomIdFromTopic = (topic) => {
   const parts = topic.split("/");
@@ -19,12 +19,12 @@ const initWebSocket = (topic, onMessage) => {
       onConnect: () => {
         console.log("✅ WebSocket connected");
 
-        clients.forEach((originalHandler, subscribedTopic) => {
+        clients.forEach((_, subscribedTopic) => {
           const subscription = client.subscribe(subscribedTopic, (message) => {
             const data = JSON.parse(message.body);
-            const chatRoomId = extractChatRoomIdFromTopic(subscribedTopic);
-            originalHandler({ ...data, chatRoomId });
+            clients.get(subscribedTopic)(data);
           });
+          clients.set(subscribedTopic, clients.get(subscribedTopic));
           console.log(`📩 Re-subscribed to topic: ${subscribedTopic}`);
         });
       },
@@ -50,8 +50,7 @@ const initWebSocket = (topic, onMessage) => {
     if (client.connected) {
       const subscription = client.subscribe(topic, (message) => {
         const data = JSON.parse(message.body);
-        const chatRoomId = extractChatRoomIdFromTopic(topic);
-        onMessage({ ...data, chatRoomId }); // ✅ Inject chatRoomId here too
+        onMessage(data);
       });
       console.log(`✅ Subscribed to topic: ${topic}`);
     }

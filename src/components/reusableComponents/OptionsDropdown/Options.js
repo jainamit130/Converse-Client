@@ -9,6 +9,8 @@ const Options = ({
   options,
   toggleDropdown,
   onSelect,
+  shouldStayVisible = false,
+  optionsIconClassName = "",
 }) => {
   const handleClick = (event) => {
     toggleDropdown(event, id);
@@ -16,13 +18,19 @@ const Options = ({
   };
 
   return (
-    <div>
-      <img src={optionsIcon} className="optionsIcon" onClick={handleClick} />
+    <div
+      className={`options-wrapper ${shouldStayVisible ? "always-visible" : ""}`}
+    >
+      <img
+        src={optionsIcon}
+        className={`optionsIcon ${optionsIconClassName}`}
+        onClick={handleClick}
+      />
       <div>
         {isOpen && (
           <OptionsDropdown
             options={options}
-            onSelect={(event, option) => onSelect(option, id)}
+            onSelect={(event, option) => onSelect(event, option, id)}
             toggleDropdown={toggleDropdown}
             parameter={id}
             parentButtonRef="optionsIcon"

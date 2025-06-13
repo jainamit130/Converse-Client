@@ -6,7 +6,7 @@ import { TypingHandlerService } from "./service/TypingHandlerService";
 import useCreateChat from "../../Users/hook/useCreateChat";
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 
-const ChatInput = () => {
+const ChatInput = ({ chatRoom }) => {
   const { send } = useChatRoomWebSocket();
   const { activeChatRoomId } = useChatRoomContext();
   const [message, setMessage] = useState("");
@@ -62,21 +62,31 @@ const ChatInput = () => {
           handleSendMessage(messageContent);
           e.target.reset();
         }}
+        style={{
+          backgroundColor: chatRoom?.isExited ? "rgb(155,155,155)" : "",
+        }}
       >
-        <input
-          className="chatInput"
-          onKeyDown={(event) => {
-            if (activeChatRoomId !== "temp") {
-              handleTyping(event, send);
-            }
-          }}
-          type="text"
-          value={message}
-          onChange={handleChange}
-          name="messageContent"
-          placeholder="Type your message..."
-          required
-        />
+        {chatRoom?.isExited ? (
+          <div className="exitInputState">
+            You can't send message to this group because you're no longer a
+            member.
+          </div>
+        ) : (
+          <input
+            className="chatInput"
+            onKeyDown={(event) => {
+              if (activeChatRoomId !== "temp") {
+                handleTyping(event, send);
+              }
+            }}
+            type="text"
+            value={message}
+            onChange={handleChange}
+            name="messageContent"
+            placeholder="Type your message..."
+            required
+          />
+        )}
 
         {message.trim().length > 0 && (
           <button type="submit" className="sendButton">

@@ -4,7 +4,6 @@
 }
 
 .chatRooms {
-  padding-left: 10px;
   width: 400px; 
   background-color: #f1f1f1; 
   overflow-y: auto;

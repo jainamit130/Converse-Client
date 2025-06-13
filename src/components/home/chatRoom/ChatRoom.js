@@ -18,8 +18,9 @@ import MessageSkeleton from "./message/util/MessageLoading/MessageSkeleton";
 import { insertDateSeparators } from "./message/util/DateSeperator/insertDateSeparators";
 import InfoPanel from "./util/infoPanel/InfoPanel";
 import GroupInfoPanel from "./GroupInfo/GroupInfoPanel";
+import useGroupTransaction from "./hook/useGroupTransaction";
 
-const ChatRoom = ({ handleChatRoomSelect }) => {
+const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
   const {
     activeChatRoomId,
     messages,
@@ -35,7 +36,7 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
     skip: !activeChatRoomId || activeChatRoomId === "temp",
     fetchPolicy: "network-only",
   });
-
+  const { exitChat, removeUsers } = useGroupTransaction();
   const { clearChat } = useClear();
   const { deleteChat } = useDeleteChat();
   const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
@@ -77,6 +78,27 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
       }
     } catch (error) {
       console.error("Failed to clear messages:", error);
+    }
+  };
+
+  const removeUsersHandler = async (users) => {
+    try {
+      const response = await removeUsers({
+        chatRoomId: activeChatRoomId,
+        users,
+      });
+      return response;
+    } catch (error) {
+      console.error("Failed to remove users:", error);
+    }
+  };
+
+  const exitChatHandler = async () => {
+    try {
+      const response = await exitChat({ chatRoomId: activeChatRoomId });
+      return response;
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
     }
   };
 
@@ -222,12 +244,19 @@ const ChatRoom = ({ handleChatRoomSelect }) => {
               onClose={handleChatInfoPanelClose}
             >
               {chatRoom.chatRoomType === "GROUP" ? (
-                <GroupInfoPanel chatRoom={chatRoom} />
+                <GroupInfoPanel
+                  chatRoom={chatRoom}
+                  handleDeletChat={deleteChatHandler}
+                  handleExitChat={exitChatHandler}
+                  handleRemoveUsers={removeUsersHandler}
+                  handleAddUsers={handleAddUsers}
+                />
               ) : null}
             </InfoPanel>
           )}
         </div>
         <ChatInput
+          chatRoom={chatRoom}
           chatRoomId={activeChatRoomId}
           handleChatRoomSelect={handleChatRoomSelect}
         />
