@@ -5,9 +5,8 @@ import exitIcon from "../../../../assets/ExitIcon.png";
 import deleteIcon from "../../../../assets/DeleteIcon.png";
 import "./GroupInfoPanel.css";
 import Tile from "../../../reusableComponents/Tile/Tile";
-import useGetGroupInfo from "../hook/useGetGroupInfo";
+import useGetChatInfo from "../hook/useGetChatInfo";
 import { iconType } from "../../../MappingTypes/iconFactory";
-import useGroupTransaction from "../hook/useGroupTransaction";
 
 const GroupInfoPanel = ({
   chatRoom,
@@ -15,8 +14,9 @@ const GroupInfoPanel = ({
   handleExitChat,
   handleRemoveUsers,
   handleAddUsers,
+  openProfileInfo,
 }) => {
-  const { fetchGroupInfo } = useGetGroupInfo();
+  const { fetchGroupInfo } = useGetChatInfo();
   const [members, setMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [memberOptions, setMemberOptions] = useState(["Remove Member"]);
@@ -140,7 +140,7 @@ const GroupInfoPanel = ({
                   icon={iconType("DIRECT")}
                   isOpen={openDropdownId === member.userId}
                   toggleDropdown={toggleDropdown}
-                  tileClick={() => openUserInfoPanel(member.userId)}
+                  tileClick={() => openProfileInfo(member.userId)}
                   options={memberOptions}
                   optionsClicked={handleOptionsClick}
                 />

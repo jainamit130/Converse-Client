@@ -9,7 +9,7 @@ const ENVIRONMENT = {
     USER_BASE_URL: "",
     CHAT_BASE_URL: "",
     CHAT_SUBBASE_URL: "/converse/chat",
-    USER_SUBBASE_URL: "/converse/user",
+    USER_SUBBASE_URL: "/converse/users",
   },
 };
 

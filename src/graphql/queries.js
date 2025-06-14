@@ -8,6 +8,7 @@ export const GET_CHAT_ROOMS_OF_USER = gql`
       chatRoomType
       userIds
       unreadMessageCount
+      counterPartUserId
       isExited
       latestMessage {
         ... on ChatMessage {

@@ -1,55 +1,76 @@
 .messageSkeleton {
-  display: flex;
-  align-items: flex-start;
-  margin: 10px;
-  gap: 10px;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  background-color: #ccc;
-  border-radius: 50%;
-}
-
-.content {
-  flex: 1;
+  padding: 10px;
+  margin: 5px 10px;
+  border-radius: 8px;
+  max-width: 70%;
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
-.line {
-  height: 10px;
-  background-color: #ccc;
-  border-radius: 4px;
+/* Avoid affecting real messages */
+.messageSkeleton-left {
+  align-self: flex-start;
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
-.short {
-  width: 30%;
-}
-
-.long {
-  width: 80%;
+.messageSkeleton-right {
+  align-self: flex-end;
+  background-color: rgba(0, 132, 255, 0.05);
 }
 
 .shimmer {
   background: linear-gradient(
-    to right,
-    #eeeeee 0%,
-    #dddddd 20%,
-    #eeeeee 40%,
-    #eeeeee 100%
+    90deg,
+    rgba(200, 200, 200, 0.2) 25%,
+    rgba(230, 230, 230, 0.5) 50%,
+    rgba(200, 200, 200, 0.2) 75%
   );
-  background-size: 800px 104px;
-  animation: shimmer 1.3s infinite linear;
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite linear;
+  border-radius: 4px;
+}
+
+.shimmer.short {
+  width: 40%;
+  height: 12px;
+  margin-bottom: 6px;
+}
+
+.shimmer.medium {
+  width: 90%;
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.shimmer.long {
+  width: 100%;
+  height: 18px;
+}
+
+.shimmer.tiny {
+  width: 30px;
+  height: 10px;
+  margin-top: 4px;
+}
+
+.messageSkeleton-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.messageSkeleton-sender,
+.messageSkeleton-options,
+.messageSkeleton-content,
+.messageSkeleton-status {
+  border-radius: 4px;
 }
 
 @keyframes shimmer {
   0% {
-    background-position: -800px 0;
+    background-position: -200% 0;
   }
   100% {
-    background-position: 800px 0;
+    background-position: 200% 0;
   }
 }

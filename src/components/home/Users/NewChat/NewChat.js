@@ -7,6 +7,7 @@ import BackButton from "../SearchComponent/BackButton/BackButton";
 import Search from "../SearchComponent/Search";
 import useSearchableUsers from "../util/useSearchableUsers";
 import UserTileList from "../util/UserTileList";
+import { initiateNewChat } from "../util/initiateNewChat";
 
 const NewChat = ({ goBack, openNewGroup, handleNewChat }) => {
   const { directSelfChats } = useChatRoomContext();
@@ -18,15 +19,7 @@ const NewChat = ({ goBack, openNewGroup, handleNewChat }) => {
   );
 
   const newChatHandler = ({ id, name, type }) => {
-    if (!id || !name) return;
-
-    if (directSelfChats.has(name)) {
-      handleNewChat({ id: directSelfChats.get(name), name, type });
-    } else {
-      localStorage.setItem("newDirectChatUserId", id);
-      handleNewChat({ id: "temp", name, type });
-    }
-    goBack();
+    initiateNewChat({ id, name, type, directSelfChats, handleNewChat, goBack });
   };
 
   return (

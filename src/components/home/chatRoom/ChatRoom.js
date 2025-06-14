@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+// ChatRoom.jsx (updated)
+import React, { useEffect, useState, useRef } from "react";
 import { useQuery } from "@apollo/client";
 import "./ChatRoom.css";
 import { GET_CHAT_ROOM_DATA } from "../../../graphql/queries";
@@ -19,6 +20,7 @@ import { insertDateSeparators } from "./message/util/DateSeperator/insertDateSep
 import InfoPanel from "./util/infoPanel/InfoPanel";
 import GroupInfoPanel from "./GroupInfo/GroupInfoPanel";
 import useGroupTransaction from "./hook/useGroupTransaction";
+import ProfileInfo from "./profileInfo/ProfileInfo";
 
 const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
   const {
@@ -31,119 +33,29 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
     setOnlineUsers,
     setDirectSelfChats,
   } = useChatRoomContext();
+  const userId = localStorage.getItem("userId");
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
     skip: !activeChatRoomId || activeChatRoomId === "temp",
     fetchPolicy: "network-only",
   });
+
   const { exitChat, removeUsers } = useGroupTransaction();
   const { clearChat } = useClear();
   const { deleteChat } = useDeleteChat();
-  const [isInfoPanelOpen, setIsInfoPanelOpen] = useState(false);
-  const [isChatInfoPanelOpen, setIsChatInfoPanelOpen] = useState(false);
-  const [infoPanelMessage, setInfoPanelMessage] = useState(null);
+
   const chatRoom = chatRooms.get(activeChatRoomId);
+
+  const [panelView, setPanelView] = useState("NONE");
+  const [infoPanelMessage, setInfoPanelMessage] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
-
-  const hanldeCloseInfoPanel = () => {
-    setIsInfoPanelOpen(false);
-    setInfoPanelMessage(null);
-  };
-
-  const handleInfoPanelOpen = (message) => {
-    setIsInfoPanelOpen(true);
-    setInfoPanelMessage(message);
-    handleChatInfoPanelClose();
-  };
-
-  const handleChatInfoPanelOpen = () => {
-    setIsChatInfoPanelOpen(true);
-    hanldeCloseInfoPanel();
-  };
-
-  const handleChatInfoPanelClose = () => {
-    setIsChatInfoPanelOpen(false);
-  };
-
-  const clearChatMessageHanlder = async () => {
-    try {
-      const response = await clearChat({ chatRoomId: activeChatRoomId });
-
-      if (response && !response.error) {
-        handleClearChat({
-          chatRoomId: activeChatRoomId,
-          setMessages,
-          setChatRooms,
-        });
-      }
-    } catch (error) {
-      console.error("Failed to clear messages:", error);
-    }
-  };
-
-  const removeUsersHandler = async (users) => {
-    try {
-      const response = await removeUsers({
-        chatRoomId: activeChatRoomId,
-        users,
-      });
-      return response;
-    } catch (error) {
-      console.error("Failed to remove users:", error);
-    }
-  };
-
-  const exitChatHandler = async () => {
-    try {
-      const response = await exitChat({ chatRoomId: activeChatRoomId });
-      return response;
-    } catch (error) {
-      console.error("Failed to delete chat:", error);
-    }
-  };
-
-  const deleteChatHandler = async () => {
-    try {
-      const response = await deleteChat({ chatRoomId: activeChatRoomId });
-
-      if (response && !response.error) {
-        handleDeleteChat({
-          chatRoomId: activeChatRoomId,
-          setChatRooms,
-          setDirectSelfChats,
-          handleChatRoomSelect,
-        });
-      }
-    } catch (error) {
-      console.error("Failed to delete chat:", error);
-    }
-  };
-
-  const deleteMessageHandler = async ({ messageIds, deleteMessages }) => {
-    try {
-      const response = await deleteMessages({
-        chatRoomId: activeChatRoomId,
-        messageIds,
-      });
-
-      if (response && !response.error) {
-        handleDeleteMessages({
-          chatRoomId: activeChatRoomId,
-          setMessages,
-          setChatRooms,
-          messageIds,
-        });
-      }
-    } catch (error) {
-      console.error("Failed to delete message:", error);
-    }
-  };
-
-  const bottomRef = useRef(null);
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "auto" });
   };
+
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     scrollToBottom();
@@ -178,8 +90,102 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
     }
   }, [data, activeChatRoomId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  const openMessageInfo = (message) => {
+    setInfoPanelMessage(message);
+    setPanelView("MESSAGE_INFO");
+  };
+
+  const openGroupInfo = () => {
+    setPanelView("GROUP_INFO");
+    setSelectedUserId(null);
+  };
+
+  const openProfileInfo = (userId) => {
+    setSelectedUserId(userId);
+    setPanelView("PROFILE_INFO");
+  };
+
+  const closePanel = () => {
+    setPanelView("NONE");
+    setInfoPanelMessage(null);
+    setSelectedUserId(null);
+  };
+
+  const clearChatMessageHandler = async () => {
+    try {
+      const response = await clearChat({ chatRoomId: activeChatRoomId });
+      if (response && !response.error) {
+        handleClearChat({
+          chatRoomId: activeChatRoomId,
+          setMessages,
+          setChatRooms,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to clear messages:", error);
+    }
+  };
+
+  const deleteChatHandler = async () => {
+    try {
+      const response = await deleteChat({ chatRoomId: activeChatRoomId });
+      if (response && !response.error) {
+        handleDeleteChat({
+          chatRoomId: activeChatRoomId,
+          setChatRooms,
+          setDirectSelfChats,
+          handleChatRoomSelect,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+    }
+  };
+
+  const removeUsersHandler = async (users) => {
+    try {
+      return await removeUsers({ chatRoomId: activeChatRoomId, users });
+    } catch (error) {
+      console.error("Failed to remove users:", error);
+    }
+  };
+
+  const exitChatHandler = async () => {
+    try {
+      return await exitChat({ chatRoomId: activeChatRoomId });
+    } catch (error) {
+      console.error("Failed to exit chat:", error);
+    }
+  };
+
+  const deleteMessageHandler = async ({ messageIds, deleteMessages }) => {
+    try {
+      const response = await deleteMessages({
+        chatRoomId: activeChatRoomId,
+        messageIds,
+      });
+      if (response && !response.error) {
+        handleDeleteMessages({
+          chatRoomId: activeChatRoomId,
+          setMessages,
+          setChatRooms,
+          messageIds,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to delete message:", error);
+    }
+  };
+
+  const handleChatDetailsPanel = () => {
+    if (chatRoom.chatRoomType === "GROUP") {
+      openGroupInfo();
+    } else if (chatRoom.chatRoomType === "DIRECT") {
+      openProfileInfo(chatRoom?.counterPartUserId);
+    } else if (chatRoom.chatRoomType === "SELF") {
+      openProfileInfo(userId);
+    }
+  };
 
   const chatRoomMessages =
     messages instanceof Map && messages.get(activeChatRoomId)
@@ -191,25 +197,24 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
       <div className="chatRoom">
         <ChatDetails />
         <div className="chatContainer">
-          <div className="messagePlusInfoContainer">
-            <div className="messagesContainer">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <MessageSkeleton key={i} />
-              ))}
-            </div>
+          <div className="messagesContainer">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <MessageSkeleton
+                key={i}
+                senderType={i % 2 === 0 ? "left" : "right"}
+              />
+            ))}
           </div>
         </div>
       </div>
     );
   }
 
-  if (error) return <p>Error: {error.message}</p>;
-
   return (
     <div className="chatRoom">
       <ChatDetails
-        handleChatDetailsPanel={handleChatInfoPanelOpen}
-        handleClearChat={clearChatMessageHanlder}
+        handleChatDetailsPanel={handleChatDetailsPanel}
+        handleClearChat={clearChatMessageHandler}
         handleDeleteChat={deleteChatHandler}
       />
       <div className="chatContainer">
@@ -220,38 +225,49 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
               unreadMessageCount,
               (message) => (
                 <Message
-                  onOpenInfoPanel={handleInfoPanelOpen}
-                  chatRooms={chatRooms}
-                  message={message}
                   key={message.id}
+                  message={message}
+                  chatRooms={chatRooms}
+                  onOpenInfoPanel={openMessageInfo}
                   handleDeleteMessages={deleteMessageHandler}
                 />
               )
             )}
-
             <div ref={bottomRef} />
           </div>
-          {isInfoPanelOpen && (
+
+          {panelView !== "NONE" && (
             <InfoPanel
-              children={<MessageInfoPanel message={infoPanelMessage} />}
-              onClose={hanldeCloseInfoPanel}
-              panelName={"Message info"}
-            ></InfoPanel>
-          )}
-          {isChatInfoPanelOpen && (
-            <InfoPanel
-              panelName="Group info"
-              onClose={handleChatInfoPanelClose}
+              panelName={
+                panelView === "MESSAGE_INFO"
+                  ? "Message Info"
+                  : panelView === "GROUP_INFO"
+                  ? "Group Info"
+                  : "Profile Info"
+              }
+              onClose={closePanel}
             >
-              {chatRoom.chatRoomType === "GROUP" ? (
+              {panelView === "MESSAGE_INFO" && (
+                <MessageInfoPanel message={infoPanelMessage} />
+              )}
+              {panelView === "GROUP_INFO" && (
                 <GroupInfoPanel
                   chatRoom={chatRoom}
                   handleDeletChat={deleteChatHandler}
                   handleExitChat={exitChatHandler}
                   handleRemoveUsers={removeUsersHandler}
                   handleAddUsers={handleAddUsers}
+                  openProfileInfo={openProfileInfo}
                 />
-              ) : null}
+              )}
+              {panelView === "PROFILE_INFO" && selectedUserId && (
+                <ProfileInfo
+                  myId={userId}
+                  userId={selectedUserId}
+                  handleChatRoomSelect={handleChatRoomSelect}
+                  onClose={closePanel}
+                />
+              )}
             </InfoPanel>
           )}
         </div>
