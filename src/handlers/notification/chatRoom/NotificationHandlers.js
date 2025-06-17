@@ -145,13 +145,14 @@ export const handleTypingNotification = (data, setTyping, activeChatRoomId) => {
 export const handleUserStatusNotification = (
   data,
   setOnlineUsers,
-  setLastSeen
+  setLastSeen,
+  activeChatRoomId
 ) => {
-  const { username, status } = data;
+  const { username, status, chatRoomId } = data;
 
   console.log("User Status Changed:", username, status);
 
-  if (!username || !status) return;
+  if (!username || !status || chatRoomId !== activeChatRoomId) return;
 
   if (status === "ACTIVE") {
     setLastSeen(null);

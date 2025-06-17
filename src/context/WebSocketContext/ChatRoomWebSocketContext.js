@@ -74,7 +74,12 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
         handleIncomingMessage(messageData.message);
         break;
       case NotificationType.STATUS:
-        handleUserStatusNotification(messageData, setOnlineUsers, setLastSeen);
+        handleUserStatusNotification(
+          messageData,
+          setOnlineUsers,
+          setLastSeen,
+          activeChatRoomIdRef.current
+        );
         break;
       case NotificationType.TYPING:
         handleTyping(messageData);

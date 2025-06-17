@@ -68,6 +68,14 @@ export const ChatRoomContextProvider = ({ children }) => {
 
   useEffect(() => {
     if (activeChatRoomId && activeChatRoomId !== "temp") {
+      setTyping([]);
+      setOnlineUsers([]);
+      setLastSeen(null);
+    }
+  }, [activeChatRoomId]);
+
+  useEffect(() => {
+    if (activeChatRoomId && activeChatRoomId !== "temp") {
       const chatRoom = chatRooms.get(activeChatRoomId);
       if (chatRoom?.isExited) {
         setTyping([]);
