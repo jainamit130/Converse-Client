@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { normalizeOnlineStatus } from "../components/home/chatRoom/util/OnlineUsersTransformation";
 
 const ChatRoomContext = createContext({
   chatRooms: new Map(),
@@ -43,8 +44,33 @@ export const ChatRoomContextProvider = ({ children }) => {
   // direct/self chats => name to direct and self chat mappings
   const [directSelfChats, setDirectSelfChats] = useState(new Map());
 
+  const handleNewChatStatus = (chatRoomName, onlineUsersDTO) => {
+    normalizeOnlineStatus({
+      chatRoomName,
+      onlineUsersDTO,
+      setOnlineUsers,
+      setLastSeen,
+    });
+  };
+
+  const updateChatRoomUsers = (chatRoomId, updaterFn) => {
+    setChatRooms((prev) => {
+      const updated = new Map(prev);
+      const chatRoom = updated.get(chatRoomId);
+
+      if (chatRoom) {
+        updated.set(chatRoomId, {
+          ...chatRoom,
+          userIds: updaterFn(chatRoom.userIds),
+        });
+      }
+
+      return updated;
+    });
+  };
+
   const handleContextOnMemberTransaction = (transaction) => {
-    if (!transaction || !transaction.username) return;
+    if (!transaction || !transaction.username || !transaction.id) return;
 
     setOnlineUsers((prev) => {
       const updated = new Set(prev);
@@ -63,6 +89,16 @@ export const ChatRoomContextProvider = ({ children }) => {
 
     if (transaction.type === "EXITED_CHAT") {
       setTyping((prev) => prev.filter((user) => user !== transaction.username));
+    }
+
+    if (transaction.type === "EXITED_CHAT") {
+      updateChatRoomUsers(transaction.id, (userIds) =>
+        userIds?.filter((id) => id !== transaction.id)
+      );
+    } else if (transaction.type === "NEW_CHAT" && transaction.userId) {
+      updateChatRoomUsers(transaction.id, (userIds) => [
+        ...new Set([...(userIds || []), transaction.id]),
+      ]);
     }
   };
 
@@ -116,6 +152,10 @@ export const ChatRoomContextProvider = ({ children }) => {
         setActiveChatRoomType,
 
         handleContextOnMemberTransaction,
+
+        updateChatRoomUsers,
+
+        handleNewChatStatus,
       }}
     >
       {children}

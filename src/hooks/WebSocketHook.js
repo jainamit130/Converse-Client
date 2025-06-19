@@ -3,12 +3,7 @@ import config from "../config/environment";
 
 let client = null;
 const clients = new Map();
-
-const extractChatRoomIdFromTopic = (topic) => {
-  const parts = topic.split("/");
-  const chatIndex = parts.indexOf("chat");
-  return chatIndex !== -1 ? parts[chatIndex + 1] : null;
-};
+const subscriptions = new Map();
 
 const initWebSocket = (topic, onMessage) => {
   if (!client) {
@@ -19,12 +14,12 @@ const initWebSocket = (topic, onMessage) => {
       onConnect: () => {
         console.log("✅ WebSocket connected");
 
-        clients.forEach((_, subscribedTopic) => {
+        clients.forEach((handler, subscribedTopic) => {
           const subscription = client.subscribe(subscribedTopic, (message) => {
             const data = JSON.parse(message.body);
-            clients.get(subscribedTopic)(data);
+            handler(data);
           });
-          clients.set(subscribedTopic, clients.get(subscribedTopic));
+          subscriptions.set(subscribedTopic, subscription);
           console.log(`📩 Re-subscribed to topic: ${subscribedTopic}`);
         });
       },
@@ -48,10 +43,17 @@ const initWebSocket = (topic, onMessage) => {
     clients.set(topic, onMessage);
 
     if (client.connected) {
-      const subscription = client.subscribe(topic, (message) => {
-        const data = JSON.parse(message.body);
-        onMessage(data);
-      });
+      const subscription = client.subscribe(
+        topic,
+        (message) => {
+          const data = JSON.parse(message.body);
+          onMessage(data);
+        },
+        {
+          "X-Initial-Subscribe": "true",
+        }
+      );
+      subscriptions.set(topic, subscription);
       console.log(`✅ Subscribed to topic: ${topic}`);
     }
   }
@@ -63,6 +65,11 @@ const closeWebSocket = (topic) => {
   if (clients.has(topic)) {
     try {
       console.log(`🔕 Unsubscribing from topic: ${topic}`);
+      const subscription = subscriptions.get(topic);
+      if (subscription) {
+        subscription.unsubscribe();
+        subscriptions.delete(topic);
+      }
     } catch (err) {
       console.warn(`⚠️ Failed to unsubscribe from topic: ${topic}`, err);
     }

@@ -32,14 +32,12 @@ const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
     }
   }, [userId, setUserId]);
 
-  const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER, {
-    fetchPolicy: "network-only",
-  });
+  const { loading, error, data } = useQuery(GET_CHAT_ROOMS_OF_USER);
 
   useEffect(() => {
     if (data && userId) {
-      const newChatRooms = new Map();
-      const newDirectSelfChats = new Map();
+      const updatedChatRooms = new Map(chatRooms); // use current state
+      const updatedDirectSelfChats = new Map();
 
       (data.getChatRoomsOfUser || []).forEach((chatRoom) => {
         const isSelfChat =
@@ -53,21 +51,21 @@ const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
             : chatRoom.chatRoomName,
         };
 
-        newChatRooms.set(modifiedChatRoom.id, modifiedChatRoom);
+        updatedChatRooms.set(modifiedChatRoom.id, modifiedChatRoom);
 
         if (
           modifiedChatRoom.chatRoomType === "DIRECT" ||
           modifiedChatRoom.chatRoomType === "SELF"
         ) {
-          newDirectSelfChats.set(
+          updatedDirectSelfChats.set(
             modifiedChatRoom.chatRoomName,
             modifiedChatRoom.id
           );
         }
       });
 
-      setChatRooms(newChatRooms);
-      setDirectSelfChats(newDirectSelfChats);
+      setChatRooms(updatedChatRooms);
+      setDirectSelfChats(updatedDirectSelfChats);
     }
   }, [data, userId]);
 

@@ -31,11 +31,14 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
     setOnlineUsers,
     setLastSeen,
     activeChatRoomId,
+    activeChatRoomName,
     handleContextOnMemberTransaction,
+    handleNewChatStatus,
   } = useChatRoomContext();
   const { initWebSocket, closeWebSocket, sendMessage } = useWebSocket();
 
   const activeChatRoomIdRef = useRef(activeChatRoomId);
+  const activeChatRoomNameRef = useRef(activeChatRoomName);
 
   const handleIncomingMessage = (message) => {
     const currentActiveId = activeChatRoomIdRef.current;
@@ -50,6 +53,14 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
   const handleTyping = (messageData) => {
     const currentActiveId = activeChatRoomIdRef.current;
     handleTypingNotification(messageData, setTyping, currentActiveId);
+  };
+
+  const handleChatTransaction = (transaction) => {
+    if (activeChatRoomIdRef.current !== transaction.chatRoomId) return;
+    handleNewChatStatus(
+      activeChatRoomNameRef.current,
+      transaction.onlineUsersDTO
+    );
   };
 
   useEffect(() => {
@@ -95,7 +106,8 @@ export const ChatRoomWebSocketProvider = ({ children }) => {
         handleChatTransactionNotification(
           messageData,
           handleIncomingMessage,
-          handleContextOnMemberTransaction
+          handleContextOnMemberTransaction,
+          handleChatTransaction
         );
         break;
       default:

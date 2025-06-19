@@ -8,7 +8,6 @@ import { NotificationType } from "../../components/MappingTypes/NotificationType
 import useWebSocket from "../../hooks/WebSocketHook";
 import { useChatRoomContext } from "../ChatRoomContext";
 import { useChatRoomWebSocket } from "./ChatRoomWebSocketContext";
-import { normalizeOnlineStatus } from "../../components/home/chatRoom/util/OnlineUsersTransformation";
 
 const UserWebSocketContext = createContext({
   userId: null,
@@ -29,18 +28,8 @@ export const UserWebSocketProvider = ({ children }) => {
     setActiveChatRoomId,
     setActiveChatRoomName,
     setActiveChatRoomType,
-    setOnlineUsers,
-    setLastSeen,
+    handleNewChatStatus,
   } = useChatRoomContext();
-
-  const handleNewChatStatus = (chatRoomName, onlineUsersDTO) => {
-    normalizeOnlineStatus({
-      chatRoomName,
-      onlineUsersDTO,
-      setOnlineUsers,
-      setLastSeen,
-    });
-  };
 
   const handleNewChat = (messageData) => {
     handleNewChatNotification(

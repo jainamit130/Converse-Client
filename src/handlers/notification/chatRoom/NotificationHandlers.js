@@ -1,12 +1,14 @@
 export const handleChatTransactionNotification = (
   data,
   handleIncomingMessage,
-  handleContextOnMemberTransaction
+  handleContextOnMemberTransaction,
+  handleChatTransaction
 ) => {
   const { notifications } = data;
   notifications.forEach((notification) => {
     handleIncomingMessage(notification.message);
     handleContextOnMemberTransaction(notification);
+    handleChatTransaction(notification);
   });
 };
 

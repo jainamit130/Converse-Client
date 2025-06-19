@@ -37,7 +37,7 @@ const Home = () => {
         users: userIds,
       });
       setView("chatRooms");
-      return response;
+      return { response, userIds };
     } catch (error) {
       console.error("Failed to add user:", error);
       return { error };

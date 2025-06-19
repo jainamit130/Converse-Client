@@ -12,7 +12,6 @@ const AddUser = ({ goBack, openNewGroup, handleAddUser, chatRoom }) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const userId = localStorage.getItem("userId");
 
-  // Get all user IDs to exclude: selected + existing group members
   const excludedIds = selectedUsers
     .map((u) => u.id)
     .concat(chatRoom?.userIds || []);
@@ -23,7 +22,7 @@ const AddUser = ({ goBack, openNewGroup, handleAddUser, chatRoom }) => {
   const toggleUserSelection = (user) => {
     setSelectedUsers((prev) => {
       if (prev.find((u) => u.id === user.id)) {
-        return prev.filter((u) => u.id !== user.id); // Deselect
+        return prev.filter((u) => u.id !== user.id);
       }
       return [...prev, user];
     });

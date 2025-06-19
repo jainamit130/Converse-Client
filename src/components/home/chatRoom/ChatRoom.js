@@ -32,6 +32,7 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
     setLastSeen,
     setOnlineUsers,
     setDirectSelfChats,
+    updateChatRoomUsers,
   } = useChatRoomContext();
   const userId = localStorage.getItem("userId");
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
@@ -144,7 +145,29 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
 
   const removeUsersHandler = async (users) => {
     try {
-      return await removeUsers({ chatRoomId: activeChatRoomId, users });
+      const response = await removeUsers({
+        chatRoomId: activeChatRoomId,
+        users,
+      });
+
+      setChatRooms((prev) => {
+        const updated = new Map(prev);
+        const chatRoom = updated.get(activeChatRoomId);
+
+        if (chatRoom) {
+          const updatedUserIds = chatRoom.userIds?.filter(
+            (id) => !users.includes(id)
+          );
+          updated.set(activeChatRoomId, {
+            ...chatRoom,
+            userIds: updatedUserIds,
+          });
+        }
+
+        return updated;
+      });
+
+      return response;
     } catch (error) {
       console.error("Failed to remove users:", error);
     }
@@ -152,9 +175,33 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
 
   const exitChatHandler = async () => {
     try {
-      return await exitChat({ chatRoomId: activeChatRoomId });
+      const response = await exitChat({ chatRoomId: activeChatRoomId });
+
+      if (!response?.error) {
+        updateChatRoomUsers(activeChatRoomId, (userIdsList) =>
+          userIdsList.filter((id) => id !== userId)
+        );
+      }
+
+      return response;
     } catch (error) {
       console.error("Failed to exit chat:", error);
+    }
+  };
+
+  const addUserHandler = async () => {
+    try {
+      const { userIds, response } = await handleAddUsers();
+
+      if (!response?.error) {
+        updateChatRoomUsers(activeChatRoomId, (userIdsList) => [
+          ...new Set([...userIdsList, ...userIds]),
+        ]);
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Failed to add users:", error);
     }
   };
 
@@ -256,7 +303,7 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
                   handleDeletChat={deleteChatHandler}
                   handleExitChat={exitChatHandler}
                   handleRemoveUsers={removeUsersHandler}
-                  handleAddUsers={handleAddUsers}
+                  handleAddUsers={addUserHandler}
                   openProfileInfo={openProfileInfo}
                 />
               )}
