@@ -17,6 +17,7 @@ const Home = () => {
     setActiveChatRoomId,
     setActiveChatRoomName,
     setActiveChatRoomType,
+    updateChatRoomUsers,
   } = useChatRoomContext();
   const [view, setView] = useState("chatRooms");
   const { chatRooms } = useChatRoomContext();
@@ -36,8 +37,13 @@ const Home = () => {
         chatRoomId: activeChatRoomId,
         users: userIds,
       });
+
       setView("chatRooms");
-      return { response, userIds };
+      if (!response?.error) {
+        updateChatRoomUsers(activeChatRoomId, (userIdsList) => [
+          ...new Set([...userIdsList, ...userIds]),
+        ]);
+      }
     } catch (error) {
       console.error("Failed to add user:", error);
       return { error };

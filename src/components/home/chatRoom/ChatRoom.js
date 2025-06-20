@@ -189,20 +189,8 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
     }
   };
 
-  const addUserHandler = async () => {
-    try {
-      const { userIds, response } = await handleAddUsers();
-
-      if (!response?.error) {
-        updateChatRoomUsers(activeChatRoomId, (userIdsList) => [
-          ...new Set([...userIdsList, ...userIds]),
-        ]);
-      }
-
-      return response;
-    } catch (error) {
-      console.error("Failed to add users:", error);
-    }
+  const addUserHandler = () => {
+    handleAddUsers();
   };
 
   const deleteMessageHandler = async ({ messageIds, deleteMessages }) => {
