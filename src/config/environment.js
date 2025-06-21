@@ -6,8 +6,8 @@ const ENVIRONMENT = {
     USER_SUBBASE_URL: "/converse/users",
   },
   production: {
-    USER_BASE_URL: "https://user-dot-converse-refactor.el.r.appspot.com",
-    CHAT_BASE_URL: "https://chat-dot-converse-refactor.el.r.appspot.com",
+    USER_BASE_URL: "https://user-service-841891702105.asia-south1.run.app",
+    CHAT_BASE_URL: "https://chat-service-841891702105.asia-south1.run.app",
     CHAT_SUBBASE_URL: "/converse/chat",
     USER_SUBBASE_URL: "/converse/users",
   },
