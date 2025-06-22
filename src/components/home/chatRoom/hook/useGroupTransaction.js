@@ -62,14 +62,17 @@ const useGroupTransaction = () => {
   );
 
   const addUsers = useCallback(
-    ({ chatRoomId, users }) => {
+    ({ chatRoomId, users, shareHistory = false }) => {
       if (!chatRoomId) {
         console.error("Missing chatRoomId for addUsers");
         return { error: "chatRoomId is required" };
       }
 
+      const query = `?shareHistory=${encodeURIComponent(shareHistory)}`;
+      const endpoint = `/add/users/${chatRoomId}${query}`;
+
       return makePostRequest({
-        endpoint: `/add/users/${chatRoomId}`,
+        endpoint,
         payload: users,
       });
     },

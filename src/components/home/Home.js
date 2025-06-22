@@ -31,11 +31,12 @@ const Home = () => {
     setActiveChatRoomType(type);
   };
 
-  const addUsersHandler = async (userIds) => {
+  const addUsersHandler = async (userIds, shareHistory) => {
     try {
       const response = await addUsers({
         chatRoomId: activeChatRoomId,
         users: userIds,
+        shareHistory,
       });
 
       setView("chatRooms");

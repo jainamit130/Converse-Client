@@ -6,10 +6,12 @@ export const handleNewChatNotification = (
   setActiveChatRoomName,
   setActiveChatRoomType,
   handleIncomingMessage,
-  handleNewChatStatus
+  handleNewChatStatus,
+  handleIncomingMessagesForActiveChat
 ) => {
-  const { chatRoom, transactionNotification } = data;
+  const { chatRoom, transactionNotification, messageHistory } = data;
   if (transactionNotification) {
+    handleIncomingMessagesForActiveChat(messageHistory, chatRoom);
     handleIncomingMessage(transactionNotification.message);
     handleNewChatStatus(
       chatRoom.chatRoomName,

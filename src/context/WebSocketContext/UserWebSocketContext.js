@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import {
   handleExitChatNotification,
   handleMessageMarkedNotification,
@@ -22,6 +28,7 @@ export const UserWebSocketProvider = ({ children }) => {
   const { initWebSocket, closeWebSocket } = useWebSocket();
   const {
     messages,
+    activeChatRoomId,
     setMessages,
     setChatRooms,
     setDirectSelfChats,
@@ -30,6 +37,7 @@ export const UserWebSocketProvider = ({ children }) => {
     setActiveChatRoomType,
     handleNewChatStatus,
   } = useChatRoomContext();
+  const activeChatRoomIdRef = useRef(activeChatRoomId);
 
   const handleNewChat = (messageData) => {
     handleNewChatNotification(
@@ -40,8 +48,28 @@ export const UserWebSocketProvider = ({ children }) => {
       setActiveChatRoomName,
       setActiveChatRoomType,
       handleIncomingMessage,
-      handleNewChatStatus
+      handleNewChatStatus,
+      handleIncomingMessagesForActiveChat
     );
+  };
+
+  const handleIncomingMessagesForActiveChat = (messages, chatRoom) => {
+    if (
+      !chatRoom ||
+      !chatRoom.id ||
+      chatRoom.id !== activeChatRoomIdRef.current
+    )
+      return;
+
+    setMessages((prevMessages) => {
+      const existingMessages = prevMessages.get(chatRoom.id) || [];
+      const updatedMessages = [...existingMessages, ...messages];
+
+      const newMessagesMap = new Map(prevMessages);
+      newMessagesMap.set(chatRoom.id, updatedMessages);
+
+      return newMessagesMap;
+    });
   };
 
   const onMessage = (messageData) => {

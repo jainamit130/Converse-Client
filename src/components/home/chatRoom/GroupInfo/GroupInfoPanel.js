@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./GroupInfoPanel.css";
 import GroupIcon from "../../../../assets/GroupIcon.png";
 import addMemberIcon from "../../../../assets/AddMemberIcon.webp";
 import exitIcon from "../../../../assets/ExitIcon.png";
@@ -94,7 +95,7 @@ const GroupInfoPanel = ({
   if (!chatRoom) return null;
 
   return (
-    <div>
+    <div style={{ flexGrow: "1" }}>
       <div
         className="profile-icon-container"
         style={{ textAlign: "center", marginTop: "20px" }}

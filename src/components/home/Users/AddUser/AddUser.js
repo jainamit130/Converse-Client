@@ -7,9 +7,11 @@ import BackButton from "../SearchComponent/BackButton/BackButton";
 import Search from "../SearchComponent/Search";
 import useSearchableUsers from "../util/useSearchableUsers";
 import UserTileList from "../util/UserTileList";
+import { FormControlLabel, Switch } from "@mui/material";
 
 const AddUser = ({ goBack, openNewGroup, handleAddUser, chatRoom }) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const [shareChatHistory, setShareChatHistory] = useState(false);
   const userId = localStorage.getItem("userId");
 
   const excludedIds = selectedUsers
@@ -31,7 +33,7 @@ const AddUser = ({ goBack, openNewGroup, handleAddUser, chatRoom }) => {
   const handleAddSelected = () => {
     if (selectedUsers.length > 0) {
       const userIds = selectedUsers.map((u) => u.id);
-      handleAddUser(userIds);
+      handleAddUser(userIds, shareChatHistory);
     }
   };
 
@@ -75,6 +77,23 @@ const AddUser = ({ goBack, openNewGroup, handleAddUser, chatRoom }) => {
       )}
 
       <div className="add-user-footer">
+        <FormControlLabel
+          control={
+            <Switch
+              checked={shareChatHistory}
+              onChange={() => setShareChatHistory((prev) => !prev)}
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": {
+                  color: "rgb(80, 165, 154)",
+                },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                  backgroundColor: "rgb(80, 165, 154)",
+                },
+              }}
+            />
+          }
+          label="Share Chat History"
+        />
         <button
           onClick={handleAddSelected}
           className="add-members-btn"
