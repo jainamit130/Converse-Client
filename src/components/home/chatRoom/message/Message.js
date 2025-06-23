@@ -11,12 +11,7 @@ import MessageOptions from "../../../reusableComponents/OptionsDropdown/MessageO
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 import NotificationMessage from "./NotificationMessage/NotificationMessage";
 
-const Message = ({
-  message,
-  handleDeleteMessages,
-  chatRooms,
-  onOpenInfoPanel,
-}) => {
+const Message = ({ message, handleDeleteMessages, onOpenInfoPanel }) => {
   const [userId] = useState(localStorage.getItem("userId"));
   const { activeChatRoomId, activeChatRoomType } = useChatRoomContext();
   const { name, content, deletedForEveryone, timestamp, id, senderId, status } =
@@ -48,7 +43,12 @@ const Message = ({
   };
 
   if (message.__typename === "NotificationMessage") {
-    return <NotificationMessage content={content} />;
+    return (
+      <NotificationMessage
+        content={content}
+        isChatHistoryShared={message?.isChatHistoryShared}
+      />
+    );
   }
 
   return (

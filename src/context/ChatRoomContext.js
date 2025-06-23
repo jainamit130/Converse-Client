@@ -70,7 +70,7 @@ export const ChatRoomContextProvider = ({ children }) => {
   };
 
   const handleContextOnMemberTransaction = (transaction) => {
-    if (!transaction || !transaction.username || !transaction.id) return;
+    if (!transaction || !transaction.username || !transaction.userId) return;
 
     setOnlineUsers((prev) => {
       const updated = new Set(prev);
@@ -92,12 +92,12 @@ export const ChatRoomContextProvider = ({ children }) => {
     }
 
     if (transaction.type === "EXITED_CHAT") {
-      updateChatRoomUsers(transaction.id, (userIds) =>
-        userIds?.filter((id) => id !== transaction.id)
+      updateChatRoomUsers(transaction.chatRoomId, (userIds) =>
+        userIds?.filter((id) => id !== transaction.userId)
       );
     } else if (transaction.type === "NEW_CHAT" && transaction.userId) {
-      updateChatRoomUsers(transaction.id, (userIds) => [
-        ...new Set([...(userIds || []), transaction.id]),
+      updateChatRoomUsers(transaction.chatRoomId, (userIds) => [
+        ...new Set([...(userIds || []), transaction.userId]),
       ]);
     }
   };

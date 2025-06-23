@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./GroupInfoPanel.css";
 import GroupIcon from "../../../../assets/GroupIcon.png";
 import addMemberIcon from "../../../../assets/AddMemberIcon.webp";
@@ -25,18 +25,19 @@ const GroupInfoPanel = ({
 
   const chatRoomId = chatRoom?.id;
 
+  const fetchAndSetGroupMembers = async () => {
+    if (!chatRoomId) return;
+    setIsLoading(true);
+    const data = await fetchGroupInfo(chatRoomId);
+    if (data?.members) {
+      setMembers(data.members);
+    }
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    const getGroupInfo = async () => {
-      if (!chatRoomId) return;
-      setIsLoading(true);
-      const data = await fetchGroupInfo(chatRoomId);
-      if (data?.members) {
-        setMembers(data.members);
-      }
-      setIsLoading(false);
-    };
-    getGroupInfo();
-  }, [chatRoomId]);
+    fetchAndSetGroupMembers();
+  }, [chatRoomId, chatRoom?.userIds]);
 
   const handleAddMember = () => {
     handleAddUsers();

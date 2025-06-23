@@ -54,6 +54,7 @@ export const GET_CHAT_ROOM_DATA = gql`
           id
           timestamp
           content
+          isChatHistoryShared
         }
       }
       onlineUsersDTO {

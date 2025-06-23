@@ -53,6 +53,10 @@ export const UserWebSocketProvider = ({ children }) => {
     );
   };
 
+  useEffect(() => {
+    activeChatRoomIdRef.current = activeChatRoomId;
+  }, [activeChatRoomId]);
+
   const handleIncomingMessagesForActiveChat = (messages, chatRoom) => {
     if (
       !chatRoom ||
@@ -63,7 +67,17 @@ export const UserWebSocketProvider = ({ children }) => {
 
     setMessages((prevMessages) => {
       const existingMessages = prevMessages.get(chatRoom.id) || [];
-      const updatedMessages = [...existingMessages, ...messages];
+
+      const lastExistingMessage = existingMessages[existingMessages.length - 1];
+
+      const firstNewMessageIndex = messages.findIndex(
+        (msg) => msg.timestamp > (lastExistingMessage?.timestamp ?? 0)
+      );
+
+      const nonDuplicateMessages =
+        firstNewMessageIndex !== -1 ? messages.slice(firstNewMessageIndex) : [];
+
+      const updatedMessages = [...existingMessages, ...nonDuplicateMessages];
 
       const newMessagesMap = new Map(prevMessages);
       newMessagesMap.set(chatRoom.id, updatedMessages);

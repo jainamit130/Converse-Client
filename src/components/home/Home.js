@@ -21,8 +21,12 @@ const Home = () => {
   } = useChatRoomContext();
   const [view, setView] = useState("chatRooms");
   const { chatRooms } = useChatRoomContext();
-  const chatRoom = chatRooms.get(activeChatRoomId);
+  const [chatRoom, setChatRoom] = useState(chatRooms.get(activeChatRoomId));
   const { addUsers } = useGroupTransaction();
+
+  useEffect(() => {
+    setChatRoom(chatRooms.get(activeChatRoomId));
+  }, [chatRooms, activeChatRoomId]);
 
   const handleChatRoomSelect = ({ id, name, type }) => {
     if (id !== "temp") localStorage.removeItem("newDirectChatUserId");
@@ -85,6 +89,7 @@ const Home = () => {
       <div className="chatRoom">
         {activeChatRoomId ? (
           <ChatRoom
+            chatRoom={chatRoom}
             handleChatRoomSelect={handleChatRoomSelect}
             handleAddUsers={() => setView("addUser")}
           />

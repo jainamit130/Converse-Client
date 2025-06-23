@@ -22,12 +22,11 @@ import GroupInfoPanel from "./GroupInfo/GroupInfoPanel";
 import useGroupTransaction from "./hook/useGroupTransaction";
 import ProfileInfo from "./profileInfo/ProfileInfo";
 
-const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
+const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
   const {
     activeChatRoomId,
     messages,
     setMessages,
-    chatRooms,
     setChatRooms,
     setLastSeen,
     setOnlineUsers,
@@ -44,9 +43,6 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
   const { exitChat, removeUsers } = useGroupTransaction();
   const { clearChat } = useClear();
   const { deleteChat } = useDeleteChat();
-
-  const chatRoom = chatRooms.get(activeChatRoomId);
-
   const [panelView, setPanelView] = useState("NONE");
   const [infoPanelMessage, setInfoPanelMessage] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -262,7 +258,6 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers }) => {
                 <Message
                   key={message.id}
                   message={message}
-                  chatRooms={chatRooms}
                   onOpenInfoPanel={openMessageInfo}
                   handleDeleteMessages={deleteMessageHandler}
                 />
