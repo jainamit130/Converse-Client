@@ -6,18 +6,26 @@
   background-image: url('../../../assets/ChatBackground.png');
 }
 
+.chatDetailsHeader {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white; 
+}
+
+
 .chatContainer {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0; /* ✨ enables children to shrink/grow properly */
+  min-height: 0; 
   overflow: hidden;
 }
 
 .messagePlusInfoContainer {
   display: flex;
   flex: 1;
-  min-height: 0; /* ✨ enables scrollable area to behave properly */
+  min-height: 0; 
   flex-direction: row;
   overflow: hidden;
 }

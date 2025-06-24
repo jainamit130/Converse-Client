@@ -249,14 +249,16 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
   return (
     <div className="chatRoom">
       {(!isMobile || panelView === "NONE") && (
-        <ChatDetails
-          handleChatDetailsPanel={handleChatDetailsPanel}
-          handleClearChat={clearChatMessageHandler}
-          handleDeleteChat={deleteChatHandler}
-          handleBack={() =>
-            handleChatRoomSelect({ id: null, name: "", type: "" })
-          }
-        />
+        <div className="chatDetailsHeader">
+          <ChatDetails
+            handleChatDetailsPanel={handleChatDetailsPanel}
+            handleClearChat={clearChatMessageHandler}
+            handleDeleteChat={deleteChatHandler}
+            handleBack={() =>
+              handleChatRoomSelect({ id: null, name: "", type: "" })
+            }
+          />
+        </div>
       )}
       <div className="chatContainer">
         <div className="messagePlusInfoContainer">
