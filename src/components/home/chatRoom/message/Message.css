@@ -33,7 +33,9 @@
 
 .message-right {
     height: max-content;
-    justify-self: right;
+    justify-self: flex-end; 
+    align-self: flex-end; 
+    margin-left: auto; 
 }
 
 .message-left {
@@ -42,4 +44,16 @@
     font-weight: 400;
     background-color: #ffffff;
     text-align: left;
+    align-self: flex-start;
   }
+
+
+  @media (max-width: 768px) {
+  .message-left {
+    align-self: flex-start !important;
+  }
+  .message-right {
+    align-self: flex-end !important;
+    margin-left: auto !important;
+  }
+}
