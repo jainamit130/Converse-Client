@@ -15,9 +15,7 @@ const useGetUsers = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          params: {
-            chatRoomId: chatRoom.id || null,
-          },
+          params: chatRoom?.id ? { chatRoomId: chatRoom.id } : {},
         });
 
         return Array.isArray(response.data) ? response.data : [];
