@@ -8,6 +8,7 @@ import Tile from "../../reusableComponents/Tile/Tile";
 import { useUserWebSocket } from "../../../context/WebSocketContext/UserWebSocketContext";
 import { useChatRoomContext } from "../../../context/ChatRoomContext";
 import newChatIcon from "../../../assets/newChat.png";
+import ChatRoomsSkeleton from "./util/ChatRoomSkeleton/ChatRoomsSkeleton";
 
 const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
   const { userId, setUserId } = useUserWebSocket();
@@ -69,7 +70,24 @@ const ChatRooms = ({ openNewChat, onChatRoomSelect }) => {
     }
   }, [data, userId]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="chatRooms">
+        <div className="chatRoomsHeader">
+          <h2>Chats</h2>
+          <img
+            src={newChatIcon}
+            className="newChatIcon"
+            onClick={openNewChat}
+          />
+        </div>
+        {Array.from({ length: 6 }).map((_, idx) => (
+          <ChatRoomsSkeleton key={idx} />
+        ))}
+      </div>
+    );
+  }
+
   if (error) return <p>Error: {error.message}</p>;
 
   return (

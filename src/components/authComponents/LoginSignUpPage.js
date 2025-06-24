@@ -3,12 +3,14 @@ import config from "../../config/environment";
 import { useNavigate } from "react-router-dom";
 import backgroundImage from "../../assets/LoginBackground.png";
 import chatBackgroundImage from "../../assets/ChatBackground.png";
+import loaderGif from "../../assets/loadinggif.gif";
 
 const LoginSignUpPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isLoginPage, setIsLoginPage] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const BASE_URL = config.USER_BASE_URL + "/converse/auth";
 
@@ -18,33 +20,31 @@ const LoginSignUpPage = () => {
 
   const handle = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    const url = isLoginPage ? BASE_URL + "/login" : BASE_URL + "/signup";
-
-    const payload = {
-      username: username,
-      password: password,
-    };
+    const url = isLoginPage ? `${BASE_URL}/login` : `${BASE_URL}/signup`;
+    const payload = { username, password };
 
     try {
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        if (response.status === 403)
+          setMessage("Incorrect username or password.");
+        setIsLoading(false);
+        return;
       }
 
       if (!isLoginPage) {
         setMessage("Signup successful! Please login.");
+        setIsLoading(false);
       } else {
         const data = await response.json();
         const { userId, username, authenticationToken, refreshToken } = data;
-
         localStorage.setItem("userId", userId);
         localStorage.setItem("username", username);
         localStorage.setItem("authenticationToken", authenticationToken);
@@ -52,13 +52,18 @@ const LoginSignUpPage = () => {
         localStorage.setItem("active", true);
         navigate("/chat-rooms");
       }
-    } catch (error) {
-      console.error("There was an error!", error);
-      setMessage("An error occurred. Please try again.");
+    } catch (err) {
+      console.error(err);
+      setMessage("Incorrect username or password.");
+      setIsLoading(false);
     }
   };
 
-  return (
+  return isLoading ? (
+    <div style={styles.loaderContainer}>
+      <img src={loaderGif} style={styles.loaderGif} alt="Loading..." />
+    </div>
+  ) : (
     <div style={styles.container}>
       <div style={styles.dimmer}></div>
 
@@ -102,6 +107,17 @@ const LoginSignUpPage = () => {
 };
 
 const styles = {
+  loaderContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "100vh",
+    background: "transparent",
+  },
+  loaderGif: {
+    width: "100%",
+    height: "100%",
+  },
   container: {
     display: "flex",
     position: "relative",

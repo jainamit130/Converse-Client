@@ -1,0 +1,57 @@
+.chatRoomTileSkeleton {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  margin: 6px 0;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.chatRoomTile-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ccc;
+  margin-right: 12px;
+}
+
+.chatRoomTile-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chatRoomTile-line {
+  height: 12px;
+  border-radius: 4px;
+  background-color: #ddd;
+}
+
+.chatRoomTile-line.short {
+  width: 50%;
+}
+
+.chatRoomTile-line.long {
+  width: 80%;
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(200, 200, 200, 0.2) 25%,
+    rgba(230, 230, 230, 0.5) 50%,
+    rgba(200, 200, 200, 0.2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
