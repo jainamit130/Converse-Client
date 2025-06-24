@@ -24,6 +24,27 @@ const Home = () => {
   const [chatRoom, setChatRoom] = useState(chatRooms.get(activeChatRoomId));
   const { addUsers } = useGroupTransaction();
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  let homePageClassNames = "homePage";
+
+  if (isMobile) {
+    if (activeChatRoomId) {
+      homePageClassNames += " chatRoomActive";
+    } else {
+      homePageClassNames += " mobile-view";
+    }
+  }
+
   useEffect(() => {
     setChatRoom(chatRooms.get(activeChatRoomId));
   }, [chatRooms, activeChatRoomId]);
@@ -56,7 +77,7 @@ const Home = () => {
   };
 
   return (
-    <div className="homePage">
+    <div className={homePageClassNames}>
       <div className="chatRooms">
         {view === "chatRooms" && (
           <ChatRooms
@@ -78,13 +99,6 @@ const Home = () => {
             handleNewGroup={handleChatRoomSelect}
           />
         )}
-        {view === "addUser" && (
-          <AddUser
-            goBack={() => setView("chatRooms")}
-            handleAddUser={addUsersHandler}
-            chatRoom={chatRoom}
-          />
-        )}
       </div>
       <div className="chatRoom">
         {activeChatRoomId ? (
@@ -100,9 +114,16 @@ const Home = () => {
               backgroundSize: "cover",
               height: "100vh",
             }}
-          ></div>
+          />
         )}
       </div>
+      {view === "addUser" && (
+        <AddUser
+          goBack={() => setView("chatRooms")}
+          handleAddUser={addUsersHandler}
+          chatRoom={chatRoom}
+        />
+      )}
     </div>
   );
 };

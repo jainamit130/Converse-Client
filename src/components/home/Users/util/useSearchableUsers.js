@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useGetUsers from "./../hook/useGetUsers";
 
-const useSearchableUsers = (excludeUserIds = []) => {
+const useSearchableUsers = (excludeUserIds = [], chatRoom) => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const { getUsers } = useGetUsers();
@@ -9,7 +9,7 @@ const useSearchableUsers = (excludeUserIds = []) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const fetched = await getUsers();
+        const fetched = await getUsers(chatRoom);
         const currentUsername = localStorage.getItem("username");
 
         const processedUsers = (fetched || []).map((user) => {

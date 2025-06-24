@@ -9,6 +9,7 @@ const NotificationMessage = ({ content, isChatHistoryShared = false }) => {
         {isChatHistoryShared && (
           <img
             src={chatHistorySharedIcon}
+            title="Chat history shared"
             alt="Chat history shared"
             className="chat-history-shared-icon"
           />

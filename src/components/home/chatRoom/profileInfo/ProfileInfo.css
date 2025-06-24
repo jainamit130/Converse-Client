@@ -145,9 +145,44 @@
 
 
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .info-panel {
-    width: 100%;
+    position: absolute;
+    top: 60px;  
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: calc(100% - 60px); 
+    z-index: 10;
+    background-color: #fff;
+    transform: translateX(100%);
+  }
+
+  .info-panel.visible {
+    transform: translateX(0);
+  }
+
+  .info-panel__avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .info-panel__username {
+    font-size: 18px;
+  }
+
+  .groups-section h3 {
+    font-size: 14px;
+  }
+
+  .chatIcon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .info-panel__title {
+    font-size: 14px;
   }
 }
 

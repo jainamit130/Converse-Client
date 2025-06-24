@@ -18,8 +18,10 @@ const AddUser = ({ goBack, openNewGroup, handleAddUser, chatRoom }) => {
     .map((u) => u.id)
     .concat(chatRoom?.userIds || []);
 
-  const { searchTerm, setSearchTerm, filteredUsers } =
-    useSearchableUsers(excludedIds);
+  const { searchTerm, setSearchTerm, filteredUsers } = useSearchableUsers(
+    excludedIds,
+    chatRoom
+  );
 
   const toggleUserSelection = (user) => {
     setSelectedUsers((prev) => {

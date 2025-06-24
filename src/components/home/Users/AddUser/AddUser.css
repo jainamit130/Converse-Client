@@ -12,7 +12,7 @@
     background-color: white;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.6s ease-in-out;
-    z-index: 100;
+    z-index: 3000;
   }
   
   .add-user-panel.open {
@@ -81,3 +81,11 @@
   opacity: 0.6;
 }
 
+@media (max-width: 768px) {
+  .add-user-panel {
+    width: 100vw; /* Full width on mobile */
+    height: 100vh; /* Full height */
+    box-shadow: none; /* Optional: remove sidebar shadow */
+    z-index: 3000;
+  }
+}

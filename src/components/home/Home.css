@@ -1,16 +1,39 @@
 .homePage {
   display: flex;
   height: 100vh;
+  overflow: hidden;
 }
 
 .chatRooms {
-  width: 400px; 
-  background-color: #f1f1f1; 
+  width: 400px;
+  background-color: #f1f1f1;
   overflow-y: auto;
 }
 
 .chatRoom {
   flex-grow: 1;
-  background-color: #ffffff; 
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 768px) {
+  .chatRooms {
+    width: 100%;
+  }
+
+  .chatRoom {
+    width: 100%;
+    display: none;
+  }
+
+  .mobile-view .chatRooms {
+    display: block;
+  }
+
+  .chatRoomActive .chatRoom {
+    display: flex;
+  }
 }

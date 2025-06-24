@@ -1,27 +1,54 @@
-.chatRoom{
-    flex-direction: column;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-    background-image: url('../../../assets/ChatBackground.png');
+.chatRoom {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background-image: url('../../../assets/ChatBackground.png');
 }
 
 .chatContainer {
-     flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }  
-
-.messagesContainer{
-    flex-grow: 1; 
-     flex-shrink: 1;
-  overflow-y: auto; 
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* ✨ enables children to shrink/grow properly */
+  overflow: hidden;
 }
 
 .messagePlusInfoContainer {
   display: flex;
-  flex-grow: 1; 
+  flex: 1;
+  min-height: 0; /* ✨ enables scrollable area to behave properly */
   flex-direction: row;
-   overflow: hidden;
+  overflow: hidden;
+}
+
+.messagesContainer {
+  flex: 1;
+  min-height: 0; 
+  overflow-y: auto;
+  padding-bottom: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  .hideOnMobile {
+    display: none;
+  }
+
+  .chatRooms {
+    display: none;
+    width: 100%;
+  }
+
+  .chatRoom {
+    display: flex;
+    width: 100%;
+  }
+
+  .mobile-view .chatRooms {
+    display: block;
+  }
+
+  .mobile-view .chatRoomActive {
+    display: block;
+  }
 }

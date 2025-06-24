@@ -21,6 +21,7 @@ import InfoPanel from "./util/infoPanel/InfoPanel";
 import GroupInfoPanel from "./GroupInfo/GroupInfoPanel";
 import useGroupTransaction from "./hook/useGroupTransaction";
 import ProfileInfo from "./profileInfo/ProfileInfo";
+import useIsMobile from "./util/infoPanel/useIsMobile";
 
 const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
   const {
@@ -34,6 +35,7 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
     updateChatRoomUsers,
   } = useChatRoomContext();
   const userId = localStorage.getItem("userId");
+  const isMobile = useIsMobile();
   const { loading, error, data } = useQuery(GET_CHAT_ROOM_DATA, {
     variables: { chatRoomId: activeChatRoomId },
     skip: !activeChatRoomId || activeChatRoomId === "temp",
@@ -47,6 +49,8 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
   const [infoPanelMessage, setInfoPanelMessage] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [profileOpenedFromGroupInfo, setProfileOpenedFromGroupInfo] =
+    useState(false);
 
   const scrollToBottom = () => {
     bottomRef.current?.scrollIntoView({ behavior: "auto" });
@@ -97,9 +101,10 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
     setSelectedUserId(null);
   };
 
-  const openProfileInfo = (userId) => {
+  const openProfileInfo = (userId, fromGroupInfo = false) => {
     setSelectedUserId(userId);
     setPanelView("PROFILE_INFO");
+    setProfileOpenedFromGroupInfo(fromGroupInfo);
   };
 
   const closePanel = () => {
@@ -243,14 +248,23 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
 
   return (
     <div className="chatRoom">
-      <ChatDetails
-        handleChatDetailsPanel={handleChatDetailsPanel}
-        handleClearChat={clearChatMessageHandler}
-        handleDeleteChat={deleteChatHandler}
-      />
+      {(!isMobile || panelView === "NONE") && (
+        <ChatDetails
+          handleChatDetailsPanel={handleChatDetailsPanel}
+          handleClearChat={clearChatMessageHandler}
+          handleDeleteChat={deleteChatHandler}
+          handleBack={() =>
+            handleChatRoomSelect({ id: null, name: "", type: "" })
+          }
+        />
+      )}
       <div className="chatContainer">
         <div className="messagePlusInfoContainer">
-          <div className="messagesContainer">
+          <div
+            className={`messagesContainer ${
+              panelView !== "NONE" ? "hideOnMobile" : ""
+            }`}
+          >
             {insertDateSeparators(
               chatRoomMessages,
               unreadMessageCount,
@@ -276,6 +290,11 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
                   : "Profile Info"
               }
               onClose={closePanel}
+              onBack={
+                panelView === "PROFILE_INFO" && profileOpenedFromGroupInfo
+                  ? () => setPanelView("GROUP_INFO")
+                  : null
+              }
             >
               {panelView === "MESSAGE_INFO" && (
                 <MessageInfoPanel message={infoPanelMessage} />
@@ -287,7 +306,7 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
                   handleExitChat={exitChatHandler}
                   handleRemoveUsers={removeUsersHandler}
                   handleAddUsers={addUserHandler}
-                  openProfileInfo={openProfileInfo}
+                  openProfileInfo={(userId) => openProfileInfo(userId, true)}
                 />
               )}
               {panelView === "PROFILE_INFO" && selectedUserId && (
@@ -301,11 +320,13 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
             </InfoPanel>
           )}
         </div>
-        <ChatInput
-          chatRoom={chatRoom}
-          chatRoomId={activeChatRoomId}
-          handleChatRoomSelect={handleChatRoomSelect}
-        />
+        {(!isMobile || panelView === "NONE") && (
+          <ChatInput
+            chatRoom={chatRoom}
+            chatRoomId={activeChatRoomId}
+            handleChatRoomSelect={handleChatRoomSelect}
+          />
+        )}
       </div>
     </div>
   );

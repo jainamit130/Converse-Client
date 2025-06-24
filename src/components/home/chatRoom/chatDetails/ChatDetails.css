@@ -1,5 +1,6 @@
 .chatDetails{
     display: flex;
+    align-items: center;
     width: 100%;
     position: sticky;
     justify-content: space-between;
@@ -27,4 +28,11 @@
   width: 5px;
   padding: 20px;
   margin-right: 10px;
+}
+
+.backButton {
+  width: 24px;
+  height: 24px;
+  margin-top: 10px;
+  cursor: pointer;
 }
