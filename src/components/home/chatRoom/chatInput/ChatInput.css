@@ -1,8 +1,7 @@
 .chatInputComponent {
   display: flex;
-  flex-shrink: 0; /* ✨ prevent collapsing */
-  background-color: white; /* optional */
-  border-top: 1px solid #ccc; /* optional visual */
+  flex-shrink: 0; 
+  border-top: 1px solid #ccc; 
 }
 
 .chatInputForm {
@@ -10,7 +9,7 @@
   width: 100%;
   height: 45px;
   align-items: center;
-  justify-content: center;
+  justify-self: left;
   padding: 0 10px;
 }
 
