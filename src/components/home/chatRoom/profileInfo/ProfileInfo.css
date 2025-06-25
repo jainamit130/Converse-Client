@@ -163,6 +163,10 @@
     transform: translateX(0);
   }
 
+  .info-panel__user-status {
+      justify-self: center !important;
+  }
+
   .info-panel__avatar {
     width: 100px;
     height: 100px;
