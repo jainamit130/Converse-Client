@@ -66,7 +66,10 @@ const LoginSignUpPage = () => {
         className="loader-container"
         style={{ backgroundImage: `url(${chatBackgroundImage})` }}
       >
-        <img className="loader-gif" src={loaderGif} alt="Loading…" />
+        <div className="loader-wrapper">
+          <img className="loader-gif" src={loaderGif} alt="Loading…" />
+          <div className="loading-line" />
+        </div>
       </div>
     );
   }
@@ -112,6 +115,10 @@ const LoginSignUpPage = () => {
           <button className="link" onClick={togglePage}>
             {isLogin ? "Sign Up" : "Login"}
           </button>
+        </p>
+
+        <p className="demo-note">
+          Any username & password works — reuse it to log in later! 🔐
         </p>
       </div>
     </div>

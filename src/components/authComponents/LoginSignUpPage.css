@@ -14,19 +14,77 @@ body {
   background-position: center;     
 }
 
-.loader-container {
-    display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-size: 200%;
-  background-position: center;     
+.loader-container{
+  display:flex;
+  justify-content:center; /* horizontal centring  */
+  align-items:center;     /* vertical   centring  */
+  min-height:100vh;       /* guarantee full height on every browser   */
+  width:100%;
+  background-position:center;
+  overflow:hidden;
+  position:relative;
 }
 
-.loader-gif {
-  width: 100%;
-  height: auto;
+/* 2️⃣ – wrapper: let it really be a flex column that is centred */
+.loader-wrapper{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center; /* <-- add this */
+  overflow:hidden;
 }
+
+/* 3️⃣ – don’t stretch the gif – just give it a max size */
+.loader-gif {
+  max-width: 70%;
+  height: auto;
+  transform: scale(1); /* default desktop scale */
+  transition: transform 0.3s ease;
+  transform-origin: center; /* make it scale from center */
+}
+.demo-note {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 16px;
+  text-align: center;
+  font-style: italic;
+}
+
+
+
+.loading-line {
+  width: 50%;
+  height: 4px;
+  margin-top: 5px;
+  bottom: 180px;
+  background: rgb(54, 89, 105);
+  position: absolute;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.loading-line::before {
+  content: "";
+  position: absolute;
+  width: 40%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  animation: loading-move 1.2s infinite ease-in-out;
+  border-radius: 2px;
+}
+
+@keyframes loading-move {
+  0% {
+    left: -40%;
+  }
+  50% {
+    left: 60%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
 
 .dimmer {
   position: absolute;
@@ -50,7 +108,7 @@ body {
   text-align: center;
 
   background-image: url("../../assets/ChatBackground.png");
-  background-size: cover; /* Only the box background remains cover */
+  background-size: cover; 
   background-position: center;
   background-repeat: no-repeat;
 
@@ -105,8 +163,15 @@ body {
   background: none;
   border: none;
   color: #4caf50;
+  font-size: medium;
   font-weight: 400;
   text-decoration: underline;
   cursor: pointer;
   padding: 0;
+}
+
+@media (max-width: 768px) {
+  .loader-gif {
+    transform: scale(1.4);  /* slight zoom on mobile */
+  }
 }

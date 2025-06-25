@@ -22,8 +22,10 @@ import GroupInfoPanel from "./GroupInfo/GroupInfoPanel";
 import useGroupTransaction from "./hook/useGroupTransaction";
 import ProfileInfo from "./profileInfo/ProfileInfo";
 import useIsMobile from "./util/infoPanel/useIsMobile";
+import useKeyboardGap from "./util/useKeyboardGap";
 
 const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
+  useKeyboardGap();
   const {
     activeChatRoomId,
     messages,
@@ -128,6 +130,16 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
     }
   };
 
+  const handleChatDetailsPanel = () => {
+    if (chatRoom.chatRoomType === "GROUP") {
+      openGroupInfo();
+    } else if (chatRoom.chatRoomType === "DIRECT") {
+      openProfileInfo(chatRoom?.counterPartUserId);
+    } else if (chatRoom.chatRoomType === "SELF") {
+      openProfileInfo(userId);
+    }
+  };
+
   const deleteChatHandler = async () => {
     try {
       const response = await deleteChat({ chatRoomId: activeChatRoomId });
@@ -210,16 +222,6 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
       }
     } catch (error) {
       console.error("Failed to delete message:", error);
-    }
-  };
-
-  const handleChatDetailsPanel = () => {
-    if (chatRoom.chatRoomType === "GROUP") {
-      openGroupInfo();
-    } else if (chatRoom.chatRoomType === "DIRECT") {
-      openProfileInfo(chatRoom?.counterPartUserId);
-    } else if (chatRoom.chatRoomType === "SELF") {
-      openProfileInfo(userId);
     }
   };
 
