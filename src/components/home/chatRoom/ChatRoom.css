@@ -59,4 +59,17 @@
   .mobile-view .chatRoomActive {
     display: block;
   }
+
+    .chatDetailsHeader {
+    position: fixed;      
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    z-index: 20;
+  }
+
+  .chatContainer {
+    padding-top: 56px;     
+  }
 }
