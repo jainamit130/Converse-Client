@@ -33,7 +33,9 @@ const LoginSignUpPage = () => {
       });
 
       if (!res.ok) {
-        if (res.status === 403) setMessage("Incorrect username or password.");
+        if (res.status === 400) setMessage("Username is taken!");
+        else if (res.status === 403)
+          setMessage("Incorrect username or password.");
         setIsLoading(false);
         return;
       }
@@ -77,7 +79,7 @@ const LoginSignUpPage = () => {
       <div className="dimmer" />
 
       <div className="login-box">
-        <h3>{isLogin ? "Login" : "Sign Up"}</h3>
+        <div className="boxTitle">{isLogin ? "Login" : "Sign Up"}</div>
 
         <form onSubmit={handleSubmit}>
           <label>

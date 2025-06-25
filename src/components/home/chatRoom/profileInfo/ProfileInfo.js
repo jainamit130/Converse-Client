@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import useGetChatInfo from "../hook/useGetChatInfo";
-import userChatIcon from "../../../../assets/userChat.png";
+
 import profileIcon from "../../../../assets/ProfileIcon.webp";
+import userChatIcon from "../../../../assets/userChat.png";
 import onlineIcon from "../../../../assets/onlineStatus.png";
 import offlineIcon from "../../../../assets/offlineStatus.png";
+
 import "./ProfileInfo.css";
 import { formatLastSeen, parseDate } from "../../../../util/dateUtil";
 import Tile from "../../../reusableComponents/Tile/Tile";
 import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 import { iconType } from "../../../MappingTypes/iconFactory";
 import { initiateNewChat } from "../../Users/util/initiateNewChat";
+import ProfileInfoSkeleton from "../message/util/ProfileInfoSekelton/ProfileInfoSekeleton";
 
 const ProfileInfo = ({ myId, userId, handleChatRoomSelect, onClose }) => {
+  const [loading, setLoading] = useState(true);
   const { fetchProfileInfo } = useGetChatInfo();
   const {
     chatRooms,
@@ -23,14 +27,14 @@ const ProfileInfo = ({ myId, userId, handleChatRoomSelect, onClose }) => {
   const [username, setUsername] = useState("");
   const [userStatus, setUserStatus] = useState("");
   const [status, setStatus] = useState("INACTIVE");
-  const [lastSeenTimestamp, setLastSeenTimestamp] = useState();
+  const [lastSeenTimestamp, setLastSeen] = useState();
   const [commonChatId, setCommonChatId] = useState(null);
-  const [commonGroupChatIds, setCommonGroupChatIds] = useState([]);
+  const [commonGroupChatIds, setGroupIds] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!userId) return;
+    if (!userId) return;
 
+    const fetchData = async () => {
       const data = await fetchProfileInfo(userId);
       if (!data) return;
 
@@ -44,15 +48,17 @@ const ProfileInfo = ({ myId, userId, handleChatRoomSelect, onClose }) => {
         userId: fetchedUserId,
       } = data;
 
-      const username =
+      const label =
         fetchedUserId === myId ? `${rawUsername} (You)` : rawUsername;
 
-      setUsername(username);
+      setUsername(label);
       setStatus(status);
       setUserStatus(userStatus);
-      setLastSeenTimestamp(formatLastSeen(parseDate(lastSeenTimestamp)));
+      setLastSeen(formatLastSeen(parseDate(lastSeenTimestamp)));
       setCommonChatId(commonChatId);
-      setCommonGroupChatIds(commonGroupChatIds);
+      setGroupIds(commonGroupChatIds);
+
+      setLoading(false);
     };
 
     fetchData();
@@ -71,47 +77,51 @@ const ProfileInfo = ({ myId, userId, handleChatRoomSelect, onClose }) => {
 
   const handleGroupClick = ({ id, name, type = "GROUP" }) => {
     handleChatRoomSelect({ id, name, type });
-    if (onClose) onClose();
+    onClose?.();
   };
 
+  if (loading) return <ProfileInfoSkeleton />;
   return (
-    <div className="info-panel visible">
-      {/* Profile */}
-      <div className="info-panel__profile">
-        <img src={profileIcon} alt="Profile" className="info-panel__avatar" />
-        <h2 className="info-panel__username">{username}</h2>
-        {userStatus && <p className="info-panel__user-status">{userStatus}</p>}
-      </div>
+    <aside className="info-panel visible">
+      <section className="info-panel__section center">
+        <img src={profileIcon} alt="Profile" className="avatar" />
+        <h2 className="username">{username}</h2>
+        {userStatus && <p className="user-status">{userStatus}</p>}
+      </section>
 
-      {/* Status */}
-      <div className="info-panel__status">
+      <hr className="divider" />
+
+      <section className="info-panel__section center status-block">
         {status === "ACTIVE" ? (
-          <div className="statusDetails">
-            <img src={onlineIcon} className="statusIcon" alt="online" />
-            <span>online</span>
-          </div>
+          <>
+            <img src={onlineIcon} className="status-icon" alt="online" />
+            <span>Online</span>
+          </>
         ) : (
-          <div className="statusDetails">
-            <img src={offlineIcon} className="statusIcon" alt="offline" />
+          <>
+            <img src={offlineIcon} className="status-icon" alt="offline" />
             <span>{lastSeenTimestamp}</span>
-          </div>
+          </>
         )}
-      </div>
+      </section>
 
-      {/* Chat Icon */}
-      <div className="info-panel__chat-launcher">
+      <hr className="divider" />
+
+      <section className="info-panel__section center">
         <img
           src={userChatIcon}
-          className="chatIcon"
-          alt="chat"
+          className="chat-launcher"
+          alt="Start chat"
           onClick={openChatRoom}
+          title="Start chat"
         />
-      </div>
+      </section>
 
-      {/* Groups in Common */}
-      <div className="groups-section">
-        <h3 className="groups-section__title">Groups in Common</h3>
-        <ul className="groups-section__list">
+      <hr className="divider" />
+
+      <section className="info-panel__section">
+        <h3 className="section-title">Groups in Common</h3>
+        <ul className="groups-list">
           {commonGroupChatIds.map((id) => {
             const group = chatRooms.get(id);
             if (!group || group.chatRoomType !== "GROUP") return null;
@@ -125,9 +135,12 @@ const ProfileInfo = ({ myId, userId, handleChatRoomSelect, onClose }) => {
               />
             );
           })}
+          {commonGroupChatIds.length === 0 && (
+            <li className="no-groups">No common groups</li>
+          )}
         </ul>
-      </div>
-    </div>
+      </section>
+    </aside>
   );
 };
 

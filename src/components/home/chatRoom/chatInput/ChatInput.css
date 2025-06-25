@@ -1,11 +1,7 @@
 .chatInputComponent {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-
   display: flex;
-  flex-shrink: 0;
-  border-top: 1px solid #ccc;
+  flex-shrink: 0; 
+  border-top: 1px solid #ccc; 
 }
 
 .chatInputForm {
@@ -47,14 +43,21 @@
 }
 
 @media screen and (max-width: 768px) {
+  .chatInputComponent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    z-index: 10;
+  }
+
   .chatInputForm {
     height: 48px;
     font-size: 14px;
   }
 
-  .chatInputComponent {
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
+  .messagesContainer {
+    padding-bottom: 56px; 
   }
 }

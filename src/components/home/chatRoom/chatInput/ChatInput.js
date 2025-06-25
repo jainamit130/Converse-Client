@@ -74,6 +74,16 @@ const ChatInput = ({ chatRoom }) => {
         ) : (
           <input
             className="chatInput"
+            onFocus={(e) => {
+              if (window.innerWidth < 768) {
+                setTimeout(() => {
+                  e.target.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }, 300);
+              }
+            }}
             onKeyDown={(event) => {
               if (activeChatRoomId !== "temp") {
                 handleTyping(event, send);
