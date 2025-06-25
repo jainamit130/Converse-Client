@@ -6,6 +6,9 @@
     min-width: 13%;
     width: fit-content;
     max-width: 40%;
+      word-wrap: break-word;          
+  overflow-wrap: anywhere;         
+  white-space: normal;  
     background-color: rgb(210, 255, 160);
 }
 

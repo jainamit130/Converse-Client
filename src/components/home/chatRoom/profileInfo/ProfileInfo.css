@@ -138,7 +138,7 @@
   color: #666;
   margin-top: 4px;
   max-width: 280px; 
-  justify-self: center;
+  justify-self: center !important;
   white-space: normal;
   word-break: break-word;
 }

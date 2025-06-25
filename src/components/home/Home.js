@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import ChatRoom from "./chatRoom/ChatRoom";
 import ChatRooms from "./chatRooms/ChatRooms";
 import backgroundImage from "../../assets/LoginBackground.png";
+import logoGif from "../../assets/loadinggif.gif";
 import "./Home.css";
 import NewGroup from "./Users/NewGroup/NewGroup";
 import NewChat from "./Users/NewChat/NewChat";
@@ -108,13 +109,13 @@ const Home = () => {
             handleAddUsers={() => setView("addUser")}
           />
         ) : (
-          <div
-            style={{
-              backgroundImage: `url(${backgroundImage})`,
-              backgroundSize: "cover",
-              height: "100vh",
-            }}
-          />
+          <div className="chatRoomPlaceholder">
+            <div
+              className="placeholder-bg"
+              style={{ backgroundImage: `url(${backgroundImage})` }}
+            />
+            <img className="placeholder-logo" src={logoGif} alt="Converse" />
+          </div>
         )}
       </div>
       {view === "addUser" && (
