@@ -52,7 +52,9 @@ const ChatInput = ({ chatRoom }) => {
   return (
     <div className="chatInputComponent">
       <form
-        className="chatInputForm"
+        className={`chatInputForm ${
+          chatRoom?.isExited ? "exitInputBackground" : ""
+        }`}
         onSubmit={(e) => {
           if (activeChatRoomId !== "temp") {
             handleStopTyping(send);
@@ -61,12 +63,6 @@ const ChatInput = ({ chatRoom }) => {
           const messageContent = e.target.elements.messageContent.value;
           handleSendMessage(messageContent);
           e.target.reset();
-        }}
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          opacity: "0.7",
-          backgroundColor: chatRoom?.isExited ? "rgb(155,155,155)" : "",
         }}
       >
         {chatRoom?.isExited ? (
