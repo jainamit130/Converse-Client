@@ -31,7 +31,7 @@ const useDelete = () => {
           },
         });
 
-        return response.status === 204;
+        return response;
       } catch (error) {
         console.error(
           `Failed to delete messages (${forEveryone ? "everyone" : "me"}):`,

@@ -63,6 +63,9 @@ const ChatInput = ({ chatRoom }) => {
           e.target.reset();
         }}
         style={{
+          display: "flex",
+          justifyContent: "center",
+          opacity: "0.7",
           backgroundColor: chatRoom?.isExited ? "rgb(155,155,155)" : "",
         }}
       >

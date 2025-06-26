@@ -1,7 +1,6 @@
 .chatInputComponent {
   display: flex;
   flex-shrink: 0; 
-  border-top: 1px solid #ccc; 
 }
 
 .chatInputForm {
@@ -24,8 +23,9 @@
 }
 
 .exitInputState {
-  color: gray;
-  font-size: 14px;
+  color: rgb(10, 10, 10);
+  font-weight: 500;
+  font-size: 18px;
 }
 
 .sendButton {

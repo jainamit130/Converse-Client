@@ -27,9 +27,7 @@ const useClear = () => {
           }
         );
 
-        return response.status === 204
-          ? { success: true }
-          : { error: "Failed to clear chat" };
+        return response;
       } catch (error) {
         console.error("Failed to clear chat:", error);
         return { error: "Failed to clear chat" };

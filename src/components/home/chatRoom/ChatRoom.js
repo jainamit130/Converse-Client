@@ -118,7 +118,7 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
   const clearChatMessageHandler = async () => {
     try {
       const response = await clearChat({ chatRoomId: activeChatRoomId });
-      if (response && !response.error) {
+      if (response?.status === 204) {
         handleClearChat({
           chatRoomId: activeChatRoomId,
           setMessages,
@@ -143,7 +143,7 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
   const deleteChatHandler = async () => {
     try {
       const response = await deleteChat({ chatRoomId: activeChatRoomId });
-      if (response && !response.error) {
+      if (response?.status === 204) {
         handleDeleteChat({
           chatRoomId: activeChatRoomId,
           setChatRooms,
@@ -163,22 +163,24 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
         users,
       });
 
-      setChatRooms((prev) => {
-        const updated = new Map(prev);
-        const chatRoom = updated.get(activeChatRoomId);
+      if (response?.status === 204) {
+        setChatRooms((prev) => {
+          const updated = new Map(prev);
+          const chatRoom = updated.get(activeChatRoomId);
 
-        if (chatRoom) {
-          const updatedUserIds = chatRoom.userIds?.filter(
-            (id) => !users.includes(id)
-          );
-          updated.set(activeChatRoomId, {
-            ...chatRoom,
-            userIds: updatedUserIds,
-          });
-        }
+          if (chatRoom) {
+            const updatedUserIds = chatRoom.userIds?.filter(
+              (id) => !users.includes(id)
+            );
+            updated.set(activeChatRoomId, {
+              ...chatRoom,
+              userIds: updatedUserIds,
+            });
+          }
 
-        return updated;
-      });
+          return updated;
+        });
+      }
 
       return response;
     } catch (error) {
@@ -190,7 +192,7 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
     try {
       const response = await exitChat({ chatRoomId: activeChatRoomId });
 
-      if (!response?.error) {
+      if (response?.status === 204) {
         updateChatRoomUsers(activeChatRoomId, (userIdsList) =>
           userIdsList.filter((id) => id !== userId)
         );
@@ -212,7 +214,7 @@ const ChatRoom = ({ handleChatRoomSelect, handleAddUsers, chatRoom }) => {
         chatRoomId: activeChatRoomId,
         messageIds,
       });
-      if (response && !response.error) {
+      if (response?.status === 204) {
         handleDeleteMessages({
           chatRoomId: activeChatRoomId,
           setMessages,

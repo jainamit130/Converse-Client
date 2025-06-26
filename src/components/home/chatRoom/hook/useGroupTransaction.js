@@ -21,9 +21,7 @@ const useGroupTransaction = () => {
           },
         });
 
-        return response.status === 204
-          ? { success: true }
-          : { error: "Unexpected response status" };
+        return response;
       } catch (error) {
         console.error("POST request failed:", error);
         return { error: error?.response?.data?.message || "Request failed" };

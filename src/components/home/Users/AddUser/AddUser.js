@@ -2,7 +2,6 @@ import { useState } from "react";
 import Tile from "../../../reusableComponents/Tile/Tile";
 import "./AddUser.css";
 import { iconType } from "../../../MappingTypes/iconFactory";
-import { useChatRoomContext } from "../../../../context/ChatRoomContext";
 import BackButton from "../SearchComponent/BackButton/BackButton";
 import Search from "../SearchComponent/Search";
 import useSearchableUsers from "../util/useSearchableUsers";

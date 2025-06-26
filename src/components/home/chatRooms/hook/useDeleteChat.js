@@ -27,7 +27,7 @@ const useDeleteChat = () => {
           }
         );
 
-        return response.status === 204;
+        return response;
       } catch (error) {
         console.error(`Failed to delete chat`, error);
         return false;

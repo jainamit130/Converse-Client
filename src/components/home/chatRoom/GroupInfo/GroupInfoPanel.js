@@ -46,7 +46,7 @@ const GroupInfoPanel = ({
   const removeMember = async (memberId) => {
     try {
       const response = await handleRemoveUsers([memberId]);
-      if (response && !response.error) {
+      if (response?.status === 204) {
         setMembers((prev) => prev.filter((m) => m.userId !== memberId));
       } else {
         console.error("Failed to remove member:", response?.error);

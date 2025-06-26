@@ -66,7 +66,7 @@ const Home = () => {
       });
 
       setView("chatRooms");
-      if (!response?.error) {
+      if (response?.status === 204) {
         updateChatRoomUsers(activeChatRoomId, (userIdsList) => [
           ...new Set([...userIdsList, ...userIds]),
         ]);
