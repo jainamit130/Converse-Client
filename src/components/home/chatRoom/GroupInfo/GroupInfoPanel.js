@@ -75,10 +75,7 @@ const GroupInfoPanel = ({
   const handleOptionsClick = (option, id) => {
     console.log(`Option "${option}" clicked for member ID:`, id);
     if (option === "Remove Member") {
-      const success = removeMember(id);
-      if (success) {
-        setMembers((prev) => prev.filter((m) => m.userId !== id));
-      }
+      removeMember(id);
     }
   };
 
